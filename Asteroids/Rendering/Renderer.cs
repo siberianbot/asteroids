@@ -4,7 +4,7 @@ using Silk.NET.OpenGL;
 
 namespace Asteroids.Rendering;
 
-public class AsteroidRenderer : IDisposable
+public class Renderer : IDisposable
 {
     private const string VertexShader = "#version 330 core\n" +
                                         "layout (location = 0) in vec2 pos;\n" +
@@ -17,10 +17,11 @@ public class AsteroidRenderer : IDisposable
                                         "}\n";
 
     private const string FragmentShader = "#version 330 core\n" +
+                                          "uniform vec3 color;\n" +
                                           "out vec4 FragColor;\n" +
                                           "void main()\n" +
                                           "{\n" +
-                                          "  FragColor = vec4(0.7, 0.7, 0.7, 1.0);\n" +
+                                          "  FragColor = vec4(color.x, color.y, color.z, 1.0);\n" +
                                           "}\n";
 
     private readonly GL _gl;
@@ -31,7 +32,7 @@ public class AsteroidRenderer : IDisposable
     private readonly VertexArrayObject<float> _vertexArray;
     private readonly Shader _shader;
 
-    public AsteroidRenderer(GL gl, Camera camera)
+    public Renderer(GL gl, Camera camera)
     {
         _gl = gl;
         _camera = camera;
@@ -55,12 +56,15 @@ public class AsteroidRenderer : IDisposable
         _shader.SetMat4("transform", positionComponent.TransformMatrix);
         _shader.SetMat4("projection", _camera.ProjectionMatrix);
         _shader.SetMat4("view", _camera.ViewMatrix);
+        _shader.SetVec3("color", modelComponent.Color);
 
         _vertexArray.Bind();
+
         _verticesBuffer.Data(modelComponent.VerticesData, BufferUsageARB.DynamicDraw);
-        _indicesBuffer.Bind();
         _indicesBuffer.Data(modelComponent.IndicesData, BufferUsageARB.DynamicDraw);
+
         _vertexArray.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2, 0);
+
         _gl.DrawElements(PrimitiveType.LineLoop, modelComponent.Count, DrawElementsType.UnsignedInt, null);
         _gl.BindVertexArray(0);
     }
@@ -69,7 +73,7 @@ public class AsteroidRenderer : IDisposable
 
     private bool _disposed;
 
-    ~AsteroidRenderer()
+    ~Renderer()
     {
         InternalDispose();
     }

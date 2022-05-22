@@ -23,7 +23,7 @@ public class Camera
     {
         get
         {
-            Vector3 position = new Vector3(_entity.GetComponent<PositionComponent>()?.Position ?? Vector2.Zero, 2f);
+            Vector3 position = new Vector3(_entity.GetComponent<PositionComponent>()?.Position ?? Vector2.Zero, 5f);
 
             return Matrix4x4.CreateLookAt(position, position + Forward, Up);
         }
@@ -34,7 +34,7 @@ public class Camera
         get
         {
             const float near = 0.00001f;
-            const float far = 5.00000f;
+            const float far = 20.00000f;
             const float fov = MathF.PI / 2;
             float aspect = (float)Dimensions.X / Dimensions.Y;
 

@@ -18,7 +18,7 @@ public class Asteroid : Entity
 
         _positionComponent = new PositionComponent(position, 0f);
         
-        AddComponent(new ModelComponent(points));
+        AddComponent(new ModelComponent(points, new Vector3(0.7f, 0.7f, 0.7f)));
         AddComponent(_positionComponent);
     }
 

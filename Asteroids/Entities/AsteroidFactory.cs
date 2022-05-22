@@ -1,4 +1,5 @@
 using System.Numerics;
+using Asteroids.Utils;
 
 namespace Asteroids.Entities;
 
@@ -17,10 +18,7 @@ public class AsteroidFactory
             float angle = MathF.Tau * i / Constants.AsteroidSpikesCount;
             float radius = 0.5f + Random.Shared.NextSingle() / 2;
 
-            Vector2 point = new Vector2(
-                radius * MathF.Cos(angle),
-                radius * MathF.Sin(angle)
-            );
+            Vector2 point = MathUtils.FromPolar(angle, radius);
 
             center += point;
 

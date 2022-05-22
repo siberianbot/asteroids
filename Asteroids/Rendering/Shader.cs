@@ -21,6 +21,12 @@ public class Shader : IDisposable
         _gl.UseProgram(_handle);
     }
 
+    public void SetVec3(string variable, Vector3 value)
+    {
+        int location = _gl.GetUniformLocation(_handle, variable);
+        _gl.Uniform3(location, value);
+    }
+
     public unsafe void SetMat4(string variable, Matrix4x4 value)
     {
         int location = _gl.GetUniformLocation(_handle, variable);

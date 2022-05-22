@@ -2,11 +2,6 @@ using Asteroids.Components;
 
 namespace Asteroids.Entities;
 
-public class UpdateContext
-{
-    public float Delta { get; init; }
-}
-
 public abstract class Entity
 {
     private readonly List<IComponent> _components = new List<IComponent>();

@@ -20,7 +20,7 @@ public sealed class Engine : IDisposable
 
     private InputController _inputController;
     private ImGuiController _imguiController;
-    private AsteroidRenderer _asteroidRenderer;
+    private Renderer _renderer;
     private Camera _camera;
 
     private readonly List<Entity> _entities = new List<Entity>();
@@ -48,14 +48,16 @@ public sealed class Engine : IDisposable
         _inputController = new InputController(_input);
         _imguiController = new ImGuiController(_gl, _window, _input);
 
-        Asteroid asteroid = _asteroidFactory.Create(Vector2.Zero, Vector2.Zero);
-        _camera = new Camera(asteroid);
-        _entities.Add(asteroid);
+        Spaceship spaceship = new Spaceship(new Vector2(+2.5f, -2.0f));
+        _camera = new Camera(spaceship);
+        _entities.Add(spaceship);
+
+        _entities.Add(_asteroidFactory.Create(Vector2.Zero, Vector2.Zero));
         _entities.Add(_asteroidFactory.Create(new Vector2(-2.5f, 0f), Vector2.Zero));
         _entities.Add(_asteroidFactory.Create(new Vector2(+2.5f, 0f), Vector2.Zero));
         _entities.Add(_asteroidFactory.Create(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f)));
 
-        _asteroidRenderer = new AsteroidRenderer(_gl, _camera);
+        _renderer = new Renderer(_gl, _camera);
 
         OnResize(_window.Size);
     }
@@ -69,7 +71,7 @@ public sealed class Engine : IDisposable
 
         foreach (Entity entity in _entities)
         {
-            _asteroidRenderer.Render(entity);
+            _renderer.Render(entity);
         }
     }
 
@@ -79,7 +81,8 @@ public sealed class Engine : IDisposable
 
         UpdateContext context = new UpdateContext
         {
-            Delta = (float)delta
+            Delta = (float)delta,
+            InputController = _inputController
         };
 
         foreach (Entity entity in _entities)
@@ -116,7 +119,7 @@ public sealed class Engine : IDisposable
             return;
         }
 
-        _asteroidRenderer.Dispose();
+        _renderer.Dispose();
         _window.Dispose();
 
         _disposed = true;
