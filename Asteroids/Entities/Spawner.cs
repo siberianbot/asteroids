@@ -3,9 +3,9 @@ using Asteroids.Utils;
 
 namespace Asteroids.Entities;
 
-public class AsteroidFactory
+public class Spawner
 {
-    public Asteroid Create(Vector2 position, Vector2 direction)
+    public Asteroid SpawnAsteroid(Vector2 position, Vector2 direction)
     {
         float velocity = Random.Shared.NextSingle();
         float rotationVelocity = Random.Shared.NextSingle();
@@ -33,5 +33,10 @@ public class AsteroidFactory
         }
 
         return new Asteroid(position, velocity * direction, rotationVelocity, points);
+    }
+
+    public Spaceship SpawnSpaceship(Vector2 position)
+    {
+        return new Spaceship(position);
     }
 }

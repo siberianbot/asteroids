@@ -24,7 +24,7 @@ public sealed class Engine : IDisposable
     private Camera _camera;
 
     private readonly List<Entity> _entities = new List<Entity>();
-    private readonly AsteroidFactory _asteroidFactory = new AsteroidFactory();
+    private readonly Spawner _spawner = new Spawner();
 
     public Engine()
     {
@@ -48,14 +48,14 @@ public sealed class Engine : IDisposable
         _inputController = new InputController(_input);
         _imguiController = new ImGuiController(_gl, _window, _input);
 
-        Spaceship spaceship = new Spaceship(new Vector2(+2.5f, -2.0f));
+        Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f));
         _camera = new Camera(spaceship);
         _entities.Add(spaceship);
 
-        _entities.Add(_asteroidFactory.Create(Vector2.Zero, Vector2.Zero));
-        _entities.Add(_asteroidFactory.Create(new Vector2(-2.5f, 0f), Vector2.Zero));
-        _entities.Add(_asteroidFactory.Create(new Vector2(+2.5f, 0f), Vector2.Zero));
-        _entities.Add(_asteroidFactory.Create(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f)));
+        _entities.Add(_spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero));
+        _entities.Add(_spawner.SpawnAsteroid(new Vector2(-2.5f, 0f), Vector2.Zero));
+        _entities.Add(_spawner.SpawnAsteroid(new Vector2(+2.5f, 0f), Vector2.Zero));
+        _entities.Add(_spawner.SpawnAsteroid(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f)));
 
         _renderer = new Renderer(_gl, _camera);
 
