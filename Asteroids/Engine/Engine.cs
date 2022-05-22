@@ -18,13 +18,12 @@ public sealed class Engine : IDisposable
     private GL _gl;
     private IInputContext _input;
 
+    private EntityController _entityController;
     private InputController _inputController;
     private ImGuiController _imguiController;
+    private Spawner _spawner;
     private Renderer _renderer;
     private Camera _camera;
-
-    private readonly List<Entity> _entities = new List<Entity>();
-    private readonly Spawner _spawner = new Spawner();
 
     public Engine()
     {
@@ -47,15 +46,18 @@ public sealed class Engine : IDisposable
 
         _inputController = new InputController(_input);
         _imguiController = new ImGuiController(_gl, _window, _input);
+        _entityController = new EntityController();
+
+        _spawner = new Spawner(_entityController);
 
         Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f));
         _camera = new Camera(spaceship);
-        _entities.Add(spaceship);
 
-        _entities.Add(_spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero));
-        _entities.Add(_spawner.SpawnAsteroid(new Vector2(-2.5f, 0f), Vector2.Zero));
-        _entities.Add(_spawner.SpawnAsteroid(new Vector2(+2.5f, 0f), Vector2.Zero));
-        _entities.Add(_spawner.SpawnAsteroid(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f)));
+        _spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero);
+        _spawner.SpawnAsteroid(new Vector2(-2.5f, 0f), Vector2.Zero);
+        _spawner.SpawnAsteroid(new Vector2(+2.5f, 0f), Vector2.Zero);
+        _spawner.SpawnAsteroid(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f));
+        _spawner.SpawnBullet(spaceship, new Vector2(-2.5f, -2.0f), new Vector2(0.0f, 0.0f));
 
         _renderer = new Renderer(_gl, _camera);
 
@@ -68,11 +70,7 @@ public sealed class Engine : IDisposable
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
         _imguiController.Render();
-
-        foreach (Entity entity in _entities)
-        {
-            _renderer.Render(entity);
-        }
+        _entityController.ForEachEntity(entity => _renderer.Render(entity));
     }
 
     private void OnUpdate(double delta)
@@ -85,10 +83,7 @@ public sealed class Engine : IDisposable
             InputController = _inputController
         };
 
-        foreach (Entity entity in _entities)
-        {
-            entity.Update(context);
-        }
+        _entityController.ForEachEntity(entity => entity.Update(context));
     }
 
     private void OnResize(Vector2D<int> dimensions)

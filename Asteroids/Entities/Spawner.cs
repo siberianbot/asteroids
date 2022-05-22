@@ -1,10 +1,18 @@
 using System.Numerics;
+using Asteroids.Engine;
 using Asteroids.Utils;
 
 namespace Asteroids.Entities;
 
 public class Spawner
 {
+    private readonly EntityController _entityController;
+
+    public Spawner(EntityController entityController)
+    {
+        _entityController = entityController;
+    }
+
     public Asteroid SpawnAsteroid(Vector2 position, Vector2 direction)
     {
         float velocity = Random.Shared.NextSingle();
@@ -32,16 +40,28 @@ public class Spawner
             points[i] -= center;
         }
 
-        return new Asteroid(position, velocity * direction, rotationVelocity, points);
+        Asteroid asteroid = new Asteroid(position, velocity * direction, rotationVelocity, points);
+
+        _entityController.AddEntity(asteroid);
+
+        return asteroid;
     }
 
     public Spaceship SpawnSpaceship(Vector2 position)
     {
-        return new Spaceship(position);
+        Spaceship spaceship = new Spaceship(position);
+
+        _entityController.AddEntity(spaceship);
+
+        return spaceship;
     }
 
     public Bullet SpawnBullet(Entity owner, Vector2 position, Vector2 direction)
     {
-        return new Bullet(owner, position, direction);
+        Bullet bullet = new Bullet(owner, position, direction);
+
+        _entityController.AddEntity(bullet);
+
+        return bullet;
     }
 }
