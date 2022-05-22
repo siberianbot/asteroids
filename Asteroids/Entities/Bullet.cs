@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace Asteroids.Entities;
 
 public class Bullet : IEntity
@@ -11,4 +13,6 @@ public class Bullet : IEntity
     {
         throw new NotImplementedException();
     }
+
+    public Vector2 Position { get => throw new NotImplementedException(); }
 }

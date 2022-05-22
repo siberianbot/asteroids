@@ -23,17 +23,17 @@ public class AsteroidRenderer : IDisposable
                                           "}\n";
 
     private readonly GL _gl;
-    private readonly GoodData _goodData;
+    private readonly Camera _camera;
 
     private readonly BufferObject<float> _verticesBuffer;
     private readonly BufferObject<uint> _indicesBuffer;
     private readonly VertexArrayObject<float> _vertexArray;
     private readonly Shader _shader;
 
-    public AsteroidRenderer(GL gl, GoodData goodData)
+    public AsteroidRenderer(GL gl, Camera camera)
     {
         _gl = gl;
-        _goodData = goodData;
+        _camera = camera;
 
         _verticesBuffer = new BufferObject<float>(_gl, BufferTargetARB.ArrayBuffer);
         _indicesBuffer = new BufferObject<uint>(_gl, BufferTargetARB.ElementArrayBuffer);
@@ -58,8 +58,8 @@ public class AsteroidRenderer : IDisposable
 
         _shader.UseProgram();
         _shader.SetMat4("transform", transform);
-        _shader.SetMat4("projection", _goodData.Projection);
-        _shader.SetMat4("view", _goodData.View);
+        _shader.SetMat4("projection", _camera.ProjectionMatrix);
+        _shader.SetMat4("view", _camera.ViewMatrix);
 
         _vertexArray.Bind();
         _verticesBuffer.Data(data, BufferUsageARB.DynamicDraw);

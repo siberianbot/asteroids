@@ -21,11 +21,7 @@ public sealed class Engine : IDisposable
     private InputController _inputController;
     private ImGuiController _imguiController;
     private AsteroidRenderer _asteroidRenderer;
-
-    private GoodData _goodData = new GoodData
-    {
-        View = Matrix4x4.CreateLookAt(new Vector3(0f, 0f, 1f), Vector3.Zero, new Vector3(0f, 1f, 0f))
-    };
+    private Camera _camera;
 
     private readonly List<IEntity> _entities = new List<IEntity>();
     private readonly AsteroidFactory _asteroidFactory = new AsteroidFactory();
@@ -52,9 +48,11 @@ public sealed class Engine : IDisposable
         _inputController = new InputController(_input);
         _imguiController = new ImGuiController(_gl, _window, _input);
 
-        _asteroidRenderer = new AsteroidRenderer(_gl, _goodData);
+        Asteroid asteroid = _asteroidFactory.Create(Vector2.Zero, Vector2.Zero);
+        _entities.Add(asteroid);
+        _camera = new Camera(asteroid);
 
-        _entities.Add(_asteroidFactory.Create(Vector2.Zero, Vector2.Zero));
+        _asteroidRenderer = new AsteroidRenderer(_gl, _camera);
 
         OnResize(_window.Size);
     }
@@ -95,7 +93,7 @@ public sealed class Engine : IDisposable
     private void OnResize(Vector2D<int> dimensions)
     {
         _gl.Viewport(dimensions);
-        _goodData.Projection = Matrix4x4.CreatePerspectiveFieldOfView(MathF.PI / 2, (float)dimensions.X / dimensions.Y, 0.00001f, 10.00000f);
+        _camera.Dimensions = dimensions;
     }
 
     #region IDisposable
