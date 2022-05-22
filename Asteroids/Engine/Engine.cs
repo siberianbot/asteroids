@@ -49,8 +49,10 @@ public sealed class Engine : IDisposable
         _imguiController = new ImGuiController(_gl, _window, _input);
 
         Asteroid asteroid = _asteroidFactory.Create(Vector2.Zero, Vector2.Zero);
-        _entities.Add(asteroid);
         _camera = new Camera(asteroid);
+        _entities.Add(asteroid);
+        _entities.Add(_asteroidFactory.Create(new Vector2(-2.5f, 0f), Vector2.Zero));
+        _entities.Add(_asteroidFactory.Create(new Vector2(+2.5f, 0f), Vector2.Zero));
 
         _asteroidRenderer = new AsteroidRenderer(_gl, _camera);
 

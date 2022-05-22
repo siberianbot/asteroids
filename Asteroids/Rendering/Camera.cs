@@ -22,7 +22,7 @@ public class Camera
     {
         get
         {
-            Vector3 position = new Vector3(_entity.Position, 1f);
+            Vector3 position = new Vector3(_entity.Position, 2f);
 
             return Matrix4x4.CreateLookAt(position, position + Forward, Up);
         }

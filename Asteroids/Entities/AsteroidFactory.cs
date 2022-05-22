@@ -27,6 +27,8 @@ public class AsteroidFactory
             points.Add(point);
         }
 
+        center /= Constants.AsteroidSpikesCount;
+
         for (int i = 0; i < Constants.AsteroidSpikesCount; i++)
         {
             points[i] -= center;

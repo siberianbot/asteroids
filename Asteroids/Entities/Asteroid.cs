@@ -22,7 +22,7 @@ public class Asteroid : IEntity
     public void Update(UpdateContext context)
     {
         _rotation = MathUtils.NormalizeRadian(_rotation + context.Delta * _rotationVelocity);
-        Position += context.Delta * _direction;
+        // Position += context.Delta * _direction;
     }
 
     public void Render(RenderContext context)

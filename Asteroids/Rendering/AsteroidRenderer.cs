@@ -12,7 +12,7 @@ public class AsteroidRenderer : IDisposable
                                         "uniform mat4 view;\n" +
                                         "void main()\n" +
                                         "{\n" +
-                                        "  gl_Position = projection * view * transform * vec4(pos.x, pos.y, 1.0, 1.0);\n" +
+                                        "  gl_Position = projection * view * transform * vec4(pos.x, pos.y, 0.0, 1.0);\n" +
                                         "}\n";
 
     private const string FragmentShader = "#version 330 core\n" +
@@ -52,8 +52,8 @@ public class AsteroidRenderer : IDisposable
     public unsafe void Render(List<Vector2> points, Vector2 position, float rotation)
     {
         Span<float> data = points.SelectMany(point => new[] { point.X, point.Y }).ToArray().AsSpan();
-        Matrix4x4 transform = Matrix4x4.CreateTranslation(new Vector3(position, -1.0f)) *
-                              Matrix4x4.CreateRotationZ(rotation) *
+        Matrix4x4 transform = Matrix4x4.CreateRotationZ(rotation) *
+                              Matrix4x4.CreateTranslation(new Vector3(position, -1.0f)) *
                               Matrix4x4.Identity;
 
         _shader.UseProgram();
