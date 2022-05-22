@@ -39,4 +39,9 @@ public class Spawner
     {
         return new Spaceship(position);
     }
+
+    public Bullet SpawnBullet(Entity owner, Vector2 position, Vector2 direction)
+    {
+        return new Bullet(owner, position, direction);
+    }
 }
