@@ -23,7 +23,7 @@ public sealed class Engine : IDisposable
     private AsteroidRenderer _asteroidRenderer;
     private Camera _camera;
 
-    private readonly List<IEntity> _entities = new List<IEntity>();
+    private readonly List<Entity> _entities = new List<Entity>();
     private readonly AsteroidFactory _asteroidFactory = new AsteroidFactory();
 
     public Engine()
@@ -53,6 +53,7 @@ public sealed class Engine : IDisposable
         _entities.Add(asteroid);
         _entities.Add(_asteroidFactory.Create(new Vector2(-2.5f, 0f), Vector2.Zero));
         _entities.Add(_asteroidFactory.Create(new Vector2(+2.5f, 0f), Vector2.Zero));
+        _entities.Add(_asteroidFactory.Create(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f)));
 
         _asteroidRenderer = new AsteroidRenderer(_gl, _camera);
 
@@ -66,14 +67,9 @@ public sealed class Engine : IDisposable
 
         _imguiController.Render();
 
-        RenderContext context = new RenderContext
+        foreach (Entity entity in _entities)
         {
-            AsteroidRenderer = _asteroidRenderer
-        };
-
-        foreach (IEntity entity in _entities)
-        {
-            entity.Render(context);
+            _asteroidRenderer.Render(entity);
         }
     }
 
@@ -86,7 +82,7 @@ public sealed class Engine : IDisposable
             Delta = (float)delta
         };
 
-        foreach (IEntity entity in _entities)
+        foreach (Entity entity in _entities)
         {
             entity.Update(context);
         }

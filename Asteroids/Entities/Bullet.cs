@@ -1,18 +1,9 @@
-using System.Numerics;
-
 namespace Asteroids.Entities;
 
-public class Bullet : IEntity
+public class Bullet : Entity
 {
-    public void Update(UpdateContext context)
+    public override void Update(UpdateContext context)
     {
         throw new NotImplementedException();
     }
-
-    public void Render(RenderContext context)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Vector2 Position { get => throw new NotImplementedException(); }
 }

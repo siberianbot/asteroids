@@ -1,34 +1,30 @@
 using System.Numerics;
+using Asteroids.Components;
 using Asteroids.Utils;
 
 namespace Asteroids.Entities;
 
-public class Asteroid : IEntity
+public class Asteroid : Entity
 {
     private readonly float _rotationVelocity;
     private readonly Vector2 _direction;
-    private readonly List<Vector2> _points;
 
-    private float _rotation;
+    private readonly PositionComponent _positionComponent;
 
     public Asteroid(Vector2 position, Vector2 direction, float rotationVelocity, List<Vector2> points)
     {
-        Position = position;
         _direction = direction;
         _rotationVelocity = rotationVelocity;
-        _points = points;
+
+        _positionComponent = new PositionComponent(position, 0f);
+        
+        AddComponent(new ModelComponent(points));
+        AddComponent(_positionComponent);
     }
 
-    public void Update(UpdateContext context)
+    public override void Update(UpdateContext context)
     {
-        _rotation = MathUtils.NormalizeRadian(_rotation + context.Delta * _rotationVelocity);
-        // Position += context.Delta * _direction;
+        _positionComponent.Rotation = MathUtils.NormalizeRadian(_positionComponent.Rotation + context.Delta * _rotationVelocity);
+        _positionComponent.Position += context.Delta * _direction;
     }
-
-    public void Render(RenderContext context)
-    {
-        context.AsteroidRenderer.Render(_points, Position, _rotation);
-    }
-
-    public Vector2 Position { get; private set; }
 }

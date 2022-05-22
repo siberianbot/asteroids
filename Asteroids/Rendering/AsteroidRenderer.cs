@@ -1,4 +1,5 @@
-using System.Numerics;
+using Asteroids.Components;
+using Asteroids.Entities;
 using Silk.NET.OpenGL;
 
 namespace Asteroids.Rendering;
@@ -39,42 +40,29 @@ public class AsteroidRenderer : IDisposable
         _indicesBuffer = new BufferObject<uint>(_gl, BufferTargetARB.ElementArrayBuffer);
         _vertexArray = new VertexArrayObject<float>(_gl);
 
-
-        uint[] indicesData = IndicesDataGenerator(Constants.AsteroidSpikesCount).ToArray();
-        _indicesBuffer.Data(indicesData.AsSpan(), BufferUsageARB.StaticDraw);
-
         _shader = new ShaderBuilder(_gl)
             .UseVertexShader(VertexShader)
             .UseFragmentShader(FragmentShader)
             .Build();
     }
 
-    public unsafe void Render(List<Vector2> points, Vector2 position, float rotation)
+    public unsafe void Render(Entity entity)
     {
-        Span<float> data = points.SelectMany(point => new[] { point.X, point.Y }).ToArray().AsSpan();
-        Matrix4x4 transform = Matrix4x4.CreateRotationZ(rotation) *
-                              Matrix4x4.CreateTranslation(new Vector3(position, -1.0f)) *
-                              Matrix4x4.Identity;
+        ModelComponent modelComponent = entity.GetComponent<ModelComponent>() ?? throw new NullReferenceException();
+        PositionComponent positionComponent = entity.GetComponent<PositionComponent>() ?? throw new NullReferenceException();
 
         _shader.UseProgram();
-        _shader.SetMat4("transform", transform);
+        _shader.SetMat4("transform", positionComponent.TransformMatrix);
         _shader.SetMat4("projection", _camera.ProjectionMatrix);
         _shader.SetMat4("view", _camera.ViewMatrix);
 
         _vertexArray.Bind();
-        _verticesBuffer.Data(data, BufferUsageARB.DynamicDraw);
+        _verticesBuffer.Data(modelComponent.VerticesData, BufferUsageARB.DynamicDraw);
         _indicesBuffer.Bind();
+        _indicesBuffer.Data(modelComponent.IndicesData, BufferUsageARB.DynamicDraw);
         _vertexArray.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2, 0);
-        _gl.DrawElements(PrimitiveType.LineLoop, (uint)points.Count, DrawElementsType.UnsignedInt, null);
+        _gl.DrawElements(PrimitiveType.LineLoop, modelComponent.Count, DrawElementsType.UnsignedInt, null);
         _gl.BindVertexArray(0);
-    }
-
-    private static IEnumerable<uint> IndicesDataGenerator(int count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            yield return (uint)i;
-        }
     }
 
     #region IDisposable

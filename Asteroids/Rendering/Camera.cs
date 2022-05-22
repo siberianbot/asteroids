@@ -1,4 +1,5 @@
 using System.Numerics;
+using Asteroids.Components;
 using Asteroids.Entities;
 using Silk.NET.Maths;
 
@@ -9,9 +10,9 @@ public class Camera
     private static readonly Vector3 Forward = new Vector3(0f, 0f, -1f);
     private static readonly Vector3 Up = new Vector3(0f, 1f, 0f);
 
-    private readonly IEntity _entity;
+    private readonly Entity _entity;
 
-    public Camera(IEntity entity)
+    public Camera(Entity entity)
     {
         _entity = entity;
     }
@@ -22,7 +23,7 @@ public class Camera
     {
         get
         {
-            Vector3 position = new Vector3(_entity.Position, 2f);
+            Vector3 position = new Vector3(_entity.GetComponent<PositionComponent>()?.Position ?? Vector2.Zero, 2f);
 
             return Matrix4x4.CreateLookAt(position, position + Forward, Up);
         }
