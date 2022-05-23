@@ -9,11 +9,9 @@ public class Spaceship : Entity
 {
     private const float Rotation = MathF.PI / 2;
     private const float RotationVelocity = MathF.PI;
-    private const float MaxForwardVelocity = 0.5f;
-    private const float ForwardAcceleration = 0.2f;
-    private const float MaxBackwardVelocity = -0.25f;
-    private const float BackwardAcceleration = -0.1f;
-    private const float DecelerationVelocity = 0.1f;
+    private const float MaxVelocity = 0.5f;
+    private const float Acceleration = 0.2f;
+    private const float Deceleration = 0.1f;
 
     private static readonly List<Vector2> Model = new List<Vector2>
     {
@@ -48,42 +46,41 @@ public class Spaceship : Entity
             _positionComponent.Rotation = MathUtils.NormalizeRadian(_positionComponent.Rotation - context.Delta * RotationVelocity);
         }
 
-        float acceleration = 0.0f;
+        float absVelocity = MathF.Abs(_velocity);
+        int sign = MathF.Sign(_velocity);
+
+        _velocity += context.Delta * CalculateAcceleration(context, absVelocity, sign);
+
+        switch (absVelocity)
+        {
+            case > MaxVelocity:
+                _velocity = sign * MaxVelocity;
+                break;
+            case > 0f:
+                _velocity -= MathF.Sign(_velocity) * Deceleration * context.Delta;
+                break;
+        }
+
+        _positionComponent.Position += MathUtils.FromPolar(_positionComponent.Rotation, _velocity);
+    }
+
+    private static float CalculateAcceleration(UpdateContext context, float absVelocity, int sign)
+    {
+        if (context.InputController.OnKeyPressed(Key.Z) && absVelocity > 0.0f)
+        {
+            return sign * -Acceleration;
+        }
 
         if (context.InputController.OnKeyPressed(Key.Up))
         {
-            acceleration = ForwardAcceleration;
+            return Acceleration;
         }
 
         if (context.InputController.OnKeyPressed(Key.Down))
         {
-            acceleration = BackwardAcceleration;
+            return -Acceleration;
         }
 
-        if (context.InputController.OnKeyPressed(Key.Z))
-        {
-            acceleration = _velocity > 0.0f
-                ? -ForwardAcceleration
-                : _velocity < 0.0f
-                    ? -BackwardAcceleration
-                    : 0.0f;
-        }
-
-        _velocity += acceleration * context.Delta;
-
-        if (_velocity > MaxForwardVelocity)
-        {
-            _velocity = MaxForwardVelocity;
-        }
-        else if (_velocity < MaxBackwardVelocity)
-        {
-            _velocity = MaxBackwardVelocity;
-        }
-        else if (MathF.Abs(_velocity) > 0f)
-        {
-            _velocity -= MathF.Sign(_velocity) * DecelerationVelocity * context.Delta;
-        }
-
-        _positionComponent.Position += MathUtils.FromPolar(_positionComponent.Rotation, _velocity);
+        return 0.0f;
     }
 }
