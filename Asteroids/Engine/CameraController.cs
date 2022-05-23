@@ -12,7 +12,13 @@ public class CameraController
     public Camera CurrentCamera
     {
         get => _currentCamera ?? _defaultCamera;
-        set => _currentCamera = value;
+        set
+        {
+            _currentCamera = value;
+            
+            // TODO: workaround
+            _currentCamera.Dimensions = _defaultCamera.Dimensions;
+        }
     }
 
     public void UpdateDimensions(Vector2D<int> dimensions)

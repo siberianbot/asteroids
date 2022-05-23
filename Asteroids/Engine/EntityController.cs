@@ -23,4 +23,9 @@ public class EntityController
             action(entity);
         }
     }
+
+    public void Clear()
+    {
+        _entities.Clear();
+    }
 }

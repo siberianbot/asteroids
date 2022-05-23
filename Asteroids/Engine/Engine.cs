@@ -1,6 +1,7 @@
 using System.Numerics;
 using Asteroids.Entities;
 using Asteroids.Rendering;
+using ImGuiNET;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
 
@@ -28,16 +29,7 @@ public sealed class Engine : IDisposable
 
     private void InitWindow()
     {
-        Spawner spawner = _dependencyContainer.Spawner;
-
-        Spaceship spaceship = spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f));
-        _dependencyContainer.CameraController.CurrentCamera = new Camera(spaceship);
-
-        spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero);
-        spawner.SpawnAsteroid(new Vector2(-2.5f, 0f), Vector2.Zero);
-        spawner.SpawnAsteroid(new Vector2(+2.5f, 0f), Vector2.Zero);
-        spawner.SpawnAsteroid(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f));
-        spawner.SpawnBullet(spaceship, new Vector2(-2.5f, -2.0f), new Vector2(0.0f, 0.0f));
+        _dependencyContainer.SceneController.ChangeScene(Constants.Testbed);
 
         OnResize(_dependencyContainer.Window.Size);
     }
@@ -46,13 +38,27 @@ public sealed class Engine : IDisposable
     {
         _dependencyContainer.Renderer.Clear();
 
-        _dependencyContainer.ImGuiController.Render();
         _dependencyContainer.EntityController.ForEachEntity(entity => _dependencyContainer.Renderer.Render(entity));
+        _dependencyContainer.ImGuiController.Render();
     }
 
     private void OnUpdate(double delta)
     {
         _dependencyContainer.ImGuiController.Update((float)delta);
+
+        ImGui.Begin("Scenes");
+
+        if (ImGui.Button("Testbed"))
+        {
+            _dependencyContainer.SceneController.ChangeScene(Constants.Testbed);
+        }
+
+        if (ImGui.Button("Asteroids Demo"))
+        {
+            _dependencyContainer.SceneController.ChangeScene(Constants.AsteroidsDemo);
+        }
+
+        ImGui.End();
 
         UpdateContext context = new UpdateContext
         {

@@ -1,5 +1,6 @@
 using Asteroids.Entities;
 using Asteroids.Rendering;
+using Asteroids.Scenes;
 using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
@@ -15,6 +16,8 @@ public class DependencyContainer : IDisposable
     private readonly Lazy<Spawner> _spawner;
     private readonly Lazy<ImGuiController> _imguiController;
     private readonly Lazy<Renderer> _renderer;
+    private readonly Lazy<SceneManager> _sceneManager;
+    private readonly Lazy<SceneController> _sceneController;
 
     public DependencyContainer(Engine engine, IWindow window)
     {
@@ -30,6 +33,8 @@ public class DependencyContainer : IDisposable
         _spawner = new Lazy<Spawner>(() => new Spawner(EntityController));
         _imguiController = new Lazy<ImGuiController>(() => new ImGuiController(gl.Value, window, inputContext.Value));
         _renderer = new Lazy<Renderer>(() => new Renderer(gl.Value, CameraController));
+        _sceneManager = new Lazy<SceneManager>(() => new SceneManager(Spawner, CameraController));
+        _sceneController = new Lazy<SceneController>(() => new SceneController(SceneManager, EntityController));
     }
 
     public Engine Engine { get; }
@@ -64,6 +69,16 @@ public class DependencyContainer : IDisposable
     public Spawner Spawner
     {
         get => _spawner.Value;
+    }
+
+    public SceneManager SceneManager
+    {
+        get => _sceneManager.Value;
+    }
+
+    public SceneController SceneController
+    {
+        get => _sceneController.Value;
     }
 
     #region IDisposable
