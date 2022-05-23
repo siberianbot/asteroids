@@ -2,7 +2,6 @@ using System.Drawing;
 using System.Numerics;
 using Asteroids.Entities;
 using Asteroids.Rendering;
-using ImGuiNET;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
@@ -18,12 +17,12 @@ public sealed class Engine : IDisposable
     private GL _gl;
     private IInputContext _input;
 
+    private CameraController _cameraController;
     private EntityController _entityController;
     private InputController _inputController;
     private ImGuiController _imguiController;
     private Spawner _spawner;
     private Renderer _renderer;
-    private Camera _camera;
 
     public Engine()
     {
@@ -44,22 +43,21 @@ public sealed class Engine : IDisposable
         _input = _window.CreateInput();
         _gl = _window.CreateOpenGL();
 
+        _cameraController = new CameraController();
         _inputController = new InputController(_input);
         _imguiController = new ImGuiController(_gl, _window, _input);
         _entityController = new EntityController();
-
         _spawner = new Spawner(_entityController);
+        _renderer = new Renderer(_gl, _cameraController);
 
         Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f));
-        _camera = new Camera(spaceship);
+        _cameraController.CurrentCamera = new Camera(spaceship);
 
         _spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero);
         _spawner.SpawnAsteroid(new Vector2(-2.5f, 0f), Vector2.Zero);
         _spawner.SpawnAsteroid(new Vector2(+2.5f, 0f), Vector2.Zero);
         _spawner.SpawnAsteroid(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f));
         _spawner.SpawnBullet(spaceship, new Vector2(-2.5f, -2.0f), new Vector2(0.0f, 0.0f));
-
-        _renderer = new Renderer(_gl, _camera);
 
         OnResize(_window.Size);
     }
@@ -89,7 +87,7 @@ public sealed class Engine : IDisposable
     private void OnResize(Vector2D<int> dimensions)
     {
         _gl.Viewport(dimensions);
-        _camera.Dimensions = dimensions;
+        _cameraController.UpdateDimensions(dimensions);
     }
 
     #region IDisposable

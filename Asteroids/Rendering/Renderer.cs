@@ -1,4 +1,5 @@
 using Asteroids.Components;
+using Asteroids.Engine;
 using Asteroids.Entities;
 using Silk.NET.OpenGL;
 
@@ -25,17 +26,17 @@ public class Renderer : IDisposable
                                           "}\n";
 
     private readonly GL _gl;
-    private readonly Camera _camera;
+    private readonly CameraController _cameraController;
 
     private readonly BufferObject<float> _verticesBuffer;
     private readonly BufferObject<uint> _indicesBuffer;
     private readonly VertexArrayObject<float> _vertexArray;
     private readonly Shader _shader;
 
-    public Renderer(GL gl, Camera camera)
+    public Renderer(GL gl, CameraController cameraController)
     {
         _gl = gl;
-        _camera = camera;
+        _cameraController = cameraController;
 
         _verticesBuffer = new BufferObject<float>(_gl, BufferTargetARB.ArrayBuffer);
         _indicesBuffer = new BufferObject<uint>(_gl, BufferTargetARB.ElementArrayBuffer);
@@ -54,8 +55,8 @@ public class Renderer : IDisposable
 
         _shader.UseProgram();
         _shader.SetMat4("transform", positionComponent.TransformMatrix);
-        _shader.SetMat4("projection", _camera.ProjectionMatrix);
-        _shader.SetMat4("view", _camera.ViewMatrix);
+        _shader.SetMat4("projection", _cameraController.CurrentCamera.ProjectionMatrix);
+        _shader.SetMat4("view", _cameraController.CurrentCamera.ViewMatrix);
         _shader.SetVec3("color", modelComponent.Color);
 
         _vertexArray.Bind();
