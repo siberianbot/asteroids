@@ -58,6 +58,11 @@ public sealed class Engine : IDisposable
             _dependencyContainer.SceneController.ChangeScene(Constants.AsteroidsDemo);
         }
 
+        if (ImGui.Button("Spaceship Demo"))
+        {
+            _dependencyContainer.SceneController.ChangeScene(Constants.SpaceshipDemo);
+        }
+
         ImGui.End();
 
         UpdateContext context = new UpdateContext

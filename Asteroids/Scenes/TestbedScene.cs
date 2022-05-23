@@ -23,7 +23,7 @@ public class TestbedScene : Scene
 
     public override void Load()
     {
-        Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f));
+        Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f), new Vector3(0.0f, 0.7f, 0.0f));
         _cameraController.CurrentCamera = new Camera(spaceship);
 
         _spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero);

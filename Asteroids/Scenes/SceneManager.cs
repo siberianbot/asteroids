@@ -12,7 +12,8 @@ public class SceneManager
         _scenes = new List<Scene>
         {
             new TestbedScene(spawner, cameraController),
-            new AsteroidsDemoScene(spawner, cameraController)
+            new AsteroidsDemoScene(spawner),
+            new SpaceshipDemoScene(spawner)
         };
     }
 

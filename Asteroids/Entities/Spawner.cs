@@ -47,9 +47,18 @@ public class Spawner
         return asteroid;
     }
 
-    public Spaceship SpawnSpaceship(Vector2 position)
+    public Spaceship SpawnSpaceship(Vector2 position, Vector3? color)
     {
-        Spaceship spaceship = new Spaceship(position);
+        float rotation = Random.Shared.NextSingle() * MathF.Tau;
+
+        if (color == null)
+        {
+            int idx = Random.Shared.Next(Constants.Colors.Length);
+
+            color = Constants.Colors[idx];
+        }
+
+        Spaceship spaceship = new Spaceship(position, rotation, color.Value);
 
         _entityController.AddEntity(spaceship);
 

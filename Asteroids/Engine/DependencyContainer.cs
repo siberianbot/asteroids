@@ -34,7 +34,7 @@ public class DependencyContainer : IDisposable
         _imguiController = new Lazy<ImGuiController>(() => new ImGuiController(gl.Value, window, inputContext.Value));
         _renderer = new Lazy<Renderer>(() => new Renderer(gl.Value, CameraController));
         _sceneManager = new Lazy<SceneManager>(() => new SceneManager(Spawner, CameraController));
-        _sceneController = new Lazy<SceneController>(() => new SceneController(SceneManager, EntityController));
+        _sceneController = new Lazy<SceneController>(() => new SceneController(SceneManager, EntityController, CameraController));
     }
 
     public Engine Engine { get; }

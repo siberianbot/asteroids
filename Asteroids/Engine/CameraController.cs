@@ -15,7 +15,7 @@ public class CameraController
         set
         {
             _currentCamera = value;
-            
+
             // TODO: workaround
             _currentCamera.Dimensions = _defaultCamera.Dimensions;
         }
@@ -29,5 +29,10 @@ public class CameraController
         }
 
         _defaultCamera.Dimensions = dimensions;
+    }
+
+    public void Reset()
+    {
+        _currentCamera = null;
     }
 }
