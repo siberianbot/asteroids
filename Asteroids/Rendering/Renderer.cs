@@ -1,6 +1,8 @@
+using System.Drawing;
 using Asteroids.Components;
 using Asteroids.Engine;
 using Asteroids.Entities;
+using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 
 namespace Asteroids.Rendering;
@@ -46,6 +48,17 @@ public class Renderer : IDisposable
             .UseVertexShader(VertexShader)
             .UseFragmentShader(FragmentShader)
             .Build();
+    }
+
+    public void Clear()
+    {
+        _gl.ClearColor(Color.FromArgb(255, 0, 0, 0));
+        _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+    }
+
+    public void UpdateDimensions(Vector2D<int> dimensions)
+    {
+        _gl.Viewport(dimensions);
     }
 
     public unsafe void Render(Entity entity)

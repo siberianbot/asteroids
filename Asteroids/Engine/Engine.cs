@@ -1,93 +1,72 @@
-using System.Drawing;
 using System.Numerics;
 using Asteroids.Entities;
 using Asteroids.Rendering;
-using Silk.NET.Input;
 using Silk.NET.Maths;
-using Silk.NET.OpenGL;
-using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
 
 namespace Asteroids.Engine;
 
 public sealed class Engine : IDisposable
 {
-    private readonly IWindow _window;
-
-    private GL _gl;
-    private IInputContext _input;
-
-    private CameraController _cameraController;
-    private EntityController _entityController;
-    private InputController _inputController;
-    private ImGuiController _imguiController;
-    private Spawner _spawner;
-    private Renderer _renderer;
+    private readonly DependencyContainer _dependencyContainer;
 
     public Engine()
     {
-        _window = Window.Create(WindowOptions.Default);
-        _window.Load += InitWindow;
-        _window.Render += OnRender;
-        _window.Update += OnUpdate;
-        _window.FramebufferResize += OnResize;
+        IWindow window = Window.Create(WindowOptions.Default);
+        window.Load += InitWindow;
+        window.Render += OnRender;
+        window.Update += OnUpdate;
+        window.FramebufferResize += OnResize;
+
+        _dependencyContainer = new DependencyContainer(this, window);
     }
 
     public void Run()
     {
-        _window.Run();
+        _dependencyContainer.Window.Run();
     }
 
     private void InitWindow()
     {
-        _input = _window.CreateInput();
-        _gl = _window.CreateOpenGL();
+        Spawner spawner = _dependencyContainer.Spawner;
 
-        _cameraController = new CameraController();
-        _inputController = new InputController(_input);
-        _imguiController = new ImGuiController(_gl, _window, _input);
-        _entityController = new EntityController();
-        _spawner = new Spawner(_entityController);
-        _renderer = new Renderer(_gl, _cameraController);
+        Spaceship spaceship = spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f));
+        _dependencyContainer.CameraController.CurrentCamera = new Camera(spaceship);
 
-        Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f));
-        _cameraController.CurrentCamera = new Camera(spaceship);
+        spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero);
+        spawner.SpawnAsteroid(new Vector2(-2.5f, 0f), Vector2.Zero);
+        spawner.SpawnAsteroid(new Vector2(+2.5f, 0f), Vector2.Zero);
+        spawner.SpawnAsteroid(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f));
+        spawner.SpawnBullet(spaceship, new Vector2(-2.5f, -2.0f), new Vector2(0.0f, 0.0f));
 
-        _spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero);
-        _spawner.SpawnAsteroid(new Vector2(-2.5f, 0f), Vector2.Zero);
-        _spawner.SpawnAsteroid(new Vector2(+2.5f, 0f), Vector2.Zero);
-        _spawner.SpawnAsteroid(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f));
-        _spawner.SpawnBullet(spaceship, new Vector2(-2.5f, -2.0f), new Vector2(0.0f, 0.0f));
-
-        OnResize(_window.Size);
+        OnResize(_dependencyContainer.Window.Size);
     }
 
     private void OnRender(double delta)
     {
-        _gl.ClearColor(Color.FromArgb(255, 0, 0, 0));
-        _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        _dependencyContainer.Renderer.Clear();
 
-        _imguiController.Render();
-        _entityController.ForEachEntity(entity => _renderer.Render(entity));
+        _dependencyContainer.ImGuiController.Render();
+        _dependencyContainer.EntityController.ForEachEntity(entity => _dependencyContainer.Renderer.Render(entity));
     }
 
     private void OnUpdate(double delta)
     {
-        _imguiController.Update((float)delta);
+        _dependencyContainer.ImGuiController.Update((float)delta);
 
         UpdateContext context = new UpdateContext
         {
             Delta = (float)delta,
-            InputController = _inputController
+            InputController = _dependencyContainer.InputController // TODO: use dependency container
         };
 
-        _entityController.ForEachEntity(entity => entity.Update(context));
+        _dependencyContainer.EntityController.ForEachEntity(entity => entity.Update(context));
     }
 
     private void OnResize(Vector2D<int> dimensions)
     {
-        _gl.Viewport(dimensions);
-        _cameraController.UpdateDimensions(dimensions);
+        _dependencyContainer.Renderer.UpdateDimensions(dimensions);
+        _dependencyContainer.CameraController.UpdateDimensions(dimensions);
     }
 
     #region IDisposable
@@ -112,8 +91,7 @@ public sealed class Engine : IDisposable
             return;
         }
 
-        _renderer.Dispose();
-        _window.Dispose();
+        _dependencyContainer.Dispose();
 
         _disposed = true;
     }
