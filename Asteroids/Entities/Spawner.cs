@@ -40,7 +40,7 @@ public class Spawner
             points[i] -= center;
         }
 
-        Asteroid asteroid = new Asteroid(position, velocity * direction, rotationVelocity, points);
+        Asteroid asteroid = new Asteroid(position, direction, velocity, rotationVelocity, points);
 
         _entityController.AddEntity(asteroid);
 

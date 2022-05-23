@@ -2,16 +2,15 @@ using Asteroids.Entities;
 
 namespace Asteroids.Components;
 
-public class SpaceshipMovementComponent : IUpdatableComponent
+public sealed class SpaceshipMovementComponent : MovementComponent, IUpdatableComponent
 {
-    private const float RotationVelocity = MathF.PI;
     private const float MaxVelocity = 0.5f;
     private const float Acceleration = 0.2f;
     private const float Deceleration = 0.1f;
 
     private float _acceleration;
 
-    public float Velocity { get; private set; }
+    public override float Velocity { get; protected set; }
 
     public void Update(UpdateContext context)
     {
@@ -52,13 +51,5 @@ public class SpaceshipMovementComponent : IUpdatableComponent
         }
 
         _acceleration = MathF.Sign(Velocity) * -Acceleration;
-    }
-
-    public void TurnLeft()
-    {
-    }
-
-    public void TurnRight()
-    {
     }
 }
