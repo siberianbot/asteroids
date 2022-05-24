@@ -1,7 +1,5 @@
 using System.Drawing;
-using Asteroids.Components;
 using Asteroids.Engine;
-using Asteroids.Entities;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 
@@ -61,25 +59,26 @@ public class Renderer : IDisposable
         _gl.Viewport(dimensions);
     }
 
-    public unsafe void Render(Entity entity)
+    public unsafe void Render(List<RenderData> renderList)
     {
-        ModelComponent modelComponent = entity.GetComponent<ModelComponent>() ?? throw new NullReferenceException();
-        PositionComponent positionComponent = entity.GetComponent<PositionComponent>() ?? throw new NullReferenceException();
-
         _shader.UseProgram();
-        _shader.SetMat4("transform", positionComponent.TransformMatrix);
         _shader.SetMat4("projection", _cameraController.CurrentCamera.ProjectionMatrix);
         _shader.SetMat4("view", _cameraController.CurrentCamera.ViewMatrix);
-        _shader.SetVec3("color", modelComponent.Color);
 
         _vertexArray.Bind();
 
-        _verticesBuffer.Data(modelComponent.VerticesData, BufferUsageARB.DynamicDraw);
-        _indicesBuffer.Data(modelComponent.IndicesData, BufferUsageARB.DynamicDraw);
+        foreach (RenderData renderData in renderList)
+        {
+            _shader.SetMat4("transform", renderData.TransformMatrix);
+            _shader.SetVec3("color", renderData.Color);
 
-        _vertexArray.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2, 0);
+            _verticesBuffer.Data(renderData.VerticesData, BufferUsageARB.DynamicDraw);
+            _indicesBuffer.Data(renderData.IndicesData, BufferUsageARB.DynamicDraw);
+            _vertexArray.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2, 0);
 
-        _gl.DrawElements(PrimitiveType.LineLoop, modelComponent.Count, DrawElementsType.UnsignedInt, null);
+            _gl.DrawElements(PrimitiveType.LineLoop, renderData.Count, DrawElementsType.UnsignedInt, null);
+        }
+
         _gl.BindVertexArray(0);
     }
 

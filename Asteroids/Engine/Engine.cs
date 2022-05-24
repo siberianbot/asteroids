@@ -1,6 +1,8 @@
 using System.Numerics;
 using Asteroids.Behaviors;
+using Asteroids.Components;
 using Asteroids.Entities;
+using Asteroids.Rendering;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
 
@@ -38,7 +40,25 @@ public sealed class Engine : IDisposable
     {
         _dependencyContainer.Renderer.Clear();
 
-        _dependencyContainer.EntityController.ForEachEntity(entity => _dependencyContainer.Renderer.Render(entity));
+        List<RenderData> renderList = new List<RenderData>();
+
+        _dependencyContainer.EntityController.ForEachEntity(entity =>
+        {
+            ModelComponent modelComponent = entity.GetComponent<ModelComponent>() ?? throw new NullReferenceException();
+            PositionComponent positionComponent = entity.GetComponent<PositionComponent>() ?? throw new NullReferenceException();
+
+            RenderData data = new RenderData(
+                modelComponent.VerticesData,
+                modelComponent.IndicesData,
+                modelComponent.Count,
+                modelComponent.Color,
+                positionComponent.TransformMatrix
+            );
+
+            renderList.Add(data);
+        });
+
+        _dependencyContainer.Renderer.Render(renderList);
         _dependencyContainer.ImGuiController.Render();
     }
 
