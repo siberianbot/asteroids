@@ -32,23 +32,22 @@ public class AsteroidCollisionScene : Scene
         const float radius = 5.0f;
 
         CollisionBehavior collisionBehavior = new CollisionBehavior();
+        AsteroidSpawnBehavior asteroidSpawnBehavior = new AsteroidSpawnBehavior(_spawner);
+        collisionBehavior.CollisionDetected += asteroidSpawnBehavior.HandleCollision;
         _behaviorController.AddBehavior(collisionBehavior);
+        _behaviorController.AddBehavior(asteroidSpawnBehavior);
         _behaviorController.AddBehavior(new MovementBehavior());
 
         float leftAngle = Random.Shared.NextSingle() * MathF.PI + MathF.PI / 2;
-        Asteroid left = _spawner.SpawnAsteroid(
+        _spawner.SpawnAsteroid(
             MathUtils.FromPolar(leftAngle, radius),
             MathUtils.FromPolar(leftAngle - MathF.PI, radius),
-            1.0f);
-        left.GetComponent<MovementComponent>()!.Velocity = velocity;
+            velocity: velocity);
 
         float rightAngle = Random.Shared.NextSingle() * MathF.PI - MathF.PI / 2;
-        Asteroid right = _spawner.SpawnAsteroid(
+        _spawner.SpawnAsteroid(
             MathUtils.FromPolar(rightAngle, radius),
             MathUtils.FromPolar(rightAngle + MathF.PI, radius),
-            1.0f);
-        right.GetComponent<MovementComponent>()!.Velocity = velocity;
-
-        collisionBehavior.CollisionDetected += (a, b) => _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 0.0f);
+            velocity: velocity);
     }
 }

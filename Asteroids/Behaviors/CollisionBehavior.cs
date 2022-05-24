@@ -21,7 +21,7 @@ public class CollisionBehavior : IBehavior
         public float Rotation { get; init; }
     }
 
-    public event Action<Entity, Entity> CollisionDetected;
+    public event Action<Entity, Entity, Vector2> CollisionDetected = delegate { };
 
     public void Update(UpdateContext context)
     {
@@ -57,41 +57,48 @@ public class CollisionBehavior : IBehavior
             Collider thisCollider = colliders[i];
             Collider nextCollider = colliders[i + 1];
 
-            if (!CheckIntersection(thisCollider, nextCollider))
+            Vector2? intersection = CheckIntersection(thisCollider, nextCollider);
+
+            if (intersection == null)
             {
                 continue;
             }
 
-            CollisionDetected?.Invoke(thisCollider.Entity, nextCollider.Entity);
+            CollisionDetected.Invoke(thisCollider.Entity, nextCollider.Entity, intersection.Value);
+
+            context.DependencyContainer.EntityController.Destroy(thisCollider.Entity);
+            context.DependencyContainer.EntityController.Destroy(nextCollider.Entity);
         }
     }
 
-    private static bool CheckIntersection(Collider left, Collider right)
+    private static Vector2? CheckIntersection(Collider left, Collider right)
     {
         if (!MathUtils.Intersects(
                 left.BoundingBox.GetTranslated(left.Position.ToGeneric()),
                 right.BoundingBox.GetTranslated(right.Position.ToGeneric())
             ))
         {
-            return false;
+            return null;
         }
 
         foreach (ColliderLineSegment leftSegment in left.Segments)
         {
             foreach (ColliderLineSegment rightSegment in right.Segments)
             {
-                if (MathUtils.IsIntersecting(
-                        left.Position + MathUtils.Rotate(leftSegment.Start, left.Rotation),
-                        left.Position + MathUtils.Rotate(leftSegment.End, left.Rotation),
-                        right.Position + MathUtils.Rotate(rightSegment.Start, right.Rotation),
-                        right.Position + MathUtils.Rotate(rightSegment.End, right.Rotation)
-                    ))
+                Vector2? intersection = MathUtils.GetIntersection(
+                    left.Position + MathUtils.Rotate(leftSegment.Start, left.Rotation),
+                    left.Position + MathUtils.Rotate(leftSegment.End, left.Rotation),
+                    right.Position + MathUtils.Rotate(rightSegment.Start, right.Rotation),
+                    right.Position + MathUtils.Rotate(rightSegment.End, right.Rotation)
+                );
+
+                if (intersection != null)
                 {
-                    return true;
+                    return intersection.Value;
                 }
             }
         }
 
-        return false;
+        return null;
     }
 }

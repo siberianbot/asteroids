@@ -84,7 +84,7 @@ public static class MathUtils
         return left.X * right.Y - right.X * left.Y;
     }
 
-    public static bool IsIntersecting(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2)
+    public static Vector2? GetIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2)
     {
         float t = (
             (a1.X - b1.X) * (b1.Y - b2.Y) - (a1.Y - b1.Y) * (b1.X - b2.X)
@@ -98,7 +98,11 @@ public static class MathUtils
             (a1.X - a2.X) * (b1.Y - b2.Y) - (a1.Y - a2.Y) * (b1.X - b2.X)
         );
 
-        return 0 <= t && t <= 1 &&
-               0 <= u && u <= 1;
+        if (t is < 0 or > 1 || u is < 0 or > 1)
+        {
+            return null;
+        }
+
+        return new Vector2(a1.X + t * (a2.X - a1.X), a1.Y + t * (a2.Y - a2.Y));
     }
 }

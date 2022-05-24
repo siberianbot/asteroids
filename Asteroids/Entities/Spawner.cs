@@ -14,9 +14,10 @@ public class Spawner
         _entityController = entityController;
     }
 
-    public Asteroid SpawnAsteroid(Vector2 position, Vector2 direction, float scale)
+    public Asteroid SpawnAsteroid(Vector2 position, Vector2 direction, float? velocity = null, float scale = 1.0f)
     {
-        float velocity = Random.Shared.NextSingle();
+        velocity ??= Random.Shared.NextSingle();
+
         float rotationVelocity = -0.5f + 2 * Random.Shared.NextSingle();
 
         List<Vector2> points = new List<Vector2>();
@@ -44,7 +45,7 @@ public class Spawner
         Asteroid asteroid = new Asteroid(rotationVelocity, scale);
         asteroid.AddComponent(new ModelComponent(points, Constants.Colors.Gray));
         asteroid.AddComponent(new PositionComponent(position, 0f));
-        asteroid.AddComponent(new MovementComponent(velocity, direction));
+        asteroid.AddComponent(new MovementComponent(velocity.Value, direction));
         asteroid.AddComponent(new ColliderComponent(points));
 
         _entityController.AddEntity(asteroid);
