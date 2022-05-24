@@ -22,8 +22,16 @@ public abstract class Entity
 
     public void AddComponent(IComponent component)
     {
+        component.Owner = this;
+
         _components.Add(component);
     }
 
-    public abstract void Update(UpdateContext context);
+    public virtual void Update(UpdateContext context)
+    {
+        foreach (IUpdatableComponent component in _components.OfType<IUpdatableComponent>())
+        {
+            component.Update(context);
+        }
+    }
 }

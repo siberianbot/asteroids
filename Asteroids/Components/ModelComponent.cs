@@ -3,7 +3,7 @@ using Asteroids.Utils;
 
 namespace Asteroids.Components;
 
-public class ModelComponent : IComponent
+public class ModelComponent : Component
 {
     public ModelComponent(List<Vector2> points, Vector3 color)
     {

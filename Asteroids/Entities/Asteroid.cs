@@ -1,4 +1,3 @@
-using System.Numerics;
 using Asteroids.Components;
 using Asteroids.Utils;
 
@@ -7,27 +6,19 @@ namespace Asteroids.Entities;
 public class Asteroid : Entity
 {
     private readonly float _rotationVelocity;
-    private readonly Vector2 _direction;
+    private readonly Lazy<PositionComponent> _positionComponent;
 
-    private readonly PositionComponent _positionComponent;
-    private readonly ConstantMovementComponent _movementComponent;
-
-    public Asteroid(Vector2 position, Vector2 direction, float velocity, float rotationVelocity, List<Vector2> points)
+    public Asteroid(float rotationVelocity)
     {
-        _direction = direction;
         _rotationVelocity = rotationVelocity;
 
-        _positionComponent = new PositionComponent(position, 0f);
-        _movementComponent = new ConstantMovementComponent(velocity);
-
-        AddComponent(new ModelComponent(points, new Vector3(0.7f, 0.7f, 0.7f)));
-        AddComponent(_positionComponent);
-        AddComponent(_movementComponent);
+        _positionComponent = new Lazy<PositionComponent>(() => GetComponent<PositionComponent>() ?? throw new ArgumentException());
     }
 
     public override void Update(UpdateContext context)
     {
-        _positionComponent.Rotation = MathUtils.NormalizeRadian(_positionComponent.Rotation + context.Delta * _rotationVelocity);
-        _positionComponent.Position += context.Delta * _movementComponent.Velocity * _direction;
+        base.Update(context);
+
+        _positionComponent.Value.Rotation = MathUtils.NormalizeRadian(_positionComponent.Value.Rotation + context.Delta * _rotationVelocity);
     }
 }

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Asteroids.Components;
 using Asteroids.Engine;
 using Asteroids.Utils;
 
@@ -40,7 +41,10 @@ public class Spawner
             points[i] -= center;
         }
 
-        Asteroid asteroid = new Asteroid(position, direction, velocity, rotationVelocity, points);
+        Asteroid asteroid = new Asteroid(rotationVelocity);
+        asteroid.AddComponent(new ModelComponent(points, new Vector3(0.7f, 0.7f, 0.7f)));
+        asteroid.AddComponent(new PositionComponent(position, 0f));
+        asteroid.AddComponent(new MovementComponent(velocity, direction));
 
         _entityController.AddEntity(asteroid);
 
@@ -58,7 +62,10 @@ public class Spawner
             color = Constants.Colors[idx];
         }
 
-        Spaceship spaceship = new Spaceship(position, rotation, color.Value);
+        Spaceship spaceship = new Spaceship();
+        spaceship.AddComponent(new ModelComponent(Spaceship.Model, color.Value));
+        spaceship.AddComponent(new MovementComponent(0.0f, Vector2.Zero));
+        spaceship.AddComponent(new PositionComponent(position, rotation));
 
         _entityController.AddEntity(spaceship);
 

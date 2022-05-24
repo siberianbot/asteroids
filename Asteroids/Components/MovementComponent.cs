@@ -1,6 +1,16 @@
+using System.Numerics;
+
 namespace Asteroids.Components;
 
-public abstract class MovementComponent : IComponent
+public class MovementComponent : Component
 {
-    public abstract float Velocity { get; protected set; }
+    public MovementComponent(float velocity, Vector2 direction)
+    {
+        Velocity = velocity;
+        Direction = direction;
+    }
+
+    public float Velocity { get; set; }
+
+    public Vector2 Direction { get; set; }
 }

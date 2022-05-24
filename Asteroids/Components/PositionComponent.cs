@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace Asteroids.Components;
 
-public class PositionComponent : IComponent
+public class PositionComponent : Component
 {
     public PositionComponent(Vector2 position, float rotation)
     {
