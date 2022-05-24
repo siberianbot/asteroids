@@ -26,6 +26,7 @@ public class DependencyContainer : IDisposable
     {
         Engine = engine;
         Window = window;
+        GlobalVars = new Vars();
 
         Lazy<IInputContext> inputContext = new(() => Window.CreateInput());
         Lazy<GL> gl = new(() => Window.CreateOpenGL());
@@ -46,6 +47,8 @@ public class DependencyContainer : IDisposable
     public Engine Engine { get; }
 
     public IWindow Window { get; }
+
+    public Vars GlobalVars { get; }
 
     public BehaviorController BehaviorController
     {
