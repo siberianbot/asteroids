@@ -1,3 +1,4 @@
+using Asteroids.Commands;
 using Asteroids.Scenes;
 
 namespace Asteroids.Engine;
@@ -8,35 +9,33 @@ public class SceneController
     private readonly EntityController _entityController;
     private readonly CameraController _cameraController;
     private readonly BehaviorController _behaviorController;
+    private readonly CommandQueue _commandQueue;
 
-    private Scene? _targetScene;
-
-    public SceneController(SceneManager sceneManager, EntityController entityController, CameraController cameraController,
-        BehaviorController behaviorController)
+    public SceneController(
+        SceneManager sceneManager,
+        EntityController entityController,
+        CameraController cameraController,
+        BehaviorController behaviorController,
+        CommandQueue commandQueue)
     {
         _sceneManager = sceneManager;
         _entityController = entityController;
         _cameraController = cameraController;
         _behaviorController = behaviorController;
+        _commandQueue = commandQueue;
     }
 
     public void ChangeScene(string sceneName)
     {
-        _targetScene = _sceneManager.GetScene(sceneName);
-    }
+        Scene scene = _sceneManager.GetScene(sceneName);
 
-    public void PerformSceneChange()
-    {
-        if (_targetScene == null)
+        _commandQueue.Push(() =>
         {
-            return;
-        }
+            _behaviorController.ClearBehaviors();
+            _entityController.Clear();
+            _cameraController.Reset();
 
-        _behaviorController.ClearBehaviors();
-        _entityController.Clear();
-        _cameraController.Reset();
-
-        _targetScene.Load();
-        _targetScene = null;
+            scene.Load();
+        });
     }
 }

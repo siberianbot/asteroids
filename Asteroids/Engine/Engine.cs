@@ -44,7 +44,7 @@ public sealed class Engine : IDisposable
 
     private void OnUpdate(double delta)
     {
-        _dependencyContainer.SceneController.PerformSceneChange();
+        _dependencyContainer.CommandQueue.ExecutePending();
 
         UpdateContext context = new UpdateContext
         {
