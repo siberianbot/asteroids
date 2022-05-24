@@ -29,7 +29,7 @@ public sealed class Engine : IDisposable
     private void InitWindow()
     {
         _dependencyContainer.BehaviorController.AddBehavior(new DebugBehavior());
-        _dependencyContainer.SceneController.ChangeScene(Constants.Testbed);
+        _dependencyContainer.SceneController.ChangeScene(Constants.Scenes.Testbed);
 
         OnResize(_dependencyContainer.Window.Size);
     }

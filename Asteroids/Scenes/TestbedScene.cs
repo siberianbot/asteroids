@@ -22,12 +22,12 @@ public class TestbedScene : Scene
 
     public override string Name
     {
-        get => Constants.Testbed;
+        get => Constants.Scenes.Testbed;
     }
 
     public override void Load()
     {
-        Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f), new Vector3(0.0f, 0.7f, 0.0f));
+        Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f), Constants.Colors.Green);
         spaceship.AddComponent(new SpaceshipControlComponent());
 
         _cameraController.CurrentCamera = new Camera(spaceship);

@@ -9,21 +9,21 @@ public class DebugBehavior : IBehavior
     {
         context.DependencyContainer.ImGuiController.Update(context.Delta);
 
-        ImGui.Begin("Scenes");
+        ImGui.Begin("Debug Menu");
 
         if (ImGui.Button("Testbed"))
         {
-            context.DependencyContainer.SceneController.ChangeScene(Constants.Testbed);
+            context.DependencyContainer.SceneController.ChangeScene(Constants.Scenes.Testbed);
         }
 
         if (ImGui.Button("Asteroids Demo"))
         {
-            context.DependencyContainer.SceneController.ChangeScene(Constants.AsteroidsDemo);
+            context.DependencyContainer.SceneController.ChangeScene(Constants.Scenes.AsteroidsDemo);
         }
 
         if (ImGui.Button("Spaceship Demo"))
         {
-            context.DependencyContainer.SceneController.ChangeScene(Constants.SpaceshipDemo);
+            context.DependencyContainer.SceneController.ChangeScene(Constants.Scenes.SpaceshipDemo);
         }
 
         ImGui.End();

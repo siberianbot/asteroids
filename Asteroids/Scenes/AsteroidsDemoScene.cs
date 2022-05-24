@@ -15,7 +15,7 @@ public class AsteroidsDemoScene : Scene
 
     public override string Name
     {
-        get => Constants.AsteroidsDemo;
+        get => Constants.Scenes.AsteroidsDemo;
     }
 
     public override void Load()

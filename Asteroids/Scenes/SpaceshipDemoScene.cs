@@ -14,7 +14,7 @@ public class SpaceshipDemoScene : Scene
 
     public override string Name
     {
-        get => Constants.SpaceshipDemo;
+        get => Constants.Scenes.SpaceshipDemo;
     }
 
     public override void Load()
@@ -24,8 +24,9 @@ public class SpaceshipDemoScene : Scene
             for (int y = 0; y < 3; y++)
             {
                 Vector2 position = new Vector2(-5.0f + x * 2.5f, -2.5f + y * 2.5f);
+                int colorIdx = Random.Shared.Next(Constants.Colors.All.Length);
 
-                _spawner.SpawnSpaceship(position, null);
+                _spawner.SpawnSpaceship(position, Constants.Colors.All[colorIdx]);
             }
         }
     }
