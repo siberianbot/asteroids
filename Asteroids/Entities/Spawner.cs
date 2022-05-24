@@ -74,7 +74,10 @@ public class Spawner
 
     public Bullet SpawnBullet(Entity owner, Vector2 position, Vector2 direction)
     {
-        Bullet bullet = new Bullet(owner, position, direction);
+        Bullet bullet = new Bullet(owner);
+        bullet.AddComponent(new ModelComponent(new List<Vector2> { Vector2.Zero }, new Vector3(1f, 1f, 1f)));
+        bullet.AddComponent(new MovementComponent(0.0f, direction)); // TODO: velocity
+        bullet.AddComponent(new PositionComponent(position, 0.0f));
 
         _entityController.AddEntity(bullet);
 

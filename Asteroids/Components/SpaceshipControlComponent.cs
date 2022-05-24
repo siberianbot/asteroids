@@ -8,7 +8,7 @@ public class SpaceshipControlComponent : Component, IUpdatableComponent
     private const float RotationVelocity = MathF.PI;
     private const float MaxVelocity = 7.5f;
     private const float Acceleration = 0.2f;
-    private const float Deceleration = 2.5f;
+    private const float Deceleration = 5.0f;
 
     private float _acceleration;
     private float _rotation;
