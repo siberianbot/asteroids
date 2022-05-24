@@ -30,7 +30,7 @@ public class AsteroidsDemoScene : Scene
             {
                 Vector2 position = new Vector2(-5.0f + x * 2.5f, -2.5f + y * 2.5f);
 
-                _spawner.SpawnAsteroid(position, Vector2.Zero);
+                _spawner.SpawnAsteroid(position, Vector2.Zero, 1.0f);
             }
         }
     }

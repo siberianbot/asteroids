@@ -37,10 +37,10 @@ public class TestbedScene : Scene
         _cameraController.CurrentCamera = new Camera(spaceship);
         _behaviorController.AddBehavior(new PlayerBehavior(spaceship));
         _behaviorController.AddBehavior(new MovementBehavior());
-        _spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero);
-        _spawner.SpawnAsteroid(new Vector2(-2.5f, 0f), Vector2.Zero);
-        _spawner.SpawnAsteroid(new Vector2(+2.5f, 0f), Vector2.Zero);
-        _spawner.SpawnAsteroid(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f));
+        _spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero, 1.0f);
+        _spawner.SpawnAsteroid(new Vector2(-2.5f, 0f), Vector2.Zero, 0.75f);
+        _spawner.SpawnAsteroid(new Vector2(+2.5f, 0f), Vector2.Zero, 0.5f);
+        _spawner.SpawnAsteroid(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f), 0.25f);
         _spawner.SpawnBullet(spaceship, new Vector2(-2.5f, -2.0f), new Vector2(0.0f, 0.0f));
     }
 }

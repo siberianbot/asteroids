@@ -27,7 +27,7 @@ public class AsteroidCollisionScene : Scene
     public override void Load()
     {
         _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f);
-        
+
         const float velocity = 0.5f;
         const float radius = 5.0f;
 
@@ -38,13 +38,15 @@ public class AsteroidCollisionScene : Scene
         float leftAngle = Random.Shared.NextSingle() * MathF.PI + MathF.PI / 2;
         Asteroid left = _spawner.SpawnAsteroid(
             MathUtils.FromPolar(leftAngle, radius),
-            MathUtils.FromPolar(leftAngle - MathF.PI, radius));
+            MathUtils.FromPolar(leftAngle - MathF.PI, radius),
+            1.0f);
         left.GetComponent<MovementComponent>()!.Velocity = velocity;
 
         float rightAngle = Random.Shared.NextSingle() * MathF.PI - MathF.PI / 2;
         Asteroid right = _spawner.SpawnAsteroid(
             MathUtils.FromPolar(rightAngle, radius),
-            MathUtils.FromPolar(rightAngle + MathF.PI, radius));
+            MathUtils.FromPolar(rightAngle + MathF.PI, radius),
+            1.0f);
         right.GetComponent<MovementComponent>()!.Velocity = velocity;
 
         collisionBehavior.CollisionDetected += (a, b) => _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 0.0f);
