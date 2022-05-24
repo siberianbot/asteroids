@@ -45,6 +45,7 @@ public class Spawner
         asteroid.AddComponent(new ModelComponent(points, Constants.Colors.Gray));
         asteroid.AddComponent(new PositionComponent(position, 0f));
         asteroid.AddComponent(new MovementComponent(velocity, direction));
+        asteroid.AddComponent(new ColliderComponent(points));
 
         _entityController.AddEntity(asteroid);
 
@@ -59,6 +60,7 @@ public class Spawner
         spaceship.AddComponent(new ModelComponent(Spaceship.Model, color));
         spaceship.AddComponent(new MovementComponent(0.0f, Vector2.Zero));
         spaceship.AddComponent(new PositionComponent(position, rotation));
+        spaceship.AddComponent(new ColliderComponent(Spaceship.Model));
 
         _entityController.AddEntity(spaceship);
 

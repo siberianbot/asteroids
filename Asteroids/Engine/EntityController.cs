@@ -1,13 +1,16 @@
+using Asteroids.Commands;
 using Asteroids.Entities;
 
 namespace Asteroids.Engine;
 
 public class EntityController
 {
+    private readonly CommandQueue _commandQueue;
     private readonly List<Entity> _entities;
 
-    public EntityController()
+    public EntityController(CommandQueue commandQueue)
     {
+        _commandQueue = commandQueue;
         _entities = new List<Entity>();
     }
 
@@ -27,5 +30,10 @@ public class EntityController
     public void Clear()
     {
         _entities.Clear();
+    }
+
+    public void Destroy(Entity entity)
+    {
+        _commandQueue.Push(() => _entities.Remove(entity));
     }
 }

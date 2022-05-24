@@ -12,12 +12,14 @@ public class TestbedScene : Scene
     private readonly Spawner _spawner;
     private readonly CameraController _cameraController;
     private readonly BehaviorController _behaviorController;
+    private readonly Vars _vars;
 
-    public TestbedScene(Spawner spawner, CameraController cameraController, BehaviorController behaviorController)
+    public TestbedScene(Spawner spawner, CameraController cameraController, BehaviorController behaviorController, Vars vars)
     {
         _spawner = spawner;
         _cameraController = cameraController;
         _behaviorController = behaviorController;
+        _vars = vars;
     }
 
     public override string Name
@@ -27,6 +29,8 @@ public class TestbedScene : Scene
 
     public override void Load()
     {
+        _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f);
+
         Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f), Constants.Colors.Green);
         spaceship.AddComponent(new SpaceshipControlComponent());
 

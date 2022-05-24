@@ -32,14 +32,14 @@ public class DependencyContainer : IDisposable
         Lazy<GL> gl = new(() => Window.CreateOpenGL());
 
         _behaviorController = new Lazy<BehaviorController>(() => new BehaviorController());
-        _entityController = new Lazy<EntityController>(() => new EntityController());
-        _cameraController = new Lazy<CameraController>(() => new CameraController());
         _commandQueue = new Lazy<CommandQueue>(() => new CommandQueue());
+        _entityController = new Lazy<EntityController>(() => new EntityController(CommandQueue));
+        _cameraController = new Lazy<CameraController>(() => new CameraController());
         _inputController = new Lazy<InputController>(() => new InputController(inputContext.Value));
         _spawner = new Lazy<Spawner>(() => new Spawner(EntityController));
         _imguiController = new Lazy<ImGuiController>(() => new ImGuiController(gl.Value, window, inputContext.Value));
         _renderer = new Lazy<Renderer>(() => new Renderer(gl.Value, CameraController));
-        _sceneManager = new Lazy<SceneManager>(() => new SceneManager(Spawner, CameraController, BehaviorController));
+        _sceneManager = new Lazy<SceneManager>(() => new SceneManager(Spawner, CameraController, BehaviorController, GlobalVars));
         _sceneController = new Lazy<SceneController>(() => new SceneController(SceneManager,
             EntityController, CameraController, BehaviorController, CommandQueue));
     }
