@@ -1,7 +1,6 @@
 using System.Numerics;
+using Asteroids.Behaviors;
 using Asteroids.Entities;
-using Asteroids.Rendering;
-using ImGuiNET;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
 
@@ -29,6 +28,7 @@ public sealed class Engine : IDisposable
 
     private void InitWindow()
     {
+        _dependencyContainer.BehaviorController.AddBehavior(new DebugBehavior());
         _dependencyContainer.SceneController.ChangeScene(Constants.Testbed);
 
         OnResize(_dependencyContainer.Window.Size);
@@ -44,34 +44,16 @@ public sealed class Engine : IDisposable
 
     private void OnUpdate(double delta)
     {
-        _dependencyContainer.ImGuiController.Update((float)delta);
-
-        ImGui.Begin("Scenes");
-
-        if (ImGui.Button("Testbed"))
-        {
-            _dependencyContainer.SceneController.ChangeScene(Constants.Testbed);
-        }
-
-        if (ImGui.Button("Asteroids Demo"))
-        {
-            _dependencyContainer.SceneController.ChangeScene(Constants.AsteroidsDemo);
-        }
-
-        if (ImGui.Button("Spaceship Demo"))
-        {
-            _dependencyContainer.SceneController.ChangeScene(Constants.SpaceshipDemo);
-        }
-
-        ImGui.End();
+        _dependencyContainer.SceneController.PerformSceneChange();
 
         UpdateContext context = new UpdateContext
         {
             Delta = (float)delta,
-            InputController = _dependencyContainer.InputController // TODO: use dependency container
+            DependencyContainer = _dependencyContainer
         };
 
         _dependencyContainer.EntityController.ForEachEntity(entity => entity.Update(context));
+        _dependencyContainer.BehaviorController.ForEachBehavior(behavior => behavior.Update(context));
     }
 
     private void OnResize(Vector2D<int> dimensions)

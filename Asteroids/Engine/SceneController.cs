@@ -7,21 +7,36 @@ public class SceneController
     private readonly SceneManager _sceneManager;
     private readonly EntityController _entityController;
     private readonly CameraController _cameraController;
+    private readonly BehaviorController _behaviorController;
 
-    public SceneController(SceneManager sceneManager, EntityController entityController, CameraController cameraController)
+    private Scene? _targetScene;
+
+    public SceneController(SceneManager sceneManager, EntityController entityController, CameraController cameraController,
+        BehaviorController behaviorController)
     {
         _sceneManager = sceneManager;
         _entityController = entityController;
         _cameraController = cameraController;
+        _behaviorController = behaviorController;
     }
 
     public void ChangeScene(string sceneName)
     {
-        Scene scene = _sceneManager.GetScene(sceneName);
+        _targetScene = _sceneManager.GetScene(sceneName);
+    }
 
+    public void PerformSceneChange()
+    {
+        if (_targetScene == null)
+        {
+            return;
+        }
+
+        _behaviorController.ClearBehaviors();
         _entityController.Clear();
         _cameraController.Reset();
 
-        scene.Load();
+        _targetScene.Load();
+        _targetScene = null;
     }
 }

@@ -10,14 +10,15 @@ namespace Asteroids.Engine;
 
 public class DependencyContainer : IDisposable
 {
-    private readonly Lazy<EntityController> _entityController;
+    private readonly Lazy<BehaviorController> _behaviorController;
     private readonly Lazy<CameraController> _cameraController;
-    private readonly Lazy<InputController> _inputController;
-    private readonly Lazy<Spawner> _spawner;
+    private readonly Lazy<EntityController> _entityController;
     private readonly Lazy<ImGuiController> _imguiController;
+    private readonly Lazy<InputController> _inputController;
     private readonly Lazy<Renderer> _renderer;
-    private readonly Lazy<SceneManager> _sceneManager;
     private readonly Lazy<SceneController> _sceneController;
+    private readonly Lazy<SceneManager> _sceneManager;
+    private readonly Lazy<Spawner> _spawner;
 
     public DependencyContainer(Engine engine, IWindow window)
     {
@@ -27,19 +28,25 @@ public class DependencyContainer : IDisposable
         Lazy<IInputContext> inputContext = new(() => Window.CreateInput());
         Lazy<GL> gl = new(() => Window.CreateOpenGL());
 
+        _behaviorController = new Lazy<BehaviorController>(() => new BehaviorController());
         _entityController = new Lazy<EntityController>(() => new EntityController());
         _cameraController = new Lazy<CameraController>(() => new CameraController());
         _inputController = new Lazy<InputController>(() => new InputController(inputContext.Value));
         _spawner = new Lazy<Spawner>(() => new Spawner(EntityController));
         _imguiController = new Lazy<ImGuiController>(() => new ImGuiController(gl.Value, window, inputContext.Value));
         _renderer = new Lazy<Renderer>(() => new Renderer(gl.Value, CameraController));
-        _sceneManager = new Lazy<SceneManager>(() => new SceneManager(Spawner, CameraController));
-        _sceneController = new Lazy<SceneController>(() => new SceneController(SceneManager, EntityController, CameraController));
+        _sceneManager = new Lazy<SceneManager>(() => new SceneManager(Spawner, CameraController, BehaviorController));
+        _sceneController = new Lazy<SceneController>(() => new SceneController(SceneManager, EntityController, CameraController, BehaviorController));
     }
 
     public Engine Engine { get; }
 
     public IWindow Window { get; }
+
+    public BehaviorController BehaviorController
+    {
+        get => _behaviorController.Value;
+    }
 
     public CameraController CameraController
     {

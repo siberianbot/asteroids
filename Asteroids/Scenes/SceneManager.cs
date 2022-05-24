@@ -7,11 +7,11 @@ public class SceneManager
 {
     private readonly List<Scene> _scenes;
 
-    public SceneManager(Spawner spawner, CameraController cameraController)
+    public SceneManager(Spawner spawner, CameraController cameraController, BehaviorController behaviorController)
     {
         _scenes = new List<Scene>
         {
-            new TestbedScene(spawner, cameraController),
+            new TestbedScene(spawner, cameraController, behaviorController),
             new AsteroidsDemoScene(spawner),
             new SpaceshipDemoScene(spawner)
         };

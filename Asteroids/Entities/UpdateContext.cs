@@ -6,5 +6,5 @@ public struct UpdateContext
 {
     public float Delta { get; init; }
 
-    public InputController InputController { get; init; }
+    public DependencyContainer DependencyContainer { get; set; }
 }
