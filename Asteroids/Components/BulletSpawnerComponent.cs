@@ -5,9 +5,12 @@ namespace Asteroids.Components;
 
 public class BulletSpawnerComponent : Component, IUpdatableComponent
 {
+    private const float Cooldown = 0.5f;
+
     private readonly Lazy<PositionComponent> _positionComponent;
     private readonly Lazy<MovementComponent> _movementComponent;
 
+    private float _offset;
     private bool _fire;
 
     public BulletSpawnerComponent()
@@ -18,7 +21,9 @@ public class BulletSpawnerComponent : Component, IUpdatableComponent
 
     public void Update(UpdateContext context)
     {
-        if (!_fire)
+        _offset += context.Delta;
+
+        if (!_fire || _offset <= Cooldown)
         {
             return;
         }
@@ -29,6 +34,7 @@ public class BulletSpawnerComponent : Component, IUpdatableComponent
         context.DependencyContainer.CommandQueue.Push(() => context.DependencyContainer.Spawner.SpawnBullet(Owner, position, direction));
 
         _fire = false;
+        _offset = 0.0f;
     }
 
     public void Fire()
