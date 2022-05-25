@@ -62,6 +62,7 @@ public class Spawner
         spaceship.AddComponent(new MovementComponent(0.0f, Vector2.Zero));
         spaceship.AddComponent(new PositionComponent(position, rotation));
         spaceship.AddComponent(new ColliderComponent(Spaceship.Model));
+        spaceship.AddComponent(new BulletSpawnerComponent());
 
         _entityController.AddEntity(spaceship);
 
@@ -71,9 +72,10 @@ public class Spawner
     public Bullet SpawnBullet(Entity owner, Vector2 position, Vector2 direction)
     {
         Bullet bullet = new Bullet(owner);
-        bullet.AddComponent(new ModelComponent(new List<Vector2> { Vector2.Zero }, Constants.Colors.White));
-        bullet.AddComponent(new MovementComponent(0.0f, direction)); // TODO: velocity
+        bullet.AddComponent(new ModelComponent(Bullet.Model, Constants.Colors.White));
+        bullet.AddComponent(new MovementComponent(10.0f, direction));
         bullet.AddComponent(new PositionComponent(position, 0.0f));
+        bullet.AddComponent(new ColliderComponent(Bullet.Model));
 
         _entityController.AddEntity(bullet);
 

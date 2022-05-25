@@ -12,6 +12,7 @@ public static class Constants
         public const string AsteroidsDemo = "AsteroidsDemo";
         public const string SpaceshipDemo = "SpaceshipDemo";
         public const string AsteroidCollision = "AsteroidCollision";
+        public const string PlayableDemo = "PlayableDemo";
     }
 
     public static class Colors

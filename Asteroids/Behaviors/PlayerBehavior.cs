@@ -7,10 +7,12 @@ namespace Asteroids.Behaviors;
 public class PlayerBehavior : IBehavior
 {
     private readonly SpaceshipControlComponent _spaceshipControlComponent;
+    private readonly BulletSpawnerComponent _bulletSpawnerComponent;
 
     public PlayerBehavior(Entity entity)
     {
         _spaceshipControlComponent = entity.GetComponent<SpaceshipControlComponent>() ?? throw new ArgumentException();
+        _bulletSpawnerComponent = entity.GetComponent<BulletSpawnerComponent>() ?? throw new ArgumentException();
     }
 
     public void Update(UpdateContext context)
@@ -36,6 +38,11 @@ public class PlayerBehavior : IBehavior
         else if (context.DependencyContainer.InputController.OnKeyPressed(Key.Down))
         {
             _spaceshipControlComponent.Decelerate();
+        }
+
+        if (context.DependencyContainer.InputController.OnKeyPressed(Key.Space))
+        {
+            _bulletSpawnerComponent.Fire();
         }
     }
 }

@@ -39,6 +39,11 @@ public class DebugBehavior : IBehavior
             {
                 context.DependencyContainer.SceneController.ChangeScene(Constants.Scenes.AsteroidCollision);
             }
+
+            if (ImGui.Button("Playable Demo"))
+            {
+                context.DependencyContainer.SceneController.ChangeScene(Constants.Scenes.PlayableDemo);
+            }
         }
 
         if (ImGui.CollapsingHeader("Engine"))
