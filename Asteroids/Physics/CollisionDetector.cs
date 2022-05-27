@@ -70,12 +70,16 @@ public static class CollisionDetector
         float numerator = MathUtils.CrossProduct(b1 - a1, r);
         float denominator = MathUtils.CrossProduct(r, s);
 
-        if (numerator != 0 && denominator == 0)
+        if (denominator != 0)
         {
-            return false;
+            float t = MathUtils.CrossProduct(b1 - a1, s) / denominator;
+            float u = numerator / denominator;
+
+            return 0 <= t && t <= 1 &&
+                   0 <= u && u <= 1;
         }
 
-        if (numerator == 0 && denominator == 0)
+        if (numerator == 0)
         {
             float t0 = Vector2.Dot(b1 - a1, r) / Vector2.Dot(r, r);
             float t1 = t0 + Vector2.Dot(s, r) / Vector2.Dot(r, r);
@@ -87,15 +91,6 @@ public static class CollisionDetector
                    0 <= absT1 && absT1 <= 1;
         }
 
-        if (denominator == 0)
-        {
-            return false;
-        }
-
-        float t = MathUtils.CrossProduct(b1 - a1, s) / denominator;
-        float u = numerator / denominator;
-
-        return 0 <= t && t <= 1 &&
-               0 <= u && u <= 1;
+        return false;
     }
 }
