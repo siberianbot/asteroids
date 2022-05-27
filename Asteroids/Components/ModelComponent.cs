@@ -5,7 +5,7 @@ namespace Asteroids.Components;
 
 public class ModelComponent : Component
 {
-    public ModelComponent(List<Vector2> points, Vector3 color)
+    public ModelComponent(IReadOnlyCollection<Vector2> points, Vector3 color)
     {
         VerticesData = points.SelectMany(point => new[] { point.X, point.Y }).ToArray();
         IndicesData = GenerationUtils.GenerateIndicesData(points.Count).ToArray();

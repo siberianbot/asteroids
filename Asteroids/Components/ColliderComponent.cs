@@ -1,4 +1,5 @@
 using System.Numerics;
+using Asteroids.Physics;
 using Asteroids.Utils;
 using Silk.NET.Maths;
 
@@ -7,38 +8,28 @@ namespace Asteroids.Components;
 public class ColliderComponent : Component
 {
     private readonly Lazy<PositionComponent> _positionComponent;
+    private readonly IReadOnlyCollection<Collider> _colliders;
 
-    public ColliderComponent(List<Vector2> points)
+    public ColliderComponent(IReadOnlyCollection<Collider> colliders)
     {
-        Segments = new ColliderLineSegment[points.Count];
-
-        for (int idx = 0; idx < points.Count; idx++)
-        {
-            int endPointIdx = idx + 1 == points.Count ? 0 : idx + 1;
-
-            Segments[idx] = new ColliderLineSegment(points[idx], points[endPointIdx]);
-        }
-
+        _colliders = colliders;
         _positionComponent = new Lazy<PositionComponent>(() => Owner.GetComponent<PositionComponent>() ?? throw new ArgumentException());
+
+        Enabled = true;
     }
 
-    public ColliderLineSegment[] Segments { get; }
+    public IReadOnlyCollection<Collider> Colliders
+    {
+        get => _colliders
+            .Select(collider => Collider.Rotate(collider, Vector2.Zero, _positionComponent.Value.Rotation))
+            .Select(collider => Collider.Translate(collider, _positionComponent.Value.Position))
+            .ToArray();
+    }
 
     public Box2D<float> BoundingBox
     {
-        get
-        {
-            float rotation = _positionComponent.Value.Rotation;
-
-            Vector2[] rotatedPoints = Segments
-                .Select(segment => MathUtils.Rotate(segment.Start, rotation))
-                .ToArray();
-
-            return new Box2D<float>(
-                rotatedPoints.Min(point => point.X),
-                rotatedPoints.Min(point => point.Y),
-                rotatedPoints.Max(point => point.X),
-                rotatedPoints.Max(point => point.Y));
-        }
+        get => Box2DUtils.FromVerticesCloud(Colliders.SelectMany(Collider.VerticesOf));
     }
+
+    public bool Enabled { get; set; }
 }

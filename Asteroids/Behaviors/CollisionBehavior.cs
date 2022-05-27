@@ -1,104 +1,90 @@
-using System.Numerics;
 using Asteroids.Components;
 using Asteroids.Entities;
-using Asteroids.Utils;
+using Asteroids.Physics;
 using Silk.NET.Maths;
 
 namespace Asteroids.Behaviors;
 
 public class CollisionBehavior : IBehavior
 {
-    private struct Collider
-    {
-        public Entity Entity { get; init; }
+    public event Action<Collision> CollisionStarted = delegate { };
 
-        public Box2D<float> BoundingBox { get; init; }
+    public event Action<Collision> CollisionFinished = delegate { };
 
-        public ColliderLineSegment[] Segments { get; init; }
-
-        public Vector2 Position { get; init; }
-
-        public float Rotation { get; init; }
-    }
-
-    public event Action<Entity, Entity, Vector2> CollisionDetected = delegate { };
+    private readonly List<Collision> _activeCollisions = new List<Collision>();
 
     public void Update(UpdateContext context)
     {
-        List<Collider> colliders = new List<Collider>();
-
-        context.DependencyContainer.EntityController.ForEachEntity(entity =>
-        {
-            ColliderComponent? colliderComponent = entity.GetComponent<ColliderComponent>();
-
-            if (colliderComponent == null)
-            {
-                return;
-            }
-
-            PositionComponent positionComponent = entity.GetComponent<PositionComponent>() ?? throw new ArgumentException();
-
-            colliders.Add(new Collider
+        var checkList = context.DependencyContainer.EntityController.Entities
+            .Select(entity => new
             {
                 Entity = entity,
-                BoundingBox = colliderComponent.BoundingBox,
-                Segments = colliderComponent.Segments,
-                Position = positionComponent.Position,
-                Rotation = positionComponent.Rotation
-            });
-        });
+                ColliderComponent = entity.GetComponent<ColliderComponent>()
+            })
+            .Where(entity => entity.ColliderComponent != null &&
+                             entity.ColliderComponent.Enabled)
+            .Select(x => new
+            {
+                x.Entity,
+                x.ColliderComponent!.Colliders,
+                x.ColliderComponent!.BoundingBox
+            })
+            .OrderBy(x => x.BoundingBox.Center.X)
+            .ToArray();
 
-        colliders = colliders
-            .OrderBy(collider => collider.BoundingBox.Center.X)
-            .ToList();
-
-        for (int i = 0; i < colliders.Count - 1; i++)
+        for (int i = 0; i < checkList.Length - 1; i++)
         {
-            Collider thisCollider = colliders[i];
-            Collider nextCollider = colliders[i + 1];
+            var left = checkList[i];
+            var right = checkList[i + 1];
+            Collision? collision = GetCollision(left.Entity, right.Entity);
 
-            Vector2? intersection = CheckIntersection(thisCollider, nextCollider);
+            if (!CollisionTest(left.BoundingBox, right.BoundingBox, left.Colliders, right.Colliders))
+            {
+                if (collision != null)
+                {
+                    CollisionFinished.Invoke(collision);
+                    _activeCollisions.Remove(collision);
+                }
 
-            if (intersection == null)
+                continue;
+            }
+
+            if (collision != null)
             {
                 continue;
             }
 
-            CollisionDetected.Invoke(thisCollider.Entity, nextCollider.Entity, intersection.Value);
-
-            context.DependencyContainer.EntityController.Destroy(thisCollider.Entity);
-            context.DependencyContainer.EntityController.Destroy(nextCollider.Entity);
+            collision = new Collision(left.Entity, right.Entity);
+            _activeCollisions.Add(collision);
+            CollisionStarted.Invoke(collision);
         }
     }
 
-    private static Vector2? CheckIntersection(Collider left, Collider right)
+    private Collision? GetCollision(Entity left, Entity right)
     {
-        if (!MathUtils.Intersects(
-                left.BoundingBox.GetTranslated(left.Position.ToGeneric()),
-                right.BoundingBox.GetTranslated(right.Position.ToGeneric())
-            ))
+        return _activeCollisions.FirstOrDefault(collision => collision.Left == left && collision.Right == right ||
+                                                             collision.Right == left && collision.Left == right);
+    }
+
+    private static bool CollisionTest(Box2D<float> leftBoundingBox, Box2D<float> rightBoundingBox,
+        IReadOnlyCollection<Collider> leftColliders, IReadOnlyCollection<Collider> rightColliders)
+    {
+        if (!CollisionDetector.BoundingBoxCollisionTest(leftBoundingBox, rightBoundingBox))
         {
-            return null;
+            return false;
         }
 
-        foreach (ColliderLineSegment leftSegment in left.Segments)
+        foreach (Collider leftCollider in leftColliders)
         {
-            foreach (ColliderLineSegment rightSegment in right.Segments)
+            foreach (Collider rightCollider in rightColliders)
             {
-                Vector2? intersection = MathUtils.GetIntersection(
-                    left.Position + MathUtils.Rotate(leftSegment.Start, left.Rotation),
-                    left.Position + MathUtils.Rotate(leftSegment.End, left.Rotation),
-                    right.Position + MathUtils.Rotate(rightSegment.Start, right.Rotation),
-                    right.Position + MathUtils.Rotate(rightSegment.End, right.Rotation)
-                );
-
-                if (intersection != null)
+                if (CollisionDetector.CollidersCollisionTest(leftCollider, rightCollider))
                 {
-                    return intersection.Value;
+                    return true;
                 }
             }
         }
 
-        return null;
+        return false;
     }
 }

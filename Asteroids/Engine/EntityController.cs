@@ -27,6 +27,11 @@ public class EntityController
         }
     }
 
+    public IEnumerable<Entity> Entities
+    {
+        get => _entities;
+    }
+
     public void Clear()
     {
         _entities.Clear();

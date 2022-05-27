@@ -14,13 +14,16 @@ public class PlayableDemoScene : Scene
     private readonly Vars _vars;
     private readonly CameraController _cameraController;
     private readonly BehaviorController _behaviorController;
+    private readonly EntityController _entityController;
 
-    public PlayableDemoScene(Spawner spawner, Vars vars, CameraController cameraController, BehaviorController behaviorController)
+    public PlayableDemoScene(Spawner spawner, Vars vars, CameraController cameraController, 
+        BehaviorController behaviorController, EntityController entityController)
     {
         _spawner = spawner;
         _vars = vars;
         _cameraController = cameraController;
         _behaviorController = behaviorController;
+        _entityController = entityController;
     }
 
     public override string Name
@@ -30,13 +33,20 @@ public class PlayableDemoScene : Scene
 
     public override void Load()
     {
+        // TODO: fix
+        
         const float radius = 10.0f;
         
         _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f);
 
         CollisionBehavior collisionBehavior = new CollisionBehavior();
+        // collisionBehavior.CollisionStarted += collision =>
+        // {
+            // _entityController.
+        // };
+        
         AsteroidSpawnBehavior asteroidSpawnBehavior = new AsteroidSpawnBehavior(_spawner);
-        collisionBehavior.CollisionDetected += asteroidSpawnBehavior.HandleCollision;
+        // collisionBehavior.CollisionStarted += asteroidSpawnBehavior.HandleCollision;
         _behaviorController.AddBehavior(collisionBehavior);
         _behaviorController.AddBehavior(asteroidSpawnBehavior);
         _behaviorController.AddBehavior(new MovementBehavior());
@@ -48,13 +58,13 @@ public class PlayableDemoScene : Scene
 
         _spawner.SpawnAsteroid(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f), scale: 1.0f);
 
-        collisionBehavior.CollisionDetected += (_, _, _) =>
-        {
-            float rightAngle = Random.Shared.NextSingle() * MathF.Tau;
-            
-            _spawner.SpawnAsteroid(
-                MathUtils.FromPolar(rightAngle, radius),
-                MathUtils.FromPolar(rightAngle + MathF.PI, radius));
-        };
+        // collisionBehavior.CollisionStarted += (_, _) =>
+        // {
+        //     float rightAngle = Random.Shared.NextSingle() * MathF.Tau;
+        //     
+        //     _spawner.SpawnAsteroid(
+        //         MathUtils.FromPolar(rightAngle, radius),
+        //         MathUtils.FromPolar(rightAngle + MathF.PI, radius));
+        // };
     }
 }

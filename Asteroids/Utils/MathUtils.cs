@@ -1,5 +1,4 @@
 using System.Numerics;
-using Silk.NET.Maths;
 
 namespace Asteroids.Utils;
 
@@ -71,12 +70,9 @@ public static class MathUtils
         return new Vector2(v.X * cos - v.Y * sin, v.X * sin + v.Y * cos);
     }
 
-    public static bool Intersects(Box2D<float> left, Box2D<float> right)
+    public static Vector2 Rotate(Vector2 v, float r, Vector2 o)
     {
-        Vector2D<float> maxDistance = left.Size / 2 + right.Size / 2;
-        Vector2D<float> diff = right.Center - left.Center;
-
-        return MathF.Abs(diff.X) <= maxDistance.X && MathF.Abs(diff.Y) <= maxDistance.Y;
+        return Rotate(v - o, r) + o;
     }
 
     public static float CrossProduct(Vector2 left, Vector2 right)
@@ -86,23 +82,18 @@ public static class MathUtils
 
     public static Vector2? GetIntersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2)
     {
-        float t = (
-            (a1.X - b1.X) * (b1.Y - b2.Y) - (a1.Y - b1.Y) * (b1.X - b2.X)
-        ) / (
-            (a1.X - a2.X) * (b1.Y - b2.Y) - (a1.Y - a2.Y) * (b1.X - b2.X)
-        );
+        float denominator = (a1.X - a2.X) * (b1.Y - b2.Y) - (a1.Y - a2.Y) * (b1.X - b2.X);
+        float p = a1.X * a2.Y - a1.Y * a2.X;
+        float q = b1.X * b2.Y - b1.Y * b2.X;
 
-        float u = (
-            (a1.X - b1.X) * (a1.Y - a2.Y) - (a1.Y - b1.Y) * (a1.X - a2.X)
-        ) / (
-            (a1.X - a2.X) * (b1.Y - b2.Y) - (a1.Y - a2.Y) * (b1.X - b2.X)
-        );
+        float x = (p * (b1.X - b2.X) - q * (a1.X - a2.X)) / denominator;
+        float y = (p * (b1.Y - b2.Y) - q * (a1.Y - a2.Y)) / denominator;
 
-        if (t is < 0 or > 1 || u is < 0 or > 1)
+        if (float.IsNaN(x) || float.IsNaN(y))
         {
             return null;
         }
 
-        return new Vector2(a1.X + t * (a2.X - a1.X), a1.Y + t * (a2.Y - a2.Y));
+        return new Vector2(x, y);
     }
 }

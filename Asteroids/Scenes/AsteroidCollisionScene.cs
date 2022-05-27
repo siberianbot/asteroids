@@ -1,5 +1,4 @@
 using Asteroids.Behaviors;
-using Asteroids.Components;
 using Asteroids.Engine;
 using Asteroids.Entities;
 using Asteroids.Utils;
@@ -11,12 +10,14 @@ public class AsteroidCollisionScene : Scene
     private readonly Spawner _spawner;
     private readonly BehaviorController _behaviorController;
     private readonly Vars _vars;
+    private readonly EntityController _entityController;
 
-    public AsteroidCollisionScene(Spawner spawner, BehaviorController behaviorController, Vars vars)
+    public AsteroidCollisionScene(Spawner spawner, BehaviorController behaviorController, Vars vars, EntityController entityController)
     {
         _spawner = spawner;
         _behaviorController = behaviorController;
         _vars = vars;
+        _entityController = entityController;
     }
 
     public override string Name
@@ -33,7 +34,13 @@ public class AsteroidCollisionScene : Scene
 
         CollisionBehavior collisionBehavior = new CollisionBehavior();
         AsteroidSpawnBehavior asteroidSpawnBehavior = new AsteroidSpawnBehavior(_spawner);
-        collisionBehavior.CollisionDetected += asteroidSpawnBehavior.HandleCollision;
+        collisionBehavior.CollisionStarted += collision =>
+        {
+            asteroidSpawnBehavior.HandleCollision(collision);
+            _entityController.Destroy(collision.Left);
+            _entityController.Destroy(collision.Right);
+        };
+
         _behaviorController.AddBehavior(collisionBehavior);
         _behaviorController.AddBehavior(asteroidSpawnBehavior);
         _behaviorController.AddBehavior(new MovementBehavior());
