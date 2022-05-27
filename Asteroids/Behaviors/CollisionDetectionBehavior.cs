@@ -5,7 +5,7 @@ using Silk.NET.Maths;
 
 namespace Asteroids.Behaviors;
 
-public class CollisionBehavior : IBehavior
+public class CollisionDetectionBehavior : IBehavior
 {
     public event Action<Collision> CollisionStarted = delegate { };
 
@@ -21,8 +21,7 @@ public class CollisionBehavior : IBehavior
                 Entity = entity,
                 ColliderComponent = entity.GetComponent<ColliderComponent>()
             })
-            .Where(entity => entity.ColliderComponent != null &&
-                             entity.ColliderComponent.Enabled)
+            .Where(entity => entity.ColliderComponent != null)
             .Select(x => new
             {
                 x.Entity,

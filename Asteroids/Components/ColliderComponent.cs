@@ -14,8 +14,6 @@ public class ColliderComponent : Component
     {
         _colliders = colliders;
         _positionComponent = new Lazy<PositionComponent>(() => Owner.GetComponent<PositionComponent>() ?? throw new ArgumentException());
-
-        Enabled = true;
     }
 
     public IReadOnlyCollection<Collider> Colliders
@@ -30,6 +28,4 @@ public class ColliderComponent : Component
     {
         get => Box2DUtils.FromVerticesCloud(Colliders.SelectMany(Collider.VerticesOf));
     }
-
-    public bool Enabled { get; set; }
 }
