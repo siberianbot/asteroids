@@ -7,16 +7,15 @@ public class SceneManager
 {
     private readonly List<Scene> _scenes;
 
-    public SceneManager(Spawner spawner, CameraController cameraController, BehaviorController behaviorController, Vars vars,
-        EntityController entityController)
+    public SceneManager(Spawner spawner, CameraController cameraController, BehaviorController behaviorController, Vars vars)
     {
         _scenes = new List<Scene>
         {
             new TestbedScene(spawner, cameraController, behaviorController, vars),
             new AsteroidsDemoScene(spawner, vars),
             new SpaceshipDemoScene(spawner, vars),
-            new AsteroidCollisionScene(spawner, behaviorController, vars, entityController),
-            new PlayableDemoScene(spawner, vars, cameraController, behaviorController, entityController)
+            new AsteroidCollisionScene(spawner, behaviorController, vars),
+            new PlayableDemoScene(spawner, vars, cameraController, behaviorController)
         };
     }
 

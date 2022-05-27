@@ -96,4 +96,9 @@ public static class MathUtils
 
         return new Vector2(x, y);
     }
+
+    public static bool AreOpposite(Vector2 a, Vector2 b)
+    {
+        return Vector2.Dot(a, b) <= 0;
+    }
 }

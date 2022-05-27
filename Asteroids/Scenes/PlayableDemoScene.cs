@@ -14,16 +14,13 @@ public class PlayableDemoScene : Scene
     private readonly Vars _vars;
     private readonly CameraController _cameraController;
     private readonly BehaviorController _behaviorController;
-    private readonly EntityController _entityController;
 
-    public PlayableDemoScene(Spawner spawner, Vars vars, CameraController cameraController, 
-        BehaviorController behaviorController, EntityController entityController)
+    public PlayableDemoScene(Spawner spawner, Vars vars, CameraController cameraController, BehaviorController behaviorController)
     {
         _spawner = spawner;
         _vars = vars;
         _cameraController = cameraController;
         _behaviorController = behaviorController;
-        _entityController = entityController;
     }
 
     public override string Name
@@ -33,38 +30,19 @@ public class PlayableDemoScene : Scene
 
     public override void Load()
     {
-        // TODO: fix
-        
         const float radius = 10.0f;
-        
+
         _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f);
 
-        CollisionBehavior collisionBehavior = new CollisionBehavior();
-        // collisionBehavior.CollisionStarted += collision =>
-        // {
-            // _entityController.
-        // };
-        
-        AsteroidSpawnBehavior asteroidSpawnBehavior = new AsteroidSpawnBehavior(_spawner);
-        // collisionBehavior.CollisionStarted += asteroidSpawnBehavior.HandleCollision;
-        _behaviorController.AddBehavior(collisionBehavior);
-        _behaviorController.AddBehavior(asteroidSpawnBehavior);
+        CollisionDetectionBehavior collisionDetectionBehavior = new CollisionDetectionBehavior();
+        _behaviorController.AddBehavior(collisionDetectionBehavior);
+        _behaviorController.AddBehavior(new CollisionHandlingBehavior(collisionDetectionBehavior));
         _behaviorController.AddBehavior(new MovementBehavior());
+        _behaviorController.AddBehavior(new AsteroidSpawningBehavior(radius, 5.0f));
 
         Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f), Constants.Colors.Green);
         spaceship.AddComponent(new SpaceshipControlComponent());
         _cameraController.CurrentCamera = new Camera(spaceship);
         _behaviorController.AddBehavior(new PlayerBehavior(spaceship));
-
-        _spawner.SpawnAsteroid(new Vector2(-5.0f, 0f), new Vector2(1.0f, 0.0f), scale: 1.0f);
-
-        // collisionBehavior.CollisionStarted += (_, _) =>
-        // {
-        //     float rightAngle = Random.Shared.NextSingle() * MathF.Tau;
-        //     
-        //     _spawner.SpawnAsteroid(
-        //         MathUtils.FromPolar(rightAngle, radius),
-        //         MathUtils.FromPolar(rightAngle + MathF.PI, radius));
-        // };
     }
 }

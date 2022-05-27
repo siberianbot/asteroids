@@ -4,8 +4,6 @@ namespace Asteroids;
 
 public static class Constants
 {
-    public const int AsteroidSpikesCount = 8;
-
     public static class Scenes
     {
         public const string Testbed = "Testbed";
@@ -48,5 +46,10 @@ public static class Constants
         public static string Engine_TimeMultiplier = "Engine:TimeMultiplier";
         public static string Physics_ShowBoundingBox = "Physics:ShowBoundingBox";
         public static string Physics_ShowCollider = "Physics:ShowCollider";
+    }
+
+    public static class Asteroids
+    {
+        public const int SpikesCount = 8;
     }
 }

@@ -15,19 +15,20 @@ public class Spawner
         _entityController = entityController;
     }
 
-    public Asteroid SpawnAsteroid(Vector2 position, Vector2 direction, float? velocity = null, float scale = 1.0f)
+    public Asteroid SpawnAsteroid(Vector2 position, Vector2 direction, float? velocity = null, float? scale = null)
     {
         velocity ??= Random.Shared.NextSingle();
+        scale ??= 0.25f + 0.75f * Random.Shared.NextSingle();
 
-        float rotationVelocity = -0.5f + 2 * Random.Shared.NextSingle();
+        float rotationVelocity = -MathF.PI + MathF.Tau * Random.Shared.NextSingle();
 
         List<Vector2> points = new List<Vector2>();
         Vector2 center = Vector2.Zero;
 
-        for (int i = 0; i < Constants.AsteroidSpikesCount; i++)
+        for (int i = 0; i < Constants.Asteroids.SpikesCount; i++)
         {
-            float angle = MathF.Tau * i / Constants.AsteroidSpikesCount;
-            float radius = scale * (0.5f + Random.Shared.NextSingle() / 2);
+            float angle = MathF.Tau * i / Constants.Asteroids.SpikesCount;
+            float radius = scale.Value * (0.5f + 0.5f * Random.Shared.NextSingle());
 
             Vector2 point = MathUtils.FromPolar(angle, radius);
 
@@ -36,9 +37,9 @@ public class Spawner
             points.Add(point);
         }
 
-        center /= Constants.AsteroidSpikesCount;
+        center /= Constants.Asteroids.SpikesCount;
 
-        for (int i = 0; i < Constants.AsteroidSpikesCount; i++)
+        for (int i = 0; i < Constants.Asteroids.SpikesCount; i++)
         {
             points[i] -= center;
         }
@@ -58,7 +59,7 @@ public class Spawner
             colliders.Add(collider);
         }
 
-        Asteroid asteroid = new Asteroid(rotationVelocity, scale);
+        Asteroid asteroid = new Asteroid(rotationVelocity, scale.Value);
         asteroid.AddComponent(new ModelComponent(points, Constants.Colors.Gray));
         asteroid.AddComponent(new ColliderComponent(colliders));
         asteroid.AddComponent(new PositionComponent(position, 0f));

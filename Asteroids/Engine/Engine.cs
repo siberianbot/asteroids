@@ -2,6 +2,7 @@ using System.Numerics;
 using Asteroids.Behaviors;
 using Asteroids.Components;
 using Asteroids.Entities;
+using Asteroids.Physics;
 using Asteroids.Rendering;
 using Asteroids.Utils;
 using Silk.NET.Maths;
@@ -76,6 +77,22 @@ public sealed class Engine : IDisposable
                 );
 
                 renderList.Add(boundingBoxData);
+                
+                foreach (Collider collider in colliderComponent.Colliders)
+                {
+                    RenderData colliderData = new RenderData(
+                        Collider.VerticesOf(collider)
+                            .SelectMany(vertices => new[] { vertices.X, vertices.Y })
+                            .ToArray(),
+                        GenerationUtils.GenerateIndicesData(3).ToArray(),
+                        3,
+                        Constants.Colors.DarkGray,
+                        Matrix4x4.CreateTranslation(0, 0, -1) *
+                        Matrix4x4.Identity
+                    );
+
+                    renderList.Add(colliderData);
+                }
             }
 
             RenderData data = new RenderData(
@@ -87,32 +104,7 @@ public sealed class Engine : IDisposable
             );
 
             renderList.Add(data);
-
-            // TODO: deal with this mess
-            // if (_dependencyContainer.GlobalVars.GetVar(Constants.Vars.Physics_ShowCollider, false) &&
-            //     colliderComponent != null)
-            // {
-            //     RenderData colliderData = new RenderData(
-            //         colliderComponent.Segments
-            //             .SelectMany(segment =>
-            //             {
-            //                 return new[]
-            //                 {
-            //                     positionComponent.Position + MathUtils.Rotate(segment.Start, positionComponent.Rotation),
-            //                     positionComponent.Position + MathUtils.Rotate(segment.End, positionComponent.Rotation)
-            //                 };
-            //             })
-            //             .SelectMany(vertices => new[] { vertices.X, vertices.Y })
-            //             .ToArray(),
-            //         GenerationUtils.GenerateIndicesData(colliderComponent.Segments.Length * 2).ToArray(),
-            //         (uint)colliderComponent.Segments.Length * 2,
-            //         Constants.Colors.MaxRed,
-            //         Matrix4x4.CreateTranslation(0, 0, -1) * Matrix4x4.Identity
-            //     );
-            //
-            //     renderList.Add(colliderData);
-            // }
-        });
+        }); 
 
         _dependencyContainer.Renderer.Render(renderList);
         _dependencyContainer.ImGuiController.Render();

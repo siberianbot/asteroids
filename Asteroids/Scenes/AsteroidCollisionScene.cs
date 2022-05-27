@@ -10,14 +10,12 @@ public class AsteroidCollisionScene : Scene
     private readonly Spawner _spawner;
     private readonly BehaviorController _behaviorController;
     private readonly Vars _vars;
-    private readonly EntityController _entityController;
 
-    public AsteroidCollisionScene(Spawner spawner, BehaviorController behaviorController, Vars vars, EntityController entityController)
+    public AsteroidCollisionScene(Spawner spawner, BehaviorController behaviorController, Vars vars)
     {
         _spawner = spawner;
         _behaviorController = behaviorController;
         _vars = vars;
-        _entityController = entityController;
     }
 
     public override string Name
@@ -32,17 +30,9 @@ public class AsteroidCollisionScene : Scene
         const float velocity = 0.5f;
         const float radius = 5.0f;
 
-        CollisionBehavior collisionBehavior = new CollisionBehavior();
-        AsteroidSpawnBehavior asteroidSpawnBehavior = new AsteroidSpawnBehavior(_spawner);
-        collisionBehavior.CollisionStarted += collision =>
-        {
-            asteroidSpawnBehavior.HandleCollision(collision);
-            _entityController.Destroy(collision.Left);
-            _entityController.Destroy(collision.Right);
-        };
-
-        _behaviorController.AddBehavior(collisionBehavior);
-        _behaviorController.AddBehavior(asteroidSpawnBehavior);
+        CollisionDetectionBehavior collisionDetectionBehavior = new CollisionDetectionBehavior();
+        _behaviorController.AddBehavior(collisionDetectionBehavior);
+        _behaviorController.AddBehavior(new CollisionHandlingBehavior(collisionDetectionBehavior));
         _behaviorController.AddBehavior(new MovementBehavior());
 
         float leftAngle = Random.Shared.NextSingle() * MathF.PI + MathF.PI / 2;
