@@ -9,8 +9,9 @@ public class DebugBehavior : IBehavior
     public void Update(UpdateContext context)
     {
         ImGui.SetNextWindowPos(new Vector2(10, 10));
+        ImGui.SetNextWindowSize(new Vector2(400, 200));
 
-        if (ImGui.Begin("Debug Menu"))
+        if (ImGui.Begin("Debug Menu", ImGuiWindowFlags.NoResize))
         {
             if (ImGui.CollapsingHeader("Frame Time"))
             {

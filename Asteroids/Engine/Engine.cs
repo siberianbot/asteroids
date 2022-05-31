@@ -146,7 +146,7 @@ public sealed class Engine : IDisposable
     private void OnResize(Vector2D<int> dimensions)
     {
         _dependencyContainer.Renderer.UpdateDimensions(dimensions);
-        _dependencyContainer.CameraController.UpdateDimensions(dimensions);
+        _dependencyContainer.ScreenController.ScreenDimensions = new Vector2(dimensions.X, dimensions.Y);
     }
 
     #region IDisposable

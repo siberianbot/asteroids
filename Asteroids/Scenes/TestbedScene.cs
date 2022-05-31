@@ -35,7 +35,7 @@ public class TestbedScene : Scene
         Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f), player);
         spaceship.AddComponent(new SpaceshipControlComponent());
 
-        _cameraController.CurrentCamera = new Camera(spaceship);
+        _cameraController.CurrentCamera = _spawner.SpawnCamera(spaceship);
         _behaviorController.AddBehavior(new PlayerControlBehavior());
         _behaviorController.AddBehavior(new MovementBehavior());
         _spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero, scale: 1.0f);

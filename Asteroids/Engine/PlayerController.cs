@@ -27,4 +27,9 @@ public class PlayerController
     {
         _commandQueue.Push(() => _players.Remove(player));
     }
+
+    public void Clear()
+    {
+        _players.Clear();
+    }
 }

@@ -9,6 +9,7 @@ public class SceneController
     private readonly EntityController _entityController;
     private readonly CameraController _cameraController;
     private readonly BehaviorController _behaviorController;
+    private readonly PlayerController _playerController;
     private readonly CommandQueue _commandQueue;
 
     public SceneController(
@@ -16,12 +17,14 @@ public class SceneController
         EntityController entityController,
         CameraController cameraController,
         BehaviorController behaviorController,
+        PlayerController playerController,
         CommandQueue commandQueue)
     {
         _sceneManager = sceneManager;
         _entityController = entityController;
         _cameraController = cameraController;
         _behaviorController = behaviorController;
+        _playerController = playerController;
         _commandQueue = commandQueue;
     }
 
@@ -32,6 +35,7 @@ public class SceneController
         _commandQueue.Push(() =>
         {
             _behaviorController.ClearBehaviors();
+            _playerController.Clear();
             _entityController.Clear();
             _cameraController.Reset();
 

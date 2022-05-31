@@ -1,3 +1,4 @@
+using System.Numerics;
 using Asteroids.Commands;
 using Asteroids.Entities;
 using Asteroids.Rendering;
@@ -21,6 +22,7 @@ public class DependencyContainer : IDisposable
     private readonly Lazy<Renderer> _renderer;
     private readonly Lazy<SceneController> _sceneController;
     private readonly Lazy<SceneManager> _sceneManager;
+    private readonly Lazy<ScreenController> _screenController;
     private readonly Lazy<Spawner> _spawner;
 
     public DependencyContainer(Engine engine, IWindow window)
@@ -35,7 +37,7 @@ public class DependencyContainer : IDisposable
         _behaviorController = new Lazy<BehaviorController>(() => new BehaviorController());
         _commandQueue = new Lazy<CommandQueue>(() => new CommandQueue());
         _entityController = new Lazy<EntityController>(() => new EntityController(CommandQueue, this));
-        _cameraController = new Lazy<CameraController>(() => new CameraController());
+        _cameraController = new Lazy<CameraController>(() => new CameraController(Spawner));
         _inputController = new Lazy<InputController>(() => new InputController(inputContext.Value));
         _spawner = new Lazy<Spawner>(() => new Spawner(EntityController, PlayerController));
         _imguiController = new Lazy<ImGuiController>(() => new ImGuiController(gl.Value, window, inputContext.Value));
@@ -43,7 +45,8 @@ public class DependencyContainer : IDisposable
         _renderer = new Lazy<Renderer>(() => new Renderer(gl.Value, CameraController));
         _sceneManager = new Lazy<SceneManager>(() => new SceneManager(Spawner, CameraController, BehaviorController, GlobalVars));
         _sceneController = new Lazy<SceneController>(() => new SceneController(SceneManager,
-            EntityController, CameraController, BehaviorController, CommandQueue));
+            EntityController, CameraController, BehaviorController, PlayerController, CommandQueue));
+        _screenController = new Lazy<ScreenController>();
     }
 
     public Engine Engine { get; }
@@ -90,6 +93,11 @@ public class DependencyContainer : IDisposable
     public Renderer Renderer
     {
         get => _renderer.Value;
+    }
+
+    public ScreenController ScreenController
+    {
+        get => _screenController.Value;
     }
 
     public Spawner Spawner
