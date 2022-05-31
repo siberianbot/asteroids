@@ -4,7 +4,6 @@ using Asteroids.Components;
 using Asteroids.Engine;
 using Asteroids.Entities;
 using Asteroids.Rendering;
-using Asteroids.Utils;
 
 namespace Asteroids.Scenes;
 
@@ -39,10 +38,9 @@ public class PlayableDemoScene : Scene
         _behaviorController.AddBehavior(new CollisionHandlingBehavior(collisionDetectionBehavior));
         _behaviorController.AddBehavior(new MovementBehavior());
         _behaviorController.AddBehavior(new AsteroidSpawningBehavior(radius, 5.0f));
+        _behaviorController.AddBehavior(new PlayerControlBehavior());
+        _behaviorController.AddBehavior(new PlayerSpawningBehavior());
 
-        Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f), Constants.Colors.Green);
-        spaceship.AddComponent(new SpaceshipControlComponent());
-        _cameraController.CurrentCamera = new Camera(spaceship);
-        _behaviorController.AddBehavior(new PlayerBehavior(spaceship));
+        _spawner.SpawnPlayer("Asteroids Player", Constants.Colors.Green);
     }
 }

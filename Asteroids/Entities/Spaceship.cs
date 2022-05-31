@@ -3,7 +3,7 @@ using Asteroids.Physics;
 
 namespace Asteroids.Entities;
 
-public class Spaceship : Entity
+public class Spaceship : Entity, IOwnedEntity
 {
     public static readonly Vector2[] Model =
     {
@@ -26,4 +26,26 @@ public class Spaceship : Entity
             new Vector2(-0.25f, -0.2f)
         )
     };
+
+    private readonly Player? _owner;
+
+    public Spaceship(Player? owner)
+    {
+        _owner = owner;
+    }
+
+    public override void Destroy(DestroyContext context)
+    {
+        base.Destroy(context);
+
+        if (_owner != null)
+        {
+            _owner.Alive = false;
+        }
+    }
+
+    public Entity? Owner
+    {
+        get => _owner;
+    }
 }

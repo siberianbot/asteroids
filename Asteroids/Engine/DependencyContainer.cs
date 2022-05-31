@@ -17,6 +17,7 @@ public class DependencyContainer : IDisposable
     private readonly Lazy<EntityController> _entityController;
     private readonly Lazy<ImGuiController> _imguiController;
     private readonly Lazy<InputController> _inputController;
+    private readonly Lazy<PlayerController> _playerController;
     private readonly Lazy<Renderer> _renderer;
     private readonly Lazy<SceneController> _sceneController;
     private readonly Lazy<SceneManager> _sceneManager;
@@ -33,11 +34,12 @@ public class DependencyContainer : IDisposable
 
         _behaviorController = new Lazy<BehaviorController>(() => new BehaviorController());
         _commandQueue = new Lazy<CommandQueue>(() => new CommandQueue());
-        _entityController = new Lazy<EntityController>(() => new EntityController(CommandQueue));
+        _entityController = new Lazy<EntityController>(() => new EntityController(CommandQueue, this));
         _cameraController = new Lazy<CameraController>(() => new CameraController());
         _inputController = new Lazy<InputController>(() => new InputController(inputContext.Value));
-        _spawner = new Lazy<Spawner>(() => new Spawner(EntityController));
+        _spawner = new Lazy<Spawner>(() => new Spawner(EntityController, PlayerController));
         _imguiController = new Lazy<ImGuiController>(() => new ImGuiController(gl.Value, window, inputContext.Value));
+        _playerController = new Lazy<PlayerController>(() => new PlayerController(CommandQueue));
         _renderer = new Lazy<Renderer>(() => new Renderer(gl.Value, CameraController));
         _sceneManager = new Lazy<SceneManager>(() => new SceneManager(Spawner, CameraController, BehaviorController, GlobalVars));
         _sceneController = new Lazy<SceneController>(() => new SceneController(SceneManager,
@@ -78,6 +80,11 @@ public class DependencyContainer : IDisposable
     public InputController InputController
     {
         get => _inputController.Value;
+    }
+
+    public PlayerController PlayerController
+    {
+        get => _playerController.Value;
     }
 
     public Renderer Renderer

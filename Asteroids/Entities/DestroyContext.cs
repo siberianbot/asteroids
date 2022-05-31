@@ -2,9 +2,7 @@ using Asteroids.Engine;
 
 namespace Asteroids.Entities;
 
-public struct UpdateContext
+public struct DestroyContext
 {
-    public float Delta { get; init; }
-
     public DependencyContainer DependencyContainer { get; init; }
 }

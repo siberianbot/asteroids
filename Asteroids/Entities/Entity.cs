@@ -34,4 +34,9 @@ public abstract class Entity
             component.Update(context);
         }
     }
+
+    public virtual void Destroy(DestroyContext context)
+    {
+        //
+    }
 }

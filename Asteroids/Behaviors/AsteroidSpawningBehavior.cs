@@ -28,6 +28,7 @@ public class AsteroidSpawningBehavior : IBehavior
 
         _passed = 0;
 
+        // TODO
         float angle = Random.Shared.NextSingle() * MathF.Tau;
 
         context.DependencyContainer.Spawner.SpawnAsteroid(

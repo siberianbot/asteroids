@@ -5,6 +5,7 @@ using Asteroids.Entities;
 using Asteroids.Physics;
 using Asteroids.Rendering;
 using Asteroids.Utils;
+using ImGuiNET;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
 
@@ -36,6 +37,7 @@ public sealed class Engine : IDisposable
     private void InitWindow()
     {
         _dependencyContainer.BehaviorController.AddBehavior(new DebugBehavior());
+        _dependencyContainer.BehaviorController.AddBehavior(new UIBehavior());
         _dependencyContainer.SceneController.ChangeScene(Constants.Scenes.Testbed);
 
         OnResize(_dependencyContainer.Window.Size);
@@ -52,7 +54,13 @@ public sealed class Engine : IDisposable
         // TODO: deal with this mess
         _dependencyContainer.EntityController.ForEachEntity(entity =>
         {
-            ModelComponent modelComponent = entity.GetComponent<ModelComponent>() ?? throw new NullReferenceException();
+            ModelComponent? modelComponent = entity.GetComponent<ModelComponent>();
+
+            if (modelComponent == null)
+            {
+                return;
+            }
+
             PositionComponent positionComponent = entity.GetComponent<PositionComponent>() ?? throw new NullReferenceException();
             ColliderComponent? colliderComponent = entity.GetComponent<ColliderComponent>();
 
@@ -77,7 +85,11 @@ public sealed class Engine : IDisposable
                 );
 
                 renderList.Add(boundingBoxData);
-                
+            }
+
+            if (_dependencyContainer.GlobalVars.GetVar(Constants.Vars.Physics_ShowCollider, false) &&
+                colliderComponent != null)
+            {
                 foreach (Collider collider in colliderComponent.Colliders)
                 {
                     RenderData colliderData = new RenderData(
@@ -104,7 +116,7 @@ public sealed class Engine : IDisposable
             );
 
             renderList.Add(data);
-        }); 
+        });
 
         _dependencyContainer.Renderer.Render(renderList);
         _dependencyContainer.ImGuiController.Render();
@@ -116,6 +128,7 @@ public sealed class Engine : IDisposable
     {
         DateTime start = DateTime.UtcNow;
 
+        _dependencyContainer.ImGuiController.Update((float)delta);
         _dependencyContainer.CommandQueue.ExecutePending();
 
         UpdateContext context = new UpdateContext

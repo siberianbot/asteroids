@@ -9,10 +9,12 @@ namespace Asteroids.Entities;
 public class Spawner
 {
     private readonly EntityController _entityController;
+    private readonly PlayerController _playerController;
 
-    public Spawner(EntityController entityController)
+    public Spawner(EntityController entityController, PlayerController playerController)
     {
         _entityController = entityController;
+        _playerController = playerController;
     }
 
     public Asteroid SpawnAsteroid(Vector2 position, Vector2 direction, float? velocity = null, float? scale = null)
@@ -70,18 +72,25 @@ public class Spawner
         return asteroid;
     }
 
-    public Spaceship SpawnSpaceship(Vector2 position, Vector3 color)
+    public Spaceship SpawnSpaceship(Vector2 position, Player? owner = null, Vector3? color = null)
     {
+        color ??= owner?.Color ?? Constants.Colors.Green;
+
         float rotation = Random.Shared.NextSingle() * MathF.Tau;
 
-        Spaceship spaceship = new Spaceship();
-        spaceship.AddComponent(new ModelComponent(Spaceship.Model, color));
+        Spaceship spaceship = new Spaceship(owner);
+        spaceship.AddComponent(new ModelComponent(Spaceship.Model, color.Value));
         spaceship.AddComponent(new ColliderComponent(Spaceship.CollisionModel));
         spaceship.AddComponent(new MovementComponent(0.0f, Vector2.Zero));
         spaceship.AddComponent(new PositionComponent(position, rotation));
         spaceship.AddComponent(new BulletSpawnerComponent());
 
         _entityController.AddEntity(spaceship);
+
+        if (owner != null)
+        {
+            owner.Alive = true;
+        }
 
         return spaceship;
     }
@@ -97,5 +106,15 @@ public class Spawner
         _entityController.AddEntity(bullet);
 
         return bullet;
+    }
+
+    public Player SpawnPlayer(string name, Vector3 color)
+    {
+        Player player = new Player(name, color);
+
+        _entityController.AddEntity(player);
+        _playerController.AddPlayer(player);
+
+        return player;
     }
 }

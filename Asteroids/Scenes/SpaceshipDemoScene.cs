@@ -31,7 +31,7 @@ public class SpaceshipDemoScene : Scene
                 Vector2 position = new Vector2(-5.0f + x * 2.5f, -2.5f + y * 2.5f);
                 int colorIdx = Random.Shared.Next(Constants.Colors.All.Length);
 
-                _spawner.SpawnSpaceship(position, Constants.Colors.All[colorIdx]);
+                _spawner.SpawnSpaceship(position, color: Constants.Colors.All[colorIdx]);
             }
         }
     }

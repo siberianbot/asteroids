@@ -3,7 +3,7 @@ using Asteroids.Physics;
 
 namespace Asteroids.Entities;
 
-public class Bullet : Entity
+public class Bullet : Entity, IOwnedEntity
 {
     public static readonly Vector2[] Model =
     {

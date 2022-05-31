@@ -31,11 +31,12 @@ public class TestbedScene : Scene
     {
         _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f);
 
-        Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f), Constants.Colors.Green);
+        Player player = _spawner.SpawnPlayer("test player", Constants.Colors.Green);
+        Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f), player);
         spaceship.AddComponent(new SpaceshipControlComponent());
 
         _cameraController.CurrentCamera = new Camera(spaceship);
-        _behaviorController.AddBehavior(new PlayerBehavior(spaceship));
+        _behaviorController.AddBehavior(new PlayerControlBehavior());
         _behaviorController.AddBehavior(new MovementBehavior());
         _spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero, scale: 1.0f);
         _spawner.SpawnAsteroid(new Vector2(-2.5f, 0f), Vector2.Zero, scale: 0.75f);
