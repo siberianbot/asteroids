@@ -38,6 +38,7 @@ public class TestbedScene : Scene
         _cameraController.CurrentCamera = _spawner.SpawnCamera(spaceship);
         _behaviorController.AddBehavior(new PlayerControlBehavior());
         _behaviorController.AddBehavior(new MovementBehavior());
+        _behaviorController.AddBehavior(new EntityCleanupBehavior());
         _spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero, scale: 1.0f);
         _spawner.SpawnAsteroid(new Vector2(-2.5f, 0f), Vector2.Zero, scale: 0.75f);
         _spawner.SpawnAsteroid(new Vector2(+2.5f, 0f), Vector2.Zero, scale: 0.5f);

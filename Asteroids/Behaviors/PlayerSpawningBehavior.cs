@@ -22,7 +22,7 @@ public class PlayerSpawningBehavior : IBehavior
 
             if (!_cooldown.ContainsKey(player))
             {
-                _cooldown[player] = 0;
+                _cooldown[player] = Cooldown;
             }
 
             _cooldown[player] += context.Delta;

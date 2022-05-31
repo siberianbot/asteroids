@@ -40,6 +40,7 @@ public class PlayableDemoScene : Scene
         _behaviorController.AddBehavior(new AsteroidSpawningBehavior(radius, 5.0f));
         _behaviorController.AddBehavior(new PlayerControlBehavior());
         _behaviorController.AddBehavior(new PlayerSpawningBehavior());
+        _behaviorController.AddBehavior(new EntityCleanupBehavior());
 
         _spawner.SpawnPlayer("Asteroids Player", Constants.Colors.Green);
     }
