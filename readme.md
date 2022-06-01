@@ -30,4 +30,3 @@ An Asteroids reincarnation, but developing in hard way.
 - [ ] Multiplayer mode;
 - [x] Asteroids generation;
 - [x] Collision handling (requires a lot of improvements).
-~~~~
