@@ -1,4 +1,5 @@
 using System.Numerics;
+using Asteroids.Components;
 using Asteroids.Entities;
 using Asteroids.Utils;
 
@@ -7,32 +8,45 @@ namespace Asteroids.Behaviors;
 public class AsteroidSpawningBehavior : IBehavior
 {
     private readonly float _radius;
-    private readonly float _delay;
-    private float _passed;
+    private readonly float _maxCooldown;
+    private float _cooldown;
 
-    public AsteroidSpawningBehavior(float radius, float delay)
+    public AsteroidSpawningBehavior(float radius, float maxCooldown)
     {
         _radius = radius;
-        _delay = delay;
-        _passed = delay;
+        _maxCooldown = maxCooldown;
+        _cooldown = maxCooldown;
     }
 
     public void Update(UpdateContext context)
     {
-        _passed += context.Delta;
+        _cooldown += context.Delta;
 
-        if (_passed < _delay)
+        if (_cooldown < _maxCooldown)
         {
             return;
         }
 
-        _passed = 0;
+        _cooldown = 0;
 
-        // TODO
-        float angle = Random.Shared.NextSingle() * MathF.Tau;
+        foreach (Player player in context.DependencyContainer.PlayerController.Players)
+        {
+            if (!player.Alive)
+            {
+                continue;
+            }
 
-        context.DependencyContainer.Spawner.SpawnAsteroid(
-            MathUtils.FromPolar(angle, _radius),
-            Vector2.Normalize(MathUtils.FromPolar(angle + MathF.PI, _radius)));
+            Vector2 position = context.DependencyContainer.EntityController
+                .GetOwnedEntities<Spaceship>(player)
+                .Single()
+                .GetComponent<PositionComponent>()!
+                .Position;
+
+            float angle = Random.Shared.NextSingle() * MathF.Tau;
+
+            context.DependencyContainer.Spawner.SpawnAsteroid(
+                position + MathUtils.FromPolar(angle, _radius),
+                Vector2.Normalize(MathUtils.FromPolar(angle + MathF.PI, _radius)));
+        }
     }
 }
