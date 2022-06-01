@@ -22,6 +22,7 @@ public sealed class Engine : IDisposable
     {
         IWindow window = Window.Create(WindowOptions.Default);
         window.Load += InitWindow;
+        window.Closing += CloseWindow;
         window.Render += OnRender;
         window.Update += OnUpdate;
         window.FramebufferResize += OnResize;
@@ -41,6 +42,11 @@ public sealed class Engine : IDisposable
         _dependencyContainer.SceneController.ChangeScene(Constants.Scenes.PlayableDemo);
 
         OnResize(_dependencyContainer.Window.Size);
+    }
+
+    private void CloseWindow()
+    {
+        _dependencyContainer.Renderer.Dispose();
     }
 
     private void OnRender(double _)
