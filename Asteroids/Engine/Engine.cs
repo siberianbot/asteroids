@@ -38,7 +38,7 @@ public sealed class Engine : IDisposable
     {
         _dependencyContainer.BehaviorController.AddBehavior(new DebugBehavior());
         _dependencyContainer.BehaviorController.AddBehavior(new UIBehavior());
-        _dependencyContainer.SceneController.ChangeScene(Constants.Scenes.Testbed);
+        _dependencyContainer.SceneController.ChangeScene(Constants.Scenes.PlayableDemo);
 
         OnResize(_dependencyContainer.Window.Size);
     }

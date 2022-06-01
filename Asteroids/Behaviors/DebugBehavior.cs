@@ -1,6 +1,7 @@
 using System.Numerics;
 using Asteroids.Entities;
 using ImGuiNET;
+using Silk.NET.Input;
 
 namespace Asteroids.Behaviors;
 
@@ -8,6 +9,18 @@ public class DebugBehavior : IBehavior
 {
     public void Update(UpdateContext context)
     {
+        if (context.DependencyContainer.InputController.OnKeyPressed(Key.F12))
+        {
+            bool value = context.DependencyContainer.GlobalVars.GetVar(Constants.Vars.Debug_Enabled, false);
+
+            context.DependencyContainer.GlobalVars.SetVar(Constants.Vars.Debug_Enabled, !value);
+        }
+
+        if (!context.DependencyContainer.GlobalVars.GetVar(Constants.Vars.Debug_Enabled, false))
+        {
+            return;
+        }
+
         ImGui.SetNextWindowPos(new Vector2(10, 10));
         ImGui.SetNextWindowSize(new Vector2(400, 200));
 
