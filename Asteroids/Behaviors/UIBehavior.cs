@@ -13,8 +13,12 @@ public class UIBehavior : IBehavior
 
         if (ImGui.Begin("Players", ImGuiWindowFlags.NoResize))
         {
-            if (ImGui.BeginTable("Players", 2))
+            if (ImGui.BeginTable("Players", 3))
             {
+                ImGui.TableSetupColumn("name", ImGuiTableColumnFlags.None, 0.7f);
+                ImGui.TableSetupColumn("status", ImGuiTableColumnFlags.None, 0.15f);
+                ImGui.TableSetupColumn("score", ImGuiTableColumnFlags.None, 0.15f);
+
                 foreach (Player player in context.DependencyContainer.PlayerController.Players)
                 {
                     ImGui.TableNextRow();
@@ -23,6 +27,8 @@ public class UIBehavior : IBehavior
                     ImGui.Text($"{player.Name}");
                     ImGui.TableNextColumn();
                     ImGui.Text($"{(player.Alive ? "Alive" : "Dead")}");
+                    ImGui.TableNextColumn();
+                    ImGui.Text($"{player.Score}");
                 }
 
                 ImGui.EndTable();

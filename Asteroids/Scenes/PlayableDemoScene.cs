@@ -36,6 +36,7 @@ public class PlayableDemoScene : Scene
         CollisionDetectionBehavior collisionDetectionBehavior = new CollisionDetectionBehavior();
         _behaviorController.AddBehavior(collisionDetectionBehavior);
         _behaviorController.AddBehavior(new CollisionHandlingBehavior(collisionDetectionBehavior));
+        _behaviorController.AddBehavior(new ScoringBehavior(collisionDetectionBehavior));
         _behaviorController.AddBehavior(new MovementBehavior());
         _behaviorController.AddBehavior(new AsteroidSpawningBehavior(radius, 5.0f));
         _behaviorController.AddBehavior(new PlayerControlBehavior());
