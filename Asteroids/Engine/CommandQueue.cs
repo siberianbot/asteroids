@@ -1,4 +1,4 @@
-namespace Asteroids.Commands;
+namespace Asteroids.Engine;
 
 public delegate void Command();
 

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Asteroids.Engine;
 
 namespace Asteroids.Entities;
 
@@ -24,6 +25,7 @@ public class Player : Entity
     {
         base.Destroy(context);
 
-        context.DependencyContainer.PlayerController.RemovePlayer(this);
+        // TODO: removal of player should not be performed by entity itself
+        context.PlayerController.RemovePlayer(this);
     }
 }

@@ -1,5 +1,6 @@
 using System.Numerics;
 using Asteroids.Components;
+using Asteroids.Controllers;
 using Asteroids.Engine;
 using Asteroids.Entities;
 using Asteroids.Physics;
@@ -41,7 +42,7 @@ public class CollisionHandlingBehavior : IBehavior
     {
         foreach (Collision collision in _collisions)
         {
-            HandleCollision(collision, context.Delta, context.DependencyContainer.Spawner, context.DependencyContainer.EntityController);
+            HandleCollision(collision, context.Delta, context.Spawner, context.EntityController);
         }
 
         _collisions.Clear();
@@ -89,7 +90,7 @@ public class CollisionHandlingBehavior : IBehavior
                 velocity, scale));
         }
 
-        entityController.Destroy(collision.Left);
-        entityController.Destroy(collision.Right);
+        entityController.DestroyEntity(collision.Left);
+        entityController.DestroyEntity(collision.Right);
     }
 }

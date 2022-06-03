@@ -1,4 +1,5 @@
 using System.Numerics;
+using Asteroids.Engine;
 using Asteroids.Entities;
 using ImGuiNET;
 
@@ -8,7 +9,7 @@ public class UIBehavior : IBehavior
 {
     public void Update(UpdateContext context)
     {
-        ImGui.SetNextWindowPos(new Vector2(context.DependencyContainer.ScreenController.ScreenDimensions.X - 310, 10));
+        ImGui.SetNextWindowPos(new Vector2(context.EngineVars.ScreenDimensions.X - 310, 10));
         ImGui.SetNextWindowSize(new Vector2(300, 100));
 
         if (ImGui.Begin("Players", ImGuiWindowFlags.NoResize))
@@ -19,7 +20,7 @@ public class UIBehavior : IBehavior
                 ImGui.TableSetupColumn("status", ImGuiTableColumnFlags.None, 0.15f);
                 ImGui.TableSetupColumn("score", ImGuiTableColumnFlags.None, 0.15f);
 
-                foreach (Player player in context.DependencyContainer.PlayerController.Players)
+                foreach (Player player in context.PlayerController.Players)
                 {
                     ImGui.TableNextRow();
 

@@ -1,9 +1,9 @@
-using Asteroids.Commands;
+using Asteroids.Engine;
 using Asteroids.Entities;
 
-namespace Asteroids.Engine;
+namespace Asteroids.Controllers;
 
-public class PlayerController
+public class PlayerController : IController
 {
     private readonly CommandQueue _commandQueue;
     private readonly List<Player> _players = new List<Player>();
@@ -28,7 +28,7 @@ public class PlayerController
         _commandQueue.Push(() => _players.Remove(player));
     }
 
-    public void Clear()
+    public void Reset()
     {
         _players.Clear();
     }

@@ -1,5 +1,4 @@
 using System.Numerics;
-using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Boolean = Silk.NET.OpenGL.Boolean;
 

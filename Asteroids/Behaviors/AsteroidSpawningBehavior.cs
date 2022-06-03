@@ -1,5 +1,6 @@
 using System.Numerics;
 using Asteroids.Components;
+using Asteroids.Engine;
 using Asteroids.Entities;
 using Asteroids.Utils;
 
@@ -29,14 +30,14 @@ public class AsteroidSpawningBehavior : IBehavior
 
         _cooldown = 0;
 
-        foreach (Player player in context.DependencyContainer.PlayerController.Players)
+        foreach (Player player in context.PlayerController.Players)
         {
             if (!player.Alive)
             {
                 continue;
             }
 
-            Vector2 position = context.DependencyContainer.EntityController
+            Vector2 position = context.EntityController
                 .GetOwnedEntities<Spaceship>(player)
                 .Single()
                 .GetComponent<PositionComponent>()!
@@ -44,7 +45,7 @@ public class AsteroidSpawningBehavior : IBehavior
 
             float angle = Random.Shared.NextSingle() * MathF.Tau;
 
-            context.DependencyContainer.Spawner.SpawnAsteroid(
+            context.Spawner.SpawnAsteroid(
                 position + MathUtils.FromPolar(angle, _radius),
                 Vector2.Normalize(MathUtils.FromPolar(angle + MathF.PI, _radius)));
         }

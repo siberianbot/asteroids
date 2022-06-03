@@ -1,4 +1,5 @@
 using Asteroids.Components;
+using Asteroids.Engine;
 
 namespace Asteroids.Entities;
 
@@ -25,6 +26,11 @@ public abstract class Entity
         component.Owner = this;
 
         _components.Add(component);
+    }
+
+    public virtual void Create()
+    {
+        //
     }
 
     public virtual void Update(UpdateContext context)

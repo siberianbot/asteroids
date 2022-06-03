@@ -1,5 +1,6 @@
 using System.Numerics;
 using Asteroids.Components;
+using Asteroids.Engine;
 
 namespace Asteroids.Entities;
 
@@ -33,7 +34,7 @@ public class Camera : Entity
                            Vector2.Zero;
 
         ViewMatrix = Matrix4x4.CreateLookAt(new Vector3(position, 5.0f), new Vector3(position, 5.0f) + Forward, Up);
-        ProjectionMatrix = Matrix4x4.CreatePerspectiveFieldOfView(Fov, context.DependencyContainer.ScreenController.ScreenAspectRatio, Near, Far);
+        ProjectionMatrix = Matrix4x4.CreatePerspectiveFieldOfView(Fov, context.EngineVars.ScreenAspectRatio, Near, Far);
     }
 
     public Matrix4x4 ViewMatrix { get; private set; }

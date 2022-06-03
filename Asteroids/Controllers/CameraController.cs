@@ -1,9 +1,9 @@
 using System.Numerics;
 using Asteroids.Entities;
 
-namespace Asteroids.Engine;
+namespace Asteroids.Controllers;
 
-public class CameraController
+public class CameraController : IController
 {
     private readonly Spawner _spawner;
     private Camera _defaultCamera;

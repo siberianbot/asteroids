@@ -1,24 +1,26 @@
 using Asteroids.Components;
+using Asteroids.Controllers;
 using Asteroids.Engine;
 using Asteroids.Entities;
 using Silk.NET.Input;
 
 namespace Asteroids.Behaviors;
 
+// TODO: rework
 public class PlayerControlBehavior : IBehavior
 {
     public void Update(UpdateContext context)
     {
-        InputController inputController = context.DependencyContainer.InputController;
+        InputController inputController = context.InputController;
 
-        foreach (Player player in context.DependencyContainer.PlayerController.Players)
+        foreach (Player player in context.PlayerController.Players)
         {
             if (!player.Alive)
             {
                 continue;
             }
 
-            Spaceship? ownedSpaceship = context.DependencyContainer.EntityController
+            Spaceship? ownedSpaceship = context.EntityController
                 .GetOwnedEntities<Spaceship>(player)
                 .SingleOrDefault();
 
@@ -32,30 +34,30 @@ public class PlayerControlBehavior : IBehavior
             BulletSpawnerComponent bulletSpawnerComponent = ownedSpaceship.GetComponent<BulletSpawnerComponent>()
                                                             ?? throw new ArgumentException();
 
-            if (inputController.OnKeyPressed(Key.Left))
+            if (inputController.IsKeyPressed(Key.Left))
             {
                 spaceshipControlComponent.TurnLeft();
             }
 
-            if (inputController.OnKeyPressed(Key.Right))
+            if (inputController.IsKeyPressed(Key.Right))
             {
                 spaceshipControlComponent.TurnRight();
             }
 
-            if (inputController.OnKeyPressed(Key.Z))
+            if (inputController.IsKeyPressed(Key.Z))
             {
                 spaceshipControlComponent.Stop();
             }
-            else if (inputController.OnKeyPressed(Key.Up))
+            else if (inputController.IsKeyPressed(Key.Up))
             {
                 spaceshipControlComponent.Accelerate();
             }
-            else if (inputController.OnKeyPressed(Key.Down))
+            else if (inputController.IsKeyPressed(Key.Down))
             {
                 spaceshipControlComponent.Decelerate();
             }
 
-            if (inputController.OnKeyPressed(Key.Space))
+            if (inputController.IsKeyPressed(Key.Space))
             {
                 bulletSpawnerComponent.Fire();
             }

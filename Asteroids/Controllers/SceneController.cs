@@ -1,9 +1,9 @@
-using Asteroids.Commands;
+using Asteroids.Engine;
 using Asteroids.Scenes;
 
-namespace Asteroids.Engine;
+namespace Asteroids.Controllers;
 
-public class SceneController
+public class SceneController : IController
 {
     private readonly SceneManager _sceneManager;
     private readonly EntityController _entityController;
@@ -34,9 +34,9 @@ public class SceneController
 
         _commandQueue.Push(() =>
         {
-            _behaviorController.ClearBehaviors();
-            _playerController.Clear();
-            _entityController.Clear();
+            _behaviorController.Reset();
+            _playerController.Reset();
+            _entityController.Reset();
             _cameraController.Reset();
 
             scene.Load();

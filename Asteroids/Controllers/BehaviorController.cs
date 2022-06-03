@@ -1,10 +1,22 @@
 using Asteroids.Behaviors;
+using Asteroids.Engine;
 
-namespace Asteroids.Engine;
+namespace Asteroids.Controllers;
 
-public class BehaviorController
+public class BehaviorController : IController
 {
+    private readonly CommandQueue _commandQueue;
     private readonly List<IBehavior> _behaviors = new List<IBehavior>();
+
+    public BehaviorController(CommandQueue commandQueue)
+    {
+        _commandQueue = commandQueue;
+    }
+
+    public IReadOnlyCollection<IBehavior> Behaviors
+    {
+        get => _behaviors;
+    }
 
     public void AddBehavior<TBehavior>(TBehavior behavior)
         where TBehavior : IBehavior
@@ -14,18 +26,10 @@ public class BehaviorController
             throw new Exception($"behavior {typeof(TBehavior).Name} already presented");
         }
 
-        _behaviors.Add(behavior);
+        _commandQueue.Push(() => _behaviors.Add(behavior));
     }
 
-    public void ForEachBehavior(Action<IBehavior> action)
-    {
-        foreach (IBehavior behavior in _behaviors)
-        {
-            action(behavior);
-        }
-    }
-
-    public void ClearBehaviors()
+    public void Reset()
     {
         _behaviors.RemoveAll(behavior => !behavior.Persistent);
     }

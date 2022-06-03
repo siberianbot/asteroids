@@ -1,4 +1,5 @@
 using Asteroids.Components;
+using Asteroids.Engine;
 using Asteroids.Utils;
 
 namespace Asteroids.Entities;

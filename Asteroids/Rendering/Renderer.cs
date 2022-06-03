@@ -1,4 +1,5 @@
 using System.Drawing;
+using Asteroids.Controllers;
 using Asteroids.Engine;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
@@ -26,7 +27,7 @@ public class Renderer : IDisposable
                                           "}\n";
 
     private readonly GL _gl;
-    private readonly CameraController _cameraController;
+    private readonly CameraController _cameraController; // TODO: remove
 
     private readonly BufferObject<float> _verticesBuffer;
     private readonly BufferObject<uint> _indicesBuffer;

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Asteroids.Engine;
 using Asteroids.Physics;
 
 namespace Asteroids.Entities;
@@ -32,6 +33,16 @@ public class Spaceship : Entity, IOwnedEntity
     public Spaceship(Player? owner)
     {
         _owner = owner;
+    }
+
+    public override void Create()
+    {
+        base.Create();
+
+        if (_owner != null)
+        {
+            _owner.Alive = true;
+        }
     }
 
     public override void Destroy(DestroyContext context)

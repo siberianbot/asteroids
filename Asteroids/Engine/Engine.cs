@@ -1,76 +1,118 @@
 using System.Numerics;
 using Asteroids.Behaviors;
 using Asteroids.Components;
+using Asteroids.Controllers;
 using Asteroids.Entities;
 using Asteroids.Physics;
 using Asteroids.Rendering;
+using Asteroids.Scenes;
 using Asteroids.Utils;
-using ImGuiNET;
+using Silk.NET.Input;
 using Silk.NET.Maths;
+using Silk.NET.OpenGL;
+using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
 
 namespace Asteroids.Engine;
 
 public sealed class Engine : IDisposable
 {
-    private readonly DependencyContainer _dependencyContainer;
+    private readonly IWindow _window;
 
-    public double UpdateTimeMs { get; private set; }
-    public double RenderTimeMs { get; private set; }
+    private readonly Lazy<CommandQueue> _commandQueue;
+    private readonly Lazy<EngineVars> _engineState;
+    private readonly Lazy<Vars> _vars;
+    private readonly Lazy<Renderer> _renderer;
+    private readonly Lazy<SceneManager> _sceneManager;
+    private readonly Lazy<Spawner> _spawner;
+    private readonly Lazy<BehaviorController> _behaviorController;
+    private readonly Lazy<CameraController> _cameraController;
+    private readonly Lazy<EntityController> _entityController;
+    private readonly Lazy<ImGuiController> _imguiController;
+    private readonly Lazy<InputController> _inputController;
+    private readonly Lazy<PlayerController> _playerController;
+    private readonly Lazy<SceneController> _sceneController;
 
     public Engine()
     {
-        IWindow window = Window.Create(WindowOptions.Default);
-        window.Load += InitWindow;
-        window.Closing += CloseWindow;
-        window.Render += OnRender;
-        window.Update += OnUpdate;
-        window.FramebufferResize += OnResize;
+        _window = Window.Create(WindowOptions.Default);
+        _window.Load += InitWindow;
+        _window.Closing += CloseWindow;
+        _window.Render += OnRender;
+        _window.Update += OnUpdate;
+        _window.FramebufferResize += OnResize;
 
-        _dependencyContainer = new DependencyContainer(this, window);
+        _commandQueue = new Lazy<CommandQueue>(() => new CommandQueue());
+        _engineState = new Lazy<EngineVars>();
+        _vars = new Lazy<Vars>(() => new Vars());
+        _behaviorController = new Lazy<BehaviorController>(() => new BehaviorController(_commandQueue.Value));
+        _playerController = new Lazy<PlayerController>(() => new PlayerController(_commandQueue.Value));
+        _entityController = new Lazy<EntityController>(() => new EntityController(_commandQueue.Value, _playerController.Value));
+        _spawner = new Lazy<Spawner>(() => new Spawner(_entityController.Value, _playerController.Value));
+        _cameraController = new Lazy<CameraController>(() => new CameraController(_spawner.Value));
+
+        _sceneManager = new Lazy<SceneManager>(() => new SceneManager(
+            _spawner.Value,
+            _cameraController.Value,
+            _behaviorController.Value,
+            _vars.Value));
+        _sceneController = new Lazy<SceneController>(() => new SceneController(
+            _sceneManager.Value,
+            _entityController.Value,
+            _cameraController.Value,
+            _behaviorController.Value,
+            _playerController.Value,
+            _commandQueue.Value));
+
+        Lazy<IInputContext> inputContext = new Lazy<IInputContext>(_window.CreateInput);
+        _inputController = new Lazy<InputController>(() => new InputController(inputContext.Value, _commandQueue.Value));
+
+        Lazy<GL> gl = new Lazy<GL>(_window.CreateOpenGL);
+        _imguiController = new Lazy<ImGuiController>(() => new ImGuiController(gl.Value, _window, inputContext.Value));
+        _renderer = new Lazy<Renderer>(() => new Renderer(gl.Value, _cameraController.Value));
     }
 
     public void Run()
     {
-        _dependencyContainer.Window.Run();
+        _window.Run();
     }
 
     private void InitWindow()
     {
-        _dependencyContainer.BehaviorController.AddBehavior(new DebugBehavior());
-        _dependencyContainer.BehaviorController.AddBehavior(new UIBehavior());
-        _dependencyContainer.SceneController.ChangeScene(Constants.Scenes.PlayableDemo);
+        _behaviorController.Value.AddBehavior(new DebugBehavior());
+        _behaviorController.Value.AddBehavior(new UIBehavior());
+        _sceneController.Value.ChangeScene(Constants.Scenes.PlayableDemo);
 
-        OnResize(_dependencyContainer.Window.Size);
+        OnResize(_window.Size);
     }
 
     private void CloseWindow()
     {
-        _dependencyContainer.Renderer.Dispose();
+        _renderer.Value.Dispose();
     }
 
     private void OnRender(double _)
     {
         DateTime start = DateTime.UtcNow;
 
-        _dependencyContainer.Renderer.Clear();
+        _renderer.Value.Clear();
 
         List<RenderData> renderList = new List<RenderData>();
 
         // TODO: deal with this mess
-        _dependencyContainer.EntityController.ForEachEntity(entity =>
+        foreach (Entity entity in _entityController.Value.Entities)
         {
             ModelComponent? modelComponent = entity.GetComponent<ModelComponent>();
 
             if (modelComponent == null)
             {
-                return;
+                continue;
             }
 
             PositionComponent positionComponent = entity.GetComponent<PositionComponent>() ?? throw new NullReferenceException();
             ColliderComponent? colliderComponent = entity.GetComponent<ColliderComponent>();
 
-            if (_dependencyContainer.GlobalVars.GetVar(Constants.Vars.Physics_ShowBoundingBox, false) &&
+            if (_vars.Value.GetVar(Constants.Vars.Physics_ShowBoundingBox, false) &&
                 colliderComponent != null)
             {
                 Box2D<float> boundingBox = colliderComponent.BoundingBox;
@@ -93,7 +135,7 @@ public sealed class Engine : IDisposable
                 renderList.Add(boundingBoxData);
             }
 
-            if (_dependencyContainer.GlobalVars.GetVar(Constants.Vars.Physics_ShowCollider, false) &&
+            if (_vars.Value.GetVar(Constants.Vars.Physics_ShowCollider, false) &&
                 colliderComponent != null)
             {
                 foreach (Collider collider in colliderComponent.Colliders)
@@ -122,37 +164,52 @@ public sealed class Engine : IDisposable
             );
 
             renderList.Add(data);
-        });
+        }
 
-        _dependencyContainer.Renderer.Render(renderList);
-        _dependencyContainer.ImGuiController.Render();
+        _renderer.Value.Render(renderList);
+        _imguiController.Value.Render();
 
-        RenderTimeMs = (DateTime.UtcNow - start).TotalMilliseconds;
+        _engineState.Value.RenderTimeMs = (DateTime.UtcNow - start).TotalMilliseconds;
     }
 
     private void OnUpdate(double delta)
     {
         DateTime start = DateTime.UtcNow;
 
-        _dependencyContainer.ImGuiController.Update((float)delta);
-        _dependencyContainer.CommandQueue.ExecutePending();
+        _commandQueue.Value.ExecutePending();
+        _imguiController.Value.Update((float)delta);
 
         UpdateContext context = new UpdateContext
         {
-            Delta = (float)delta * _dependencyContainer.GlobalVars.GetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f),
-            DependencyContainer = _dependencyContainer
+            Delta = (float)delta * _vars.Value.GetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f),
+            EngineVars = _engineState.Value,
+            Spawner = _spawner.Value,
+            CameraController = _cameraController.Value,
+            CommandQueue = _commandQueue.Value,
+            EntityController = _entityController.Value,
+            GlobalVars = _vars.Value,
+            InputController = _inputController.Value,
+            PlayerController = _playerController.Value,
+            SceneController = _sceneController.Value
         };
 
-        _dependencyContainer.EntityController.ForEachEntity(entity => entity.Update(context));
-        _dependencyContainer.BehaviorController.ForEachBehavior(behavior => behavior.Update(context));
+        foreach (Entity entity in _entityController.Value.Entities)
+        {
+            entity.Update(context);
+        }
 
-        UpdateTimeMs = (DateTime.UtcNow - start).TotalMilliseconds;
+        foreach (IBehavior behavior in _behaviorController.Value.Behaviors)
+        {
+            behavior.Update(context);
+        }
+
+        _engineState.Value.UpdateTimeMs = (DateTime.UtcNow - start).TotalMilliseconds;
     }
 
     private void OnResize(Vector2D<int> dimensions)
     {
-        _dependencyContainer.Renderer.UpdateDimensions(dimensions);
-        _dependencyContainer.ScreenController.ScreenDimensions = new Vector2(dimensions.X, dimensions.Y);
+        _renderer.Value.UpdateDimensions(dimensions);
+        _engineState.Value.ScreenDimensions = new Vector2(dimensions.X, dimensions.Y);
     }
 
     #region IDisposable
@@ -177,7 +234,7 @@ public sealed class Engine : IDisposable
             return;
         }
 
-        _dependencyContainer.Dispose();
+        _window.Dispose();
 
         _disposed = true;
     }

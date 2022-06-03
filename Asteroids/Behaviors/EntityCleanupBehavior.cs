@@ -1,5 +1,6 @@
 using System.Numerics;
 using Asteroids.Components;
+using Asteroids.Engine;
 using Asteroids.Entities;
 
 namespace Asteroids.Behaviors;
@@ -10,17 +11,16 @@ public class EntityCleanupBehavior : IBehavior
 
     public void Update(UpdateContext context)
     {
-        Vector2[] knownPositions = context.DependencyContainer.PlayerController.Players
+        Vector2[] knownPositions = context.PlayerController.Players
             .Where(player => player.Alive)
-            .Select(player => context.DependencyContainer.EntityController
+            .Select(player => context.EntityController
                 .GetOwnedEntities<Spaceship>(player)
                 .Single()
                 .GetComponent<PositionComponent>()!
                 .Position)
             .ToArray();
 
-        foreach (Entity entity in context.DependencyContainer.EntityController.Entities
-                     .Except(context.DependencyContainer.PlayerController.Players))
+        foreach (Entity entity in context.EntityController.Entities.Except(context.PlayerController.Players))
         {
             PositionComponent? positionComponent = entity.GetComponent<PositionComponent>();
 
@@ -34,7 +34,7 @@ public class EntityCleanupBehavior : IBehavior
                 continue;
             }
 
-            context.DependencyContainer.EntityController.Destroy(entity);
+            context.EntityController.DestroyEntity(entity);
         }
     }
 }

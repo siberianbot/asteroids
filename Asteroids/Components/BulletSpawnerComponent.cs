@@ -1,4 +1,5 @@
 using System.Numerics;
+using Asteroids.Engine;
 using Asteroids.Entities;
 
 namespace Asteroids.Components;
@@ -31,7 +32,7 @@ public class BulletSpawnerComponent : Component, IUpdatableComponent
         Vector2 position = _positionComponent.Value.Position + _movementComponent.Value.Direction;
         Vector2 direction = _movementComponent.Value.Direction;
 
-        context.DependencyContainer.CommandQueue.Push(() => context.DependencyContainer.Spawner.SpawnBullet(Owner, position, direction));
+        context.CommandQueue.Push(() => context.Spawner.SpawnBullet(Owner, position, direction));
 
         _fire = false;
         _offset = 0.0f;

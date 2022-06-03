@@ -1,11 +1,13 @@
 using System.Numerics;
 using Asteroids.Components;
+using Asteroids.Controllers;
 using Asteroids.Engine;
 using Asteroids.Physics;
 using Asteroids.Utils;
 
 namespace Asteroids.Entities;
 
+// TODO: complicated
 public class Spawner
 {
     private readonly EntityController _entityController;
@@ -86,11 +88,6 @@ public class Spawner
         spaceship.AddComponent(new BulletSpawnerComponent());
 
         _entityController.AddEntity(spaceship);
-
-        if (owner != null)
-        {
-            owner.Alive = true;
-        }
 
         return spaceship;
     }
