@@ -1,5 +1,6 @@
 using System.Numerics;
 using Asteroids.Components;
+using Asteroids.Controllers;
 using Asteroids.Engine;
 using Asteroids.Entities;
 using Asteroids.Rendering;
@@ -14,7 +15,7 @@ public class PlayerSpawningBehavior : IBehavior
 
     public void Update(UpdateContext context)
     {
-        foreach (Player player in context.PlayerController.Players)
+        foreach (Player player in context.Controllers.GetController<PlayerController>().Players)
         {
             if (player.Alive)
             {
@@ -36,7 +37,7 @@ public class PlayerSpawningBehavior : IBehavior
             // TODO: randomize position
             Spaceship spaceship = context.Spawner.SpawnSpaceship(Vector2.Zero, player, player.Color);
             spaceship.AddComponent(new SpaceshipControlComponent());
-            context.CameraController.CurrentCamera = context.Spawner.SpawnCamera(spaceship);
+            context.Controllers.GetController<CameraController>().CurrentCamera = context.Spawner.SpawnCamera(spaceship);
 
             _cooldown[player] = 0;
         }

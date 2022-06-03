@@ -11,16 +11,16 @@ public class PlayerControlBehavior : IBehavior
 {
     public void Update(UpdateContext context)
     {
-        InputController inputController = context.InputController;
+        InputController inputController = context.Controllers.GetController<InputController>();
 
-        foreach (Player player in context.PlayerController.Players)
+        foreach (Player player in context.Controllers.GetController<PlayerController>().Players)
         {
             if (!player.Alive)
             {
                 continue;
             }
 
-            Spaceship? ownedSpaceship = context.EntityController
+            Spaceship? ownedSpaceship = context.Controllers.GetController<EntityController>()
                 .GetOwnedEntities<Spaceship>(player)
                 .SingleOrDefault();
 

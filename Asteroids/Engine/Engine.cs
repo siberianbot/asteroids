@@ -25,13 +25,10 @@ public sealed class Engine : IDisposable
     private readonly Lazy<Renderer> _renderer;
     private readonly Lazy<SceneManager> _sceneManager;
     private readonly Lazy<Spawner> _spawner;
-    private readonly Lazy<BehaviorController> _behaviorController;
-    private readonly Lazy<CameraController> _cameraController;
-    private readonly Lazy<EntityController> _entityController;
-    private readonly Lazy<ImGuiController> _imguiController;
-    private readonly Lazy<InputController> _inputController;
-    private readonly Lazy<PlayerController> _playerController;
-    private readonly Lazy<SceneController> _sceneController;
+    private readonly Lazy<ImGuiController> _imguiController; // <- NOT OUR CONTROLLER
+    private readonly Lazy<IInputContext> _inputContext;
+
+    private readonly ControllersCollection _controllers = new ControllersCollection();
 
     public Engine()
     {
@@ -45,31 +42,19 @@ public sealed class Engine : IDisposable
         _commandQueue = new Lazy<CommandQueue>(() => new CommandQueue());
         _engineState = new Lazy<EngineVars>();
         _vars = new Lazy<Vars>(() => new Vars());
-        _behaviorController = new Lazy<BehaviorController>(() => new BehaviorController(_commandQueue.Value));
-        _playerController = new Lazy<PlayerController>(() => new PlayerController(_commandQueue.Value));
-        _entityController = new Lazy<EntityController>(() => new EntityController(_commandQueue.Value, _playerController.Value));
-        _spawner = new Lazy<Spawner>(() => new Spawner(_entityController.Value, _playerController.Value));
-        _cameraController = new Lazy<CameraController>(() => new CameraController(_spawner.Value));
+
+        _spawner = new Lazy<Spawner>(() => new Spawner(_controllers.GetController<EntityController>(), _controllers.GetController<PlayerController>()));
 
         _sceneManager = new Lazy<SceneManager>(() => new SceneManager(
             _spawner.Value,
-            _cameraController.Value,
-            _behaviorController.Value,
+            _controllers.GetController<CameraController>(),
+            _controllers.GetController<BehaviorController>(),
             _vars.Value));
-        _sceneController = new Lazy<SceneController>(() => new SceneController(
-            _sceneManager.Value,
-            _entityController.Value,
-            _cameraController.Value,
-            _behaviorController.Value,
-            _playerController.Value,
-            _commandQueue.Value));
 
-        Lazy<IInputContext> inputContext = new Lazy<IInputContext>(_window.CreateInput);
-        _inputController = new Lazy<InputController>(() => new InputController(inputContext.Value, _commandQueue.Value));
-
+        _inputContext = new Lazy<IInputContext>(_window.CreateInput);
         Lazy<GL> gl = new Lazy<GL>(_window.CreateOpenGL);
-        _imguiController = new Lazy<ImGuiController>(() => new ImGuiController(gl.Value, _window, inputContext.Value));
-        _renderer = new Lazy<Renderer>(() => new Renderer(gl.Value, _cameraController.Value));
+        _imguiController = new Lazy<ImGuiController>(() => new ImGuiController(gl.Value, _window, _inputContext.Value));
+        _renderer = new Lazy<Renderer>(() => new Renderer(gl.Value, _controllers.GetController<CameraController>()));
     }
 
     public void Run()
@@ -79,9 +64,22 @@ public sealed class Engine : IDisposable
 
     private void InitWindow()
     {
-        _behaviorController.Value.AddBehavior(new DebugBehavior());
-        _behaviorController.Value.AddBehavior(new UIBehavior());
-        _sceneController.Value.ChangeScene(Constants.Scenes.PlayableDemo);
+        _controllers.AddController(new BehaviorController(_commandQueue.Value));
+        _controllers.AddController(new PlayerController(_commandQueue.Value));
+        _controllers.AddController(new EntityController(_commandQueue.Value, _controllers.GetController<PlayerController>()));
+        _controllers.AddController(new CameraController(_spawner.Value));
+        _controllers.AddController(new SceneController(
+            _sceneManager.Value,
+            _controllers.GetController<EntityController>(),
+            _controllers.GetController<CameraController>(),
+            _controllers.GetController<BehaviorController>(),
+            _controllers.GetController<PlayerController>(),
+            _commandQueue.Value));
+        _controllers.AddController(new InputController(_inputContext.Value, _commandQueue.Value));
+
+        _controllers.GetController<BehaviorController>().AddBehavior(new DebugBehavior());
+        _controllers.GetController<BehaviorController>().AddBehavior(new UIBehavior());
+        _controllers.GetController<SceneController>().ChangeScene(Constants.Scenes.PlayableDemo);
 
         OnResize(_window.Size);
     }
@@ -100,7 +98,7 @@ public sealed class Engine : IDisposable
         List<RenderData> renderList = new List<RenderData>();
 
         // TODO: deal with this mess
-        foreach (Entity entity in _entityController.Value.Entities)
+        foreach (Entity entity in _controllers.GetController<EntityController>().Entities)
         {
             ModelComponent? modelComponent = entity.GetComponent<ModelComponent>();
 
@@ -184,21 +182,17 @@ public sealed class Engine : IDisposable
             Delta = (float)delta * _vars.Value.GetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f),
             EngineVars = _engineState.Value,
             Spawner = _spawner.Value,
-            CameraController = _cameraController.Value,
             CommandQueue = _commandQueue.Value,
-            EntityController = _entityController.Value,
             GlobalVars = _vars.Value,
-            InputController = _inputController.Value,
-            PlayerController = _playerController.Value,
-            SceneController = _sceneController.Value
+            Controllers = _controllers
         };
 
-        foreach (Entity entity in _entityController.Value.Entities)
+        foreach (Entity entity in _controllers.GetController<EntityController>().Entities)
         {
             entity.Update(context);
         }
 
-        foreach (IBehavior behavior in _behaviorController.Value.Behaviors)
+        foreach (IBehavior behavior in _controllers.GetController<BehaviorController>().Behaviors)
         {
             behavior.Update(context);
         }

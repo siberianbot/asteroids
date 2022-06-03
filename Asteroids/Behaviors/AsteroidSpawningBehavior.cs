@@ -1,5 +1,6 @@
 using System.Numerics;
 using Asteroids.Components;
+using Asteroids.Controllers;
 using Asteroids.Engine;
 using Asteroids.Entities;
 using Asteroids.Utils;
@@ -30,14 +31,14 @@ public class AsteroidSpawningBehavior : IBehavior
 
         _cooldown = 0;
 
-        foreach (Player player in context.PlayerController.Players)
+        foreach (Player player in context.Controllers.GetController<PlayerController>().Players)
         {
             if (!player.Alive)
             {
                 continue;
             }
 
-            Vector2 position = context.EntityController
+            Vector2 position = context.Controllers.GetController<EntityController>()
                 .GetOwnedEntities<Spaceship>(player)
                 .Single()
                 .GetComponent<PositionComponent>()!

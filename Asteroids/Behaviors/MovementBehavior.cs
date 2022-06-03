@@ -1,4 +1,5 @@
 using Asteroids.Components;
+using Asteroids.Controllers;
 using Asteroids.Engine;
 using Asteroids.Entities;
 
@@ -8,7 +9,7 @@ public class MovementBehavior : IBehavior
 {
     public void Update(UpdateContext context)
     {
-        foreach (Entity entity in context.EntityController.Entities)
+        foreach (Entity entity in context.Controllers.GetController<EntityController>().Entities)
         {
             MovementComponent? movementComponent = entity.GetComponent<MovementComponent>();
             PositionComponent? positionComponent = entity.GetComponent<PositionComponent>();

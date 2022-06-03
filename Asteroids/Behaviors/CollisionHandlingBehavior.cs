@@ -42,7 +42,7 @@ public class CollisionHandlingBehavior : IBehavior
     {
         foreach (Collision collision in _collisions)
         {
-            HandleCollision(collision, context.Delta, context.Spawner, context.EntityController);
+            HandleCollision(collision, context.Delta, context.Spawner, context.Controllers.GetController<EntityController>());
         }
 
         _collisions.Clear();

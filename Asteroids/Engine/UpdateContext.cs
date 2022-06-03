@@ -14,15 +14,7 @@ public struct UpdateContext
 
     public Spawner Spawner { get; init; }
 
-    public PlayerController PlayerController { get; init; }
-
-    public EntityController EntityController { get; init; }
-
-    public InputController InputController { get; init; }
-
     public Vars GlobalVars { get; init; }
 
-    public SceneController SceneController { get; init; }
-
-    public CameraController CameraController { get; init; }
+    public ControllersCollection Controllers { get; init; }
 }

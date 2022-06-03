@@ -5,7 +5,7 @@ namespace Asteroids.Controllers;
 
 public class CameraController : IController
 {
-    private readonly Spawner _spawner;
+    private readonly Spawner _spawner; // TODO: remove
     private Camera _defaultCamera;
     private Camera? _currentCamera;
 

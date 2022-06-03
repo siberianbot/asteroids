@@ -1,4 +1,5 @@
 using Asteroids.Components;
+using Asteroids.Controllers;
 using Asteroids.Engine;
 using Asteroids.Entities;
 using Asteroids.Physics;
@@ -16,7 +17,7 @@ public class CollisionDetectionBehavior : IBehavior
 
     public void Update(UpdateContext context)
     {
-        var checkList = context.EntityController.Entities
+        var checkList = context.Controllers.GetController<EntityController>().Entities
             .Select(entity => new
             {
                 Entity = entity,

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Asteroids.Controllers;
 using Asteroids.Engine;
 using ImGuiNET;
 using Silk.NET.Input;
@@ -9,7 +10,7 @@ public class DebugBehavior : IBehavior
 {
     public void Update(UpdateContext context)
     {
-        if (context.InputController.IsKeyPressed(Key.F12))
+        if (context.Controllers.GetController<InputController>().IsKeyPressed(Key.F12))
         {
             bool value = context.GlobalVars.GetVar(Constants.Vars.Debug_Enabled, false);
 
@@ -37,27 +38,27 @@ public class DebugBehavior : IBehavior
             {
                 if (ImGui.Button("Testbed"))
                 {
-                    context.SceneController.ChangeScene(Constants.Scenes.Testbed);
+                    context.Controllers.GetController<SceneController>().ChangeScene(Constants.Scenes.Testbed);
                 }
 
                 if (ImGui.Button("Asteroids Demo"))
                 {
-                    context.SceneController.ChangeScene(Constants.Scenes.AsteroidsDemo);
+                    context.Controllers.GetController<SceneController>().ChangeScene(Constants.Scenes.AsteroidsDemo);
                 }
 
                 if (ImGui.Button("Spaceship Demo"))
                 {
-                    context.SceneController.ChangeScene(Constants.Scenes.SpaceshipDemo);
+                    context.Controllers.GetController<SceneController>().ChangeScene(Constants.Scenes.SpaceshipDemo);
                 }
 
                 if (ImGui.Button("Asteroid Collision"))
                 {
-                    context.SceneController.ChangeScene(Constants.Scenes.AsteroidCollision);
+                    context.Controllers.GetController<SceneController>().ChangeScene(Constants.Scenes.AsteroidCollision);
                 }
 
                 if (ImGui.Button("Playable Demo"))
                 {
-                    context.SceneController.ChangeScene(Constants.Scenes.PlayableDemo);
+                    context.Controllers.GetController<SceneController>().ChangeScene(Constants.Scenes.PlayableDemo);
                 }
             }
 

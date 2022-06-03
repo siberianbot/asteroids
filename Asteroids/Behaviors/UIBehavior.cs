@@ -1,4 +1,5 @@
 using System.Numerics;
+using Asteroids.Controllers;
 using Asteroids.Engine;
 using Asteroids.Entities;
 using ImGuiNET;
@@ -20,7 +21,7 @@ public class UIBehavior : IBehavior
                 ImGui.TableSetupColumn("status", ImGuiTableColumnFlags.None, 0.15f);
                 ImGui.TableSetupColumn("score", ImGuiTableColumnFlags.None, 0.15f);
 
-                foreach (Player player in context.PlayerController.Players)
+                foreach (Player player in context.Controllers.GetController<PlayerController>().Players)
                 {
                     ImGui.TableNextRow();
 
