@@ -12,6 +12,8 @@ public struct UpdateContext
 
     public CommandQueue CommandQueue { get; init; }
 
+    public EventQueue EventQueue { get; init; }
+
     public Spawner Spawner { get; init; }
 
     public Vars GlobalVars { get; init; }

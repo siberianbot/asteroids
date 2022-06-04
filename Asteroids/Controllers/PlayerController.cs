@@ -12,7 +12,15 @@ public class PlayerController : IController
     {
         _commandQueue = commandQueue;
 
-        eventQueue.Event += OnEvent;
+        eventQueue.OnEvent(EventType.EntityDestroy, @event =>
+        {
+            if (@event.Entity is not Player player)
+            {
+                return;
+            }
+
+            RemovePlayer(player);
+        });
     }
 
     public IReadOnlyCollection<Player> Players
@@ -33,15 +41,5 @@ public class PlayerController : IController
     public void Reset()
     {
         _players.Clear();
-    }
-
-    private void OnEvent(Event @event)
-    {
-        if (@event.EventType != EventType.EntityDestroy || @event.Entity is not Player player)
-        {
-            return;
-        }
-
-        RemovePlayer(player);
     }
 }

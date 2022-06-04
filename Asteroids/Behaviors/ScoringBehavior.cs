@@ -8,15 +8,15 @@ public class ScoringBehavior : IBehavior
 {
     private readonly List<Collision> _collisions = new List<Collision>();
 
-    public ScoringBehavior(CollisionDetectionBehavior collisionDetectionBehavior)
+    public ScoringBehavior(EventQueue eventQueue)
     {
-        collisionDetectionBehavior.CollisionStarted += collision =>
+        eventQueue.OnEvent(EventType.CollisionStarted, @event =>
         {
-            if (collision.Left is Bullet ^ collision.Right is Bullet)
+            if (@event.Collision!.Left is Bullet ^ @event.Collision.Right is Bullet)
             {
-                _collisions.Add(collision);
+                _collisions.Add(@event.Collision);
             }
-        };
+        });
     }
 
     public void Update(UpdateContext context)

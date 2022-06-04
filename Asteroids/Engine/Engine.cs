@@ -51,7 +51,8 @@ public sealed class Engine : IDisposable
             _spawner.Value,
             _controllers.GetController<CameraController>(),
             _controllers.GetController<BehaviorController>(),
-            _vars.Value));
+            _vars.Value,
+            _eventQueue.Value));
 
         _inputContext = new Lazy<IInputContext>(_window.CreateInput);
         Lazy<GL> gl = new Lazy<GL>(_window.CreateOpenGL);
@@ -192,7 +193,8 @@ public sealed class Engine : IDisposable
             Spawner = _spawner.Value,
             CommandQueue = _commandQueue.Value,
             GlobalVars = _vars.Value,
-            Controllers = _controllers
+            Controllers = _controllers,
+            EventQueue = _eventQueue.Value
         };
 
         foreach (Entity entity in _controllers.GetController<EntityController>().Entities)

@@ -14,13 +14,16 @@ public class PlayableDemoScene : Scene
     private readonly Vars _vars;
     private readonly CameraController _cameraController;
     private readonly BehaviorController _behaviorController;
+    private readonly EventQueue _eventQueue;
 
-    public PlayableDemoScene(Spawner spawner, Vars vars, CameraController cameraController, BehaviorController behaviorController)
+    
+    public PlayableDemoScene(Spawner spawner, Vars vars, CameraController cameraController, BehaviorController behaviorController, EventQueue eventQueue)
     {
         _spawner = spawner;
         _vars = vars;
         _cameraController = cameraController;
         _behaviorController = behaviorController;
+        _eventQueue = eventQueue;
     }
 
     public override string Name
@@ -36,8 +39,8 @@ public class PlayableDemoScene : Scene
 
         CollisionDetectionBehavior collisionDetectionBehavior = new CollisionDetectionBehavior();
         _behaviorController.AddBehavior(collisionDetectionBehavior);
-        _behaviorController.AddBehavior(new CollisionHandlingBehavior(collisionDetectionBehavior));
-        _behaviorController.AddBehavior(new ScoringBehavior(collisionDetectionBehavior));
+        _behaviorController.AddBehavior(new CollisionHandlingBehavior(_eventQueue));
+        _behaviorController.AddBehavior(new ScoringBehavior(_eventQueue));
         _behaviorController.AddBehavior(new MovementBehavior());
         _behaviorController.AddBehavior(new AsteroidSpawningBehavior(radius, 5.0f));
         _behaviorController.AddBehavior(new PlayerControlBehavior());

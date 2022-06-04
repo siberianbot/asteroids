@@ -12,30 +12,32 @@ public class CollisionHandlingBehavior : IBehavior
     private readonly List<Entity> _excluded = new List<Entity>();
     private readonly List<Collision> _collisions = new List<Collision>();
 
-    public CollisionHandlingBehavior(CollisionDetectionBehavior collisionDetectionBehavior)
+    public CollisionHandlingBehavior(EventQueue eventQueue)
     {
-        collisionDetectionBehavior.CollisionStarted += collision =>
+        eventQueue.OnEvent(EventType.CollisionStarted, @event =>
         {
-            if (_excluded.Contains(collision.Left) || _excluded.Contains(collision.Right))
+            if (_excluded.Contains(@event.Collision!.Left) || _excluded.Contains(@event.Collision.Right))
             {
                 return;
             }
 
-            _collisions.Add(collision);
-        };
+            _collisions.Add(@event.Collision);
+        });
 
-        collisionDetectionBehavior.CollisionFinished += collision =>
+        eventQueue.OnEvent(EventType.EntityDestroy, @event => _excluded.Remove(@event.Entity!));
+
+        eventQueue.OnEvent(EventType.CollisionFinished, @event =>
         {
-            if (_excluded.Contains(collision.Left))
+            if (_excluded.Contains(@event.Collision!.Left))
             {
-                _excluded.Remove(collision.Left);
+                _excluded.Remove(@event.Collision.Left);
             }
 
-            if (_excluded.Contains(collision.Right))
+            if (_excluded.Contains(@event.Collision.Right))
             {
-                _excluded.Remove(collision.Right);
+                _excluded.Remove(@event.Collision.Right);
             }
-        };
+        });
     }
 
     public void Update(UpdateContext context)

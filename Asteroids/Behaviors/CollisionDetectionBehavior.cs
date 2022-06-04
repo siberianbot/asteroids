@@ -9,10 +9,6 @@ namespace Asteroids.Behaviors;
 
 public class CollisionDetectionBehavior : IBehavior
 {
-    public event Action<Collision> CollisionStarted = delegate { };
-
-    public event Action<Collision> CollisionFinished = delegate { };
-
     private readonly List<Collision> _activeCollisions = new List<Collision>();
 
     public void Update(UpdateContext context)
@@ -43,7 +39,12 @@ public class CollisionDetectionBehavior : IBehavior
             {
                 if (collision != null)
                 {
-                    CollisionFinished.Invoke(collision);
+                    context.EventQueue.Push(new Event
+                    {
+                        EventType = EventType.CollisionFinished,
+                        Collision = collision
+                    });
+
                     _activeCollisions.Remove(collision);
                 }
 
@@ -57,7 +58,12 @@ public class CollisionDetectionBehavior : IBehavior
 
             collision = new Collision(left.Entity, right.Entity);
             _activeCollisions.Add(collision);
-            CollisionStarted.Invoke(collision);
+
+            context.EventQueue.Push(new Event
+            {
+                EventType = EventType.CollisionStarted,
+                Collision = collision
+            });
         }
     }
 

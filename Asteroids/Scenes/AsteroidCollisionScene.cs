@@ -11,12 +11,14 @@ public class AsteroidCollisionScene : Scene
     private readonly Spawner _spawner;
     private readonly BehaviorController _behaviorController;
     private readonly Vars _vars;
+    private readonly EventQueue _eventQueue;
 
-    public AsteroidCollisionScene(Spawner spawner, BehaviorController behaviorController, Vars vars)
+    public AsteroidCollisionScene(Spawner spawner, BehaviorController behaviorController, Vars vars, EventQueue eventQueue)
     {
         _spawner = spawner;
         _behaviorController = behaviorController;
         _vars = vars;
+        _eventQueue = eventQueue;
     }
 
     public override string Name
@@ -33,7 +35,7 @@ public class AsteroidCollisionScene : Scene
 
         CollisionDetectionBehavior collisionDetectionBehavior = new CollisionDetectionBehavior();
         _behaviorController.AddBehavior(collisionDetectionBehavior);
-        _behaviorController.AddBehavior(new CollisionHandlingBehavior(collisionDetectionBehavior));
+        _behaviorController.AddBehavior(new CollisionHandlingBehavior(_eventQueue));
         _behaviorController.AddBehavior(new MovementBehavior());
 
         float leftAngle = Random.Shared.NextSingle() * MathF.PI + MathF.PI / 2;
