@@ -41,7 +41,7 @@ public abstract class Entity
         }
     }
 
-    public virtual void Destroy(DestroyContext context)
+    public virtual void Destroy()
     {
         //
     }

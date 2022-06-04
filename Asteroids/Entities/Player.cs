@@ -1,5 +1,4 @@
 using System.Numerics;
-using Asteroids.Engine;
 
 namespace Asteroids.Entities;
 
@@ -20,12 +19,4 @@ public class Player : Entity
     public long Score { get; set; }
 
     public bool Alive { get; set; }
-
-    public override void Destroy(DestroyContext context)
-    {
-        base.Destroy(context);
-
-        // TODO: removal of player should not be performed by entity itself
-        context.PlayerController.RemovePlayer(this);
-    }
 }

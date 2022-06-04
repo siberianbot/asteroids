@@ -6,13 +6,13 @@ namespace Asteroids.Controllers;
 public class EntityController : IController
 {
     private readonly CommandQueue _commandQueue;
-    private readonly PlayerController _playerController;
+    private readonly EventQueue _eventQueue;
     private readonly List<Entity> _entities = new List<Entity>();
 
-    public EntityController(CommandQueue commandQueue, PlayerController playerController)
+    public EntityController(CommandQueue commandQueue, EventQueue eventQueue)
     {
         _commandQueue = commandQueue;
-        _playerController = playerController;
+        _eventQueue = eventQueue;
     }
 
     public IReadOnlyCollection<Entity> Entities
@@ -32,16 +32,17 @@ public class EntityController : IController
 
     public void DestroyEntity(Entity entity)
     {
-        DestroyContext destroyContext = new DestroyContext
-        {
-            PlayerController = _playerController
-        };
-
         _commandQueue.Push(() =>
         {
-            entity.Destroy(destroyContext);
+            entity.Destroy();
 
             _entities.Remove(entity);
+        });
+
+        _eventQueue.Push(new Event
+        {
+            EventType = EventType.EntityDestroy,
+            Entity = entity
         });
     }
 

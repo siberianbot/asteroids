@@ -20,6 +20,7 @@ public sealed class Engine : IDisposable
     private readonly IWindow _window;
 
     private readonly Lazy<CommandQueue> _commandQueue;
+    private readonly Lazy<EventQueue> _eventQueue;
     private readonly Lazy<EngineVars> _engineState;
     private readonly Lazy<Vars> _vars;
     private readonly Lazy<Renderer> _renderer;
@@ -40,6 +41,7 @@ public sealed class Engine : IDisposable
         _window.FramebufferResize += OnResize;
 
         _commandQueue = new Lazy<CommandQueue>(() => new CommandQueue());
+        _eventQueue = new Lazy<EventQueue>(() => new EventQueue());
         _engineState = new Lazy<EngineVars>();
         _vars = new Lazy<Vars>(() => new Vars());
 
@@ -66,8 +68,8 @@ public sealed class Engine : IDisposable
     {
         _controllers.AddController(new CameraController());
         _controllers.AddController(new BehaviorController(_commandQueue.Value));
-        _controllers.AddController(new PlayerController(_commandQueue.Value));
-        _controllers.AddController(new EntityController(_commandQueue.Value, _controllers.GetController<PlayerController>()));
+        _controllers.AddController(new PlayerController(_commandQueue.Value, _eventQueue.Value));
+        _controllers.AddController(new EntityController(_commandQueue.Value, _eventQueue.Value));
         _controllers.AddController(new SceneController(
             _sceneManager.Value,
             _controllers.GetController<EntityController>(),
@@ -179,6 +181,8 @@ public sealed class Engine : IDisposable
         DateTime start = DateTime.UtcNow;
 
         _commandQueue.Value.ExecutePending();
+        _eventQueue.Value.ExecutePending();
+
         _imguiController.Value.Update((float)delta);
 
         UpdateContext context = new UpdateContext

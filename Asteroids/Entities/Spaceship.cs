@@ -45,9 +45,9 @@ public class Spaceship : Entity, IOwnedEntity
         }
     }
 
-    public override void Destroy(DestroyContext context)
+    public override void Destroy()
     {
-        base.Destroy(context);
+        base.Destroy();
 
         if (_owner != null)
         {

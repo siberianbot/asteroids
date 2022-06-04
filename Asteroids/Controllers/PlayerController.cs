@@ -8,9 +8,11 @@ public class PlayerController : IController
     private readonly CommandQueue _commandQueue;
     private readonly List<Player> _players = new List<Player>();
 
-    public PlayerController(CommandQueue commandQueue)
+    public PlayerController(CommandQueue commandQueue, EventQueue eventQueue)
     {
         _commandQueue = commandQueue;
+
+        eventQueue.Event += OnEvent;
     }
 
     public IReadOnlyCollection<Player> Players
@@ -31,5 +33,15 @@ public class PlayerController : IController
     public void Reset()
     {
         _players.Clear();
+    }
+
+    private void OnEvent(Event @event)
+    {
+        if (@event.EventType != EventType.EntityDestroy || @event.Entity is not Player player)
+        {
+            return;
+        }
+
+        RemovePlayer(player);
     }
 }

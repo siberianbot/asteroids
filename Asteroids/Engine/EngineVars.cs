@@ -9,9 +9,4 @@ public class EngineVars
     public double RenderTimeMs { get; set; }
 
     public Vector2 ScreenDimensions { get; set; }
-
-    public float ScreenAspectRatio
-    {
-        get => ScreenDimensions.X / ScreenDimensions.Y;
-    }
 }
