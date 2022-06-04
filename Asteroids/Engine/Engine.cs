@@ -53,8 +53,8 @@ public sealed class Engine : IDisposable
 
         _inputContext = new Lazy<IInputContext>(_window.CreateInput);
         Lazy<GL> gl = new Lazy<GL>(_window.CreateOpenGL);
+        _renderer = new Lazy<Renderer>(() => new Renderer(gl.Value));
         _imguiController = new Lazy<ImGuiController>(() => new ImGuiController(gl.Value, _window, _inputContext.Value));
-        _renderer = new Lazy<Renderer>(() => new Renderer(gl.Value, _controllers.GetController<CameraController>()));
     }
 
     public void Run()
@@ -64,10 +64,10 @@ public sealed class Engine : IDisposable
 
     private void InitWindow()
     {
+        _controllers.AddController(new CameraController());
         _controllers.AddController(new BehaviorController(_commandQueue.Value));
         _controllers.AddController(new PlayerController(_commandQueue.Value));
         _controllers.AddController(new EntityController(_commandQueue.Value, _controllers.GetController<PlayerController>()));
-        _controllers.AddController(new CameraController(_spawner.Value));
         _controllers.AddController(new SceneController(
             _sceneManager.Value,
             _controllers.GetController<EntityController>(),
@@ -95,7 +95,7 @@ public sealed class Engine : IDisposable
 
         _renderer.Value.Clear();
 
-        List<RenderData> renderList = new List<RenderData>();
+        List<ModelData> models = new List<ModelData>();
 
         // TODO: deal with this mess
         foreach (Entity entity in _controllers.GetController<EntityController>().Entities)
@@ -115,7 +115,7 @@ public sealed class Engine : IDisposable
             {
                 Box2D<float> boundingBox = colliderComponent.BoundingBox;
 
-                RenderData boundingBoxData = new RenderData(
+                ModelData boundingBoxData = new ModelData(
                     new[]
                     {
                         boundingBox.Min.X, boundingBox.Min.Y,
@@ -130,7 +130,7 @@ public sealed class Engine : IDisposable
                     Matrix4x4.Identity
                 );
 
-                renderList.Add(boundingBoxData);
+                models.Add(boundingBoxData);
             }
 
             if (_vars.Value.GetVar(Constants.Vars.Physics_ShowCollider, false) &&
@@ -138,7 +138,7 @@ public sealed class Engine : IDisposable
             {
                 foreach (Collider collider in colliderComponent.Colliders)
                 {
-                    RenderData colliderData = new RenderData(
+                    ModelData colliderData = new ModelData(
                         Collider.VerticesOf(collider)
                             .SelectMany(vertices => new[] { vertices.X, vertices.Y })
                             .ToArray(),
@@ -149,11 +149,11 @@ public sealed class Engine : IDisposable
                         Matrix4x4.Identity
                     );
 
-                    renderList.Add(colliderData);
+                    models.Add(colliderData);
                 }
             }
 
-            RenderData data = new RenderData(
+            ModelData data = new ModelData(
                 modelComponent.VerticesData,
                 modelComponent.IndicesData,
                 modelComponent.Count,
@@ -161,10 +161,14 @@ public sealed class Engine : IDisposable
                 positionComponent.TransformMatrix
             );
 
-            renderList.Add(data);
+            models.Add(data);
         }
 
-        _renderer.Value.Render(renderList);
+        Matrix4x4 viewMatrix = _controllers.GetController<CameraController>().CurrentCamera?.ViewMatrix ??
+                               MatrixUtils.GetViewMatrix(new Vector2(0, 0));
+        RenderData renderData = new RenderData(models, viewMatrix);
+
+        _renderer.Value.Render(renderData);
         _imguiController.Value.Render();
 
         _engineState.Value.RenderTimeMs = (DateTime.UtcNow - start).TotalMilliseconds;

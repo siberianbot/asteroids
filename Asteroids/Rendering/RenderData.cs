@@ -4,22 +4,13 @@ namespace Asteroids.Rendering;
 
 public struct RenderData
 {
-    public RenderData(float[] verticesData, uint[] indicesData, uint count, Vector3 color, Matrix4x4 transformMatrix)
+    public RenderData(IReadOnlyCollection<ModelData> models, Matrix4x4 viewMatrix)
     {
-        VerticesData = verticesData;
-        IndicesData = indicesData;
-        Count = count;
-        Color = color;
-        TransformMatrix = transformMatrix;
+        Models = models;
+        ViewMatrix = viewMatrix;
     }
 
-    public float[] VerticesData { get; }
+    public IReadOnlyCollection<ModelData> Models { get; }
 
-    public uint[] IndicesData { get; }
-
-    public uint Count { get; }
-
-    public Vector3 Color { get; }
-
-    public Matrix4x4 TransformMatrix { get; }
+    public Matrix4x4 ViewMatrix { get; }
 }

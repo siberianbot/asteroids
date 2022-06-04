@@ -1,6 +1,5 @@
 using System.Drawing;
-using Asteroids.Controllers;
-using Asteroids.Engine;
+using System.Numerics;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 
@@ -8,6 +7,10 @@ namespace Asteroids.Rendering;
 
 public class Renderer : IDisposable
 {
+    private const float Near = 0.00001f;
+    private const float Far = 20.00000f;
+    private const float Fov = MathF.PI / 2;
+
     private const string VertexShader = "#version 330 core\n" +
                                         "layout (location = 0) in vec2 pos;\n" +
                                         "uniform mat4 transform;\n" +
@@ -27,17 +30,15 @@ public class Renderer : IDisposable
                                           "}\n";
 
     private readonly GL _gl;
-    private readonly CameraController _cameraController; // TODO: remove
-
     private readonly BufferObject<float> _verticesBuffer;
     private readonly BufferObject<uint> _indicesBuffer;
     private readonly VertexArrayObject<float> _vertexArray;
     private readonly Shader _shader;
+    private Matrix4x4 _projectionMatrix;
 
-    public Renderer(GL gl, CameraController cameraController)
+    public Renderer(GL gl)
     {
         _gl = gl;
-        _cameraController = cameraController;
 
         _verticesBuffer = new BufferObject<float>(_gl, BufferTargetARB.ArrayBuffer);
         _indicesBuffer = new BufferObject<uint>(_gl, BufferTargetARB.ElementArrayBuffer);
@@ -58,26 +59,27 @@ public class Renderer : IDisposable
     public void UpdateDimensions(Vector2D<int> dimensions)
     {
         _gl.Viewport(dimensions);
+        _projectionMatrix = Matrix4x4.CreatePerspectiveFieldOfView(Fov, (float)dimensions.X / dimensions.Y, Near, Far);
     }
 
-    public unsafe void Render(List<RenderData> renderList)
+    public unsafe void Render(RenderData renderData)
     {
         _shader.UseProgram();
-        _shader.SetMat4("projection", _cameraController.CurrentCamera.ProjectionMatrix);
-        _shader.SetMat4("view", _cameraController.CurrentCamera.ViewMatrix);
+        _shader.SetMat4("projection", _projectionMatrix);
+        _shader.SetMat4("view", renderData.ViewMatrix);
 
         _vertexArray.Bind();
 
-        foreach (RenderData renderData in renderList)
+        foreach (ModelData modelData in renderData.Models)
         {
-            _shader.SetMat4("transform", renderData.TransformMatrix);
-            _shader.SetVec3("color", renderData.Color);
+            _shader.SetMat4("transform", modelData.TransformMatrix);
+            _shader.SetVec3("color", modelData.Color);
 
-            _verticesBuffer.Data(renderData.VerticesData, BufferUsageARB.DynamicDraw);
-            _indicesBuffer.Data(renderData.IndicesData, BufferUsageARB.DynamicDraw);
+            _verticesBuffer.Data(modelData.VerticesData, BufferUsageARB.DynamicDraw);
+            _indicesBuffer.Data(modelData.IndicesData, BufferUsageARB.DynamicDraw);
             _vertexArray.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2, 0);
 
-            _gl.DrawElements(PrimitiveType.LineLoop, renderData.Count, DrawElementsType.UnsignedInt, null);
+            _gl.DrawElements(PrimitiveType.LineLoop, modelData.Count, DrawElementsType.UnsignedInt, null);
         }
 
         _gl.BindVertexArray(0);
