@@ -19,7 +19,7 @@ public class EntityCleanupBehavior : IBehavior
         _playerController = playerController;
     }
 
-    public void Update(UpdateContext context)
+    public void Update(float delta)
     {
         Vector2[] knownPositions = _playerController.Players
             .Where(player => player.Alive)

@@ -25,14 +25,11 @@ public class PlayableDemoScene : Scene
 
     public override void Load()
     {
-        const float radius = 10.0f;
-        const float cooldown = 5.0f;
-
         _behaviorController.AddBehavior(_behaviorFactory.CreateCollisionDetectionBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreateCollisionHandlingBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreateScoringBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreateMovementBehavior());
-        _behaviorController.AddBehavior(_behaviorFactory.CreateAsteroidSpawningBehavior(radius, cooldown));
+        _behaviorController.AddBehavior(_behaviorFactory.CreateAsteroidSpawningBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreatePlayerControlBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreatePlayerSpawningBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreateEntityCleanupBehavior());

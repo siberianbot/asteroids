@@ -31,9 +31,9 @@ public class DebugBehavior : IBehavior
                 return;
             }
 
-            bool value = _vars.GetVar(Constants.Vars.Debug_Enabled, false);
+            bool value = _vars.GetVar(Constants.Vars.DebugEnabled, false);
 
-            _vars.SetVar(Constants.Vars.Debug_Enabled, !value);
+            _vars.SetVar(Constants.Vars.DebugEnabled, !value);
         });
     }
 
@@ -42,9 +42,9 @@ public class DebugBehavior : IBehavior
         _eventQueue.Unsubscribe(EventType.KeyPress, _subscriptionIdx);
     }
 
-    public void Update(UpdateContext context)
+    public void Update(float delta)
     {
-        if (!_vars.GetVar(Constants.Vars.Debug_Enabled, false))
+        if (!_vars.GetVar(Constants.Vars.DebugEnabled, false))
         {
             return;
         }
@@ -91,25 +91,25 @@ public class DebugBehavior : IBehavior
 
             if (ImGui.CollapsingHeader("Engine"))
             {
-                float timeMultiplier = _vars.GetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f);
+                float timeMultiplier = _vars.GetVar(Constants.Vars.EngineTimeMultiplier, 1.0f);
                 if (ImGui.SliderFloat("Time multiplier", ref timeMultiplier, -5.0f, 5.0f))
                 {
-                    _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, timeMultiplier);
+                    _vars.SetVar(Constants.Vars.EngineTimeMultiplier, timeMultiplier);
                 }
 
                 if (ImGui.Button("Stop"))
                 {
-                    _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 0.0f);
+                    _vars.SetVar(Constants.Vars.EngineTimeMultiplier, 0.0f);
                 }
 
                 if (ImGui.Button("TOOO SLOW"))
                 {
-                    _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 0.063f);
+                    _vars.SetVar(Constants.Vars.EngineTimeMultiplier, 0.063f);
                 }
 
                 if (ImGui.Button("Reset time multiplier"))
                 {
-                    _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f);
+                    _vars.SetVar(Constants.Vars.EngineTimeMultiplier, 1.0f);
                 }
             }
 
@@ -117,16 +117,16 @@ public class DebugBehavior : IBehavior
             {
                 if (ImGui.Button("Toggle bounding box rendering"))
                 {
-                    bool value = _vars.GetVar(Constants.Vars.Physics_ShowBoundingBox, false);
+                    bool value = _vars.GetVar(Constants.Vars.PhysicsShowBoundingBox, false);
 
-                    _vars.SetVar(Constants.Vars.Physics_ShowBoundingBox, !value);
+                    _vars.SetVar(Constants.Vars.PhysicsShowBoundingBox, !value);
                 }
 
                 if (ImGui.Button("Toggle collider rendering"))
                 {
-                    bool value = _vars.GetVar(Constants.Vars.Physics_ShowCollider, false);
+                    bool value = _vars.GetVar(Constants.Vars.PhysicsShowCollider, false);
 
-                    _vars.SetVar(Constants.Vars.Physics_ShowCollider, !value);
+                    _vars.SetVar(Constants.Vars.PhysicsShowCollider, !value);
                 }
             }
 

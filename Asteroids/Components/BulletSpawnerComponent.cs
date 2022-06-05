@@ -8,21 +8,25 @@ public class BulletSpawnerComponent : Component, IUpdatableComponent
 {
     private const float Cooldown = 0.5f;
 
+    private readonly CommandQueue _commandQueue;
+    private readonly Spawner _spawner;
     private readonly Lazy<PositionComponent> _positionComponent;
     private readonly Lazy<MovementComponent> _movementComponent;
 
     private float _offset;
     private bool _fire;
 
-    public BulletSpawnerComponent()
+    public BulletSpawnerComponent(CommandQueue commandQueue, Spawner spawner)
     {
+        _commandQueue = commandQueue;
+        _spawner = spawner;
         _positionComponent = new Lazy<PositionComponent>(() => Owner.GetComponent<PositionComponent>() ?? throw new ArgumentException());
         _movementComponent = new Lazy<MovementComponent>(() => Owner.GetComponent<MovementComponent>() ?? throw new ArgumentException());
     }
 
-    public void Update(UpdateContext context)
+    public void Update(float delta)
     {
-        _offset += context.Delta;
+        _offset += delta;
 
         if (!_fire || _offset <= Cooldown)
         {
@@ -32,7 +36,7 @@ public class BulletSpawnerComponent : Component, IUpdatableComponent
         Vector2 position = _positionComponent.Value.Position + _movementComponent.Value.Direction;
         Vector2 direction = _movementComponent.Value.Direction;
 
-        context.CommandQueue.Push(() => context.Spawner.SpawnBullet(Owner, position, direction));
+        _commandQueue.Push(() => _spawner.SpawnBullet(Owner, position, direction));
 
         _fire = false;
         _offset = 0.0f;

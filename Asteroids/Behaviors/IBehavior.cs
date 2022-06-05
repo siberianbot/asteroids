@@ -1,5 +1,3 @@
-using Asteroids.Engine;
-
 namespace Asteroids.Behaviors;
 
 public interface IBehavior
@@ -14,7 +12,7 @@ public interface IBehavior
         //
     }
 
-    void Update(UpdateContext context);
+    void Update(float delta);
 
     bool Persistent
     {

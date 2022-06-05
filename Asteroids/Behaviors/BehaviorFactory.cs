@@ -26,12 +26,13 @@ public class BehaviorFactory
         _vars = vars;
     }
 
-    public AsteroidSpawningBehavior CreateAsteroidSpawningBehavior(float radius, float maxCooldown)
+    public AsteroidSpawningBehavior CreateAsteroidSpawningBehavior()
     {
         return new AsteroidSpawningBehavior(
             _controllersCollection.GetController<PlayerController>(),
             _controllersCollection.GetController<EntityController>(),
-            radius, maxCooldown);
+            _spawner,
+            _vars);
     }
 
     public CollisionDetectionBehavior CreateCollisionDetectionBehavior()

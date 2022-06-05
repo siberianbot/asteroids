@@ -48,7 +48,8 @@ public sealed class Engine : IDisposable
 
         _spawner = new Lazy<Spawner>(() => new Spawner(
             _controllers.GetController<EntityController>(),
-            _controllers.GetController<PlayerController>()));
+            _controllers.GetController<PlayerController>(),
+            _commandQueue.Value));
 
         _behaviorFactory = new Lazy<BehaviorFactory>(() => new BehaviorFactory(
             _controllers,
@@ -118,7 +119,7 @@ public sealed class Engine : IDisposable
             PositionComponent positionComponent = entity.GetComponent<PositionComponent>() ?? throw new NullReferenceException();
             ColliderComponent? colliderComponent = entity.GetComponent<ColliderComponent>();
 
-            if (_vars.Value.GetVar(Constants.Vars.Physics_ShowBoundingBox, false) &&
+            if (_vars.Value.GetVar(Constants.Vars.PhysicsShowBoundingBox, false) &&
                 colliderComponent != null)
             {
                 Box2D<float> boundingBox = colliderComponent.BoundingBox;
@@ -141,7 +142,7 @@ public sealed class Engine : IDisposable
                 models.Add(boundingBoxData);
             }
 
-            if (_vars.Value.GetVar(Constants.Vars.Physics_ShowCollider, false) &&
+            if (_vars.Value.GetVar(Constants.Vars.PhysicsShowCollider, false) &&
                 colliderComponent != null)
             {
                 foreach (Collider collider in colliderComponent.Colliders)
@@ -191,21 +192,16 @@ public sealed class Engine : IDisposable
 
         _imguiController.Value.Update((float)delta);
 
-        UpdateContext context = new UpdateContext
-        {
-            Delta = (float)delta * _vars.Value.GetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f),
-            Spawner = _spawner.Value,
-            CommandQueue = _commandQueue.Value,
-        };
+        float targetDelta = (float)delta * _vars.Value.GetVar(Constants.Vars.EngineTimeMultiplier, 1.0f);
 
         foreach (Entity entity in _controllers.GetController<EntityController>().Entities)
         {
-            entity.Update(context);
+            entity.Update(targetDelta);
         }
 
         foreach (IBehavior behavior in _controllers.GetController<BehaviorController>().Behaviors)
         {
-            behavior.Update(context);
+            behavior.Update(targetDelta);
         }
 
         _engineState.Value.UpdateTimeMs = (DateTime.UtcNow - start).TotalMilliseconds;

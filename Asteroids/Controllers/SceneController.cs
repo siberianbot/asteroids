@@ -34,7 +34,7 @@ public class SceneController : IController
         _commandQueue.Push(() =>
         {
             scene.Load();
-            _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f);
+            _vars.SetVar(Constants.Vars.EngineTimeMultiplier, 1.0f);
         });
     }
 }

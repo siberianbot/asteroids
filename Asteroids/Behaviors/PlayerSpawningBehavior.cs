@@ -1,7 +1,6 @@
 using System.Numerics;
 using Asteroids.Components;
 using Asteroids.Controllers;
-using Asteroids.Engine;
 using Asteroids.Entities;
 
 namespace Asteroids.Behaviors;
@@ -22,7 +21,7 @@ public class PlayerSpawningBehavior : IBehavior
         _spawner = spawner;
     }
 
-    public void Update(UpdateContext context)
+    public void Update(float delta)
     {
         foreach (Player player in _playerController.Players)
         {
@@ -36,7 +35,7 @@ public class PlayerSpawningBehavior : IBehavior
                 _cooldown[player] = Cooldown;
             }
 
-            _cooldown[player] += context.Delta;
+            _cooldown[player] += delta;
 
             if (_cooldown[player] <= Cooldown)
             {
@@ -46,7 +45,7 @@ public class PlayerSpawningBehavior : IBehavior
             // TODO: randomize position
             Spaceship spaceship = _spawner.SpawnSpaceship(Vector2.Zero, player, player.Color);
             spaceship.AddComponent(new SpaceshipControlComponent());
-            _cameraController.CurrentCamera = context.Spawner.SpawnCamera(spaceship);
+            _cameraController.CurrentCamera = _spawner.SpawnCamera(spaceship);
 
             _cooldown[player] = 0;
         }

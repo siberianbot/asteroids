@@ -1,5 +1,3 @@
-using Asteroids.Engine;
-using Asteroids.Entities;
 using Asteroids.Utils;
 
 namespace Asteroids.Components;
@@ -23,9 +21,9 @@ public class SpaceshipControlComponent : Component, IUpdatableComponent
         _movementComponent = new Lazy<MovementComponent>(() => Owner.GetComponent<MovementComponent>() ?? throw new ArgumentException());
     }
 
-    public void Update(UpdateContext context)
+    public void Update(float delta)
     {
-        _positionComponent.Value.Rotation += context.Delta * _rotation * RotationVelocity;
+        _positionComponent.Value.Rotation += delta * _rotation * RotationVelocity;
         _movementComponent.Value.Direction = MathUtils.FromPolar(_positionComponent.Value.Rotation, 1.0f);
 
         if (_acceleration != 0)
@@ -39,7 +37,7 @@ public class SpaceshipControlComponent : Component, IUpdatableComponent
         }
         else if (_movementComponent.Value.Velocity != 0)
         {
-            _movementComponent.Value.Velocity -= MathF.Sign(_movementComponent.Value.Velocity) * context.Delta * Deceleration;
+            _movementComponent.Value.Velocity -= MathF.Sign(_movementComponent.Value.Velocity) * delta * Deceleration;
         }
 
         _acceleration = 0;

@@ -33,11 +33,11 @@ public abstract class Entity
         //
     }
 
-    public virtual void Update(UpdateContext context)
+    public virtual void Update(float delta)
     {
         foreach (IUpdatableComponent component in _components.OfType<IUpdatableComponent>())
         {
-            component.Update(context);
+            component.Update(delta);
         }
     }
 

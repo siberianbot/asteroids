@@ -49,11 +49,11 @@ public class CollisionHandlingBehavior : IBehavior
         });
     }
 
-    public void Update(UpdateContext context)
+    public void Update(float delta)
     {
         foreach (Collision collision in _collisions)
         {
-            HandleCollision(collision, context.Delta);
+            HandleCollision(collision, delta);
         }
 
         _collisions.Clear();

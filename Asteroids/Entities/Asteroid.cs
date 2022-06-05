@@ -19,10 +19,10 @@ public class Asteroid : Entity
 
     public float Scale { get; }
 
-    public override void Update(UpdateContext context)
+    public override void Update(float delta)
     {
-        base.Update(context);
+        base.Update(delta);
 
-        _positionComponent.Value.Rotation = MathUtils.NormalizeRadian(_positionComponent.Value.Rotation + context.Delta * _rotationVelocity);
+        _positionComponent.Value.Rotation = MathUtils.NormalizeRadian(_positionComponent.Value.Rotation + delta * _rotationVelocity);
     }
 }

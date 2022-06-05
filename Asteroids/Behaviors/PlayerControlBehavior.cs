@@ -46,7 +46,7 @@ public class PlayerControlBehavior : IBehavior
         _eventQueue.Unsubscribe(EventType.KeyRelease, _keyReleaseSubscription);
     }
 
-    public void Update(UpdateContext context)
+    public void Update(float delta)
     {
         foreach (Player player in _playerController.Players)
         {

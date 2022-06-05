@@ -1,6 +1,5 @@
 using Asteroids.Components;
 using Asteroids.Controllers;
-using Asteroids.Engine;
 using Asteroids.Entities;
 
 namespace Asteroids.Behaviors;
@@ -14,7 +13,7 @@ public class MovementBehavior : IBehavior
         _entityController = entityController;
     }
 
-    public void Update(UpdateContext context)
+    public void Update(float delta)
     {
         foreach (Entity entity in _entityController.Entities)
         {
@@ -26,7 +25,7 @@ public class MovementBehavior : IBehavior
                 continue;
             }
 
-            positionComponent.Position += context.Delta * movementComponent.Velocity * movementComponent.Direction;
+            positionComponent.Position += delta * movementComponent.Velocity * movementComponent.Direction;
         }
     }
 }

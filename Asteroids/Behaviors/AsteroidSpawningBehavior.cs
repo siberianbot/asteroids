@@ -11,22 +11,29 @@ public class AsteroidSpawningBehavior : IBehavior
 {
     private readonly PlayerController _playerController;
     private readonly EntityController _entityController;
+    private readonly Spawner _spawner;
     private readonly float _radius;
     private readonly float _maxCooldown;
     private float _cooldown;
 
-    public AsteroidSpawningBehavior(PlayerController playerController, EntityController entityController, float radius, float maxCooldown)
+    public AsteroidSpawningBehavior(
+        PlayerController playerController,
+        EntityController entityController,
+        Spawner spawner,
+        Vars vars)
     {
         _playerController = playerController;
         _entityController = entityController;
-        _radius = radius;
-        _maxCooldown = maxCooldown;
-        _cooldown = maxCooldown;
+        _spawner = spawner;
+
+        _radius = vars.GetVar(Constants.Vars.AsteroidsSpawningRadius, 10.0f);
+        _maxCooldown = vars.GetVar(Constants.Vars.AsteroidsSpawningCooldown, 5.0f);
+        _cooldown = _maxCooldown;
     }
 
-    public void Update(UpdateContext context)
+    public void Update(float delta)
     {
-        _cooldown += context.Delta;
+        _cooldown += delta;
 
         if (_cooldown < _maxCooldown)
         {
@@ -49,7 +56,7 @@ public class AsteroidSpawningBehavior : IBehavior
 
             float angle = Random.Shared.NextSingle() * MathF.Tau;
 
-            context.Spawner.SpawnAsteroid(
+            _spawner.SpawnAsteroid(
                 position + MathUtils.FromPolar(angle, _radius),
                 Vector2.Normalize(MathUtils.FromPolar(angle + MathF.PI, _radius)));
         }

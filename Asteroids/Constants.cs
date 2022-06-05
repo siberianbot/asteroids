@@ -43,10 +43,12 @@ public static class Constants
 
     public static class Vars
     {
-        public static string Debug_Enabled = "Debug:Enabled";
-        public static string Engine_TimeMultiplier = "Engine:TimeMultiplier";
-        public static string Physics_ShowBoundingBox = "Physics:ShowBoundingBox";
-        public static string Physics_ShowCollider = "Physics:ShowCollider";
+        public const string DebugEnabled = "Debug:Enabled";
+        public const string EngineTimeMultiplier = "Engine:TimeMultiplier";
+        public const string PhysicsShowBoundingBox = "Physics:ShowBoundingBox";
+        public const string PhysicsShowCollider = "Physics:ShowCollider";
+        public const string AsteroidsSpawningRadius = "AsteroidsSpawning:Radius";
+        public const string AsteroidsSpawningCooldown = "AsteroidsSpawning:Cooldown";
     }
 
     public static class Asteroids

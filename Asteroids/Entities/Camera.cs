@@ -20,9 +20,9 @@ public class Camera : Entity
         _position = position;
     }
 
-    public override void Update(UpdateContext context)
+    public override void Update(float delta)
     {
-        base.Update(context);
+        base.Update(delta);
 
         Vector2 position = _entity?.GetComponent<PositionComponent>()?.Position ??
                            _position ??

@@ -17,7 +17,7 @@ public class UIBehavior : IBehavior
         _playerController = playerController;
     }
 
-    public void Update(UpdateContext context)
+    public void Update(float delta)
     {
         ImGui.SetNextWindowPos(new Vector2(_engineVars.ScreenDimensions.X - 310, 10));
         ImGui.SetNextWindowSize(new Vector2(300, 100));

@@ -31,7 +31,7 @@ public class ScoringBehavior : IBehavior
         _eventQueue.Unsubscribe(EventType.CollisionStarted, _collisionStartedSubscription);
     }
 
-    public void Update(UpdateContext context)
+    public void Update(float delta)
     {
         foreach (Collision collision in _collisions)
         {

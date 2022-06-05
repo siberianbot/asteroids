@@ -19,7 +19,7 @@ public class CollisionDetectionBehavior : IBehavior
         _eventQueue = eventQueue;
     }
 
-    public void Update(UpdateContext context)
+    public void Update(float delta)
     {
         var checkList = _entityController.Entities
             .Select(entity => new
