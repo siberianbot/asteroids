@@ -25,6 +25,7 @@ public class PlayableDemoScene : Scene
 
     public override void Load()
     {
+        _behaviorController.AddBehavior(_behaviorFactory.CreateBulletSpawningBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreateCollisionDetectionBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreateCollisionHandlingBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreateScoringBehavior());

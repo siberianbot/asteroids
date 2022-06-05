@@ -47,8 +47,15 @@ public class ScoringBehavior : IBehavior
         Right
     }
 
+    // TODO: complicated
     private static void HandleCollision(Collision collision)
     {
+        if (collision.Right is Bullet rightBullet && rightBullet.Owner == collision.Left ||
+            collision.Left is Bullet leftBullet && leftBullet.Owner == collision.Right)
+        {
+            return;
+        }
+
         (Player owner, CollisionSide side) = collision.Left is Bullet left && left.Owner is Spaceship leftSpaceship
             ? (leftSpaceship.Owner as Player ?? throw new ArgumentException(), CollisionSide.Left)
             : collision.Right is Bullet right && right.Owner is Spaceship rightSpaceship

@@ -12,12 +12,12 @@ public class PlayerControlBehavior : IBehavior
     private enum Action
     {
         None = 0,
-        Accelerate = 0b1,
-        Decelerate = 0b10,
-        Stop = 0b100,
-        TurnLeft = 0b1000,
-        TurnRight = 0b10000,
-        Fire = 0b100000
+        Accelerate = 1,
+        Decelerate = Accelerate << 1,
+        Stop = Decelerate << 1,
+        TurnLeft = Stop << 1,
+        TurnRight = TurnLeft << 1,
+        Fire = TurnRight << 1
     }
 
     private readonly PlayerController _playerController;
@@ -48,6 +48,7 @@ public class PlayerControlBehavior : IBehavior
 
     public void Update(float delta)
     {
+        // TODO: it gonna make 
         foreach (Player player in _playerController.Players)
         {
             if (!player.Alive)
@@ -62,39 +63,39 @@ public class PlayerControlBehavior : IBehavior
                 continue;
             }
 
-            SpaceshipControlComponent spaceshipControlComponent = ownedSpaceship.GetComponent<SpaceshipControlComponent>()
-                                                                  ?? throw new ArgumentException();
             BulletSpawnerComponent bulletSpawnerComponent = ownedSpaceship.GetComponent<BulletSpawnerComponent>()
                                                             ?? throw new ArgumentException();
 
             if (_currentAction.HasFlag(Action.TurnLeft))
             {
-                spaceshipControlComponent.TurnLeft();
+                ownedSpaceship.TurnLeft();
             }
 
             if (_currentAction.HasFlag(Action.TurnRight))
             {
-                spaceshipControlComponent.TurnRight();
+                ownedSpaceship.TurnRight();
             }
 
             if (_currentAction.HasFlag(Action.Stop))
             {
-                spaceshipControlComponent.Stop();
+                ownedSpaceship.Stop();
             }
 
             if (_currentAction.HasFlag(Action.Accelerate))
             {
-                spaceshipControlComponent.Accelerate();
+                ownedSpaceship.Accelerate();
             }
 
             if (_currentAction.HasFlag(Action.Decelerate))
             {
-                spaceshipControlComponent.Decelerate();
+                ownedSpaceship.Decelerate();
             }
 
             if (_currentAction.HasFlag(Action.Fire))
             {
-                bulletSpawnerComponent.Fire();
+                bulletSpawnerComponent.Fire = true;
+
+                _currentAction &= ~Action.Fire;
             }
         }
     }

@@ -1,5 +1,4 @@
 using Asteroids.Components;
-using Asteroids.Engine;
 
 namespace Asteroids.Entities;
 
@@ -35,10 +34,7 @@ public abstract class Entity
 
     public virtual void Update(float delta)
     {
-        foreach (IUpdatableComponent component in _components.OfType<IUpdatableComponent>())
-        {
-            component.Update(delta);
-        }
+        //
     }
 
     public virtual void Destroy()

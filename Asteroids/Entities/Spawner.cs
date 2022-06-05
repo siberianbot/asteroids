@@ -12,13 +12,11 @@ public class Spawner
 {
     private readonly EntityController _entityController;
     private readonly PlayerController _playerController;
-    private readonly CommandQueue _commandQueue;
 
-    public Spawner(EntityController entityController, PlayerController playerController, CommandQueue commandQueue)
+    public Spawner(EntityController entityController, PlayerController playerController)
     {
         _entityController = entityController;
         _playerController = playerController;
-        _commandQueue = commandQueue;
     }
 
     public Asteroid SpawnAsteroid(Vector2 position, Vector2 direction, float? velocity = null, float? scale = null)
@@ -87,8 +85,7 @@ public class Spawner
         spaceship.AddComponent(new ColliderComponent(Spaceship.CollisionModel));
         spaceship.AddComponent(new MovementComponent(0.0f, Vector2.Zero));
         spaceship.AddComponent(new PositionComponent(position, rotation));
-        // TODO: component should not depend on controllers, spawner, etc.
-        spaceship.AddComponent(new BulletSpawnerComponent(_commandQueue, this));
+        spaceship.AddComponent(new BulletSpawnerComponent());
 
         _entityController.AddEntity(spaceship);
 
@@ -100,7 +97,7 @@ public class Spawner
         Bullet bullet = new Bullet(owner);
         bullet.AddComponent(new ModelComponent(Bullet.Model, Constants.Colors.White));
         bullet.AddComponent(new ColliderComponent(Bullet.CollisionModel));
-        bullet.AddComponent(new MovementComponent(10.0f, direction));
+        bullet.AddComponent(new MovementComponent(15.0f, direction));
         bullet.AddComponent(new PositionComponent(position, 0.0f));
 
         _entityController.AddEntity(bullet);

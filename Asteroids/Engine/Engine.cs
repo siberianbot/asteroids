@@ -48,11 +48,11 @@ public sealed class Engine : IDisposable
 
         _spawner = new Lazy<Spawner>(() => new Spawner(
             _controllers.GetController<EntityController>(),
-            _controllers.GetController<PlayerController>(),
-            _commandQueue.Value));
+            _controllers.GetController<PlayerController>()));
 
         _behaviorFactory = new Lazy<BehaviorFactory>(() => new BehaviorFactory(
             _controllers,
+            _commandQueue.Value,
             _engineState.Value,
             _eventQueue.Value,
             _spawner.Value,

@@ -61,6 +61,12 @@ public class CollisionHandlingBehavior : IBehavior
 
     private void HandleCollision(Collision collision, float delta)
     {
+        if (collision.Right is Bullet rightBullet && rightBullet.Owner == collision.Left ||
+            collision.Left is Bullet leftBullet && leftBullet.Owner == collision.Right)
+        {
+            return;
+        }
+        
         MovementComponent leftMovement = collision.Left.GetComponent<MovementComponent>() ?? throw new ArgumentException();
         PositionComponent leftPosition = collision.Left.GetComponent<PositionComponent>() ?? throw new ArgumentException();
         MovementComponent rightMovement = collision.Right.GetComponent<MovementComponent>() ?? throw new ArgumentException();

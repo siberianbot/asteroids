@@ -44,7 +44,6 @@ public class PlayerSpawningBehavior : IBehavior
 
             // TODO: randomize position
             Spaceship spaceship = _spawner.SpawnSpaceship(Vector2.Zero, player, player.Color);
-            spaceship.AddComponent(new SpaceshipControlComponent());
             _cameraController.CurrentCamera = _spawner.SpawnCamera(spaceship);
 
             _cooldown[player] = 0;

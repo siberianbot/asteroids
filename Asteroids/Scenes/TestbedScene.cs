@@ -30,12 +30,12 @@ public class TestbedScene : Scene
     {
         Player player = _spawner.SpawnPlayer("test player", Constants.Colors.Green);
         Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f), player);
-        spaceship.AddComponent(new SpaceshipControlComponent());
 
         _cameraController.CurrentCamera = _spawner.SpawnCamera(spaceship);
         _behaviorController.AddBehavior(_behaviorFactory.CreatePlayerControlBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreateMovementBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreateEntityCleanupBehavior());
+        _behaviorController.AddBehavior(_behaviorFactory.CreateBulletSpawningBehavior());
         _spawner.SpawnAsteroid(Vector2.Zero, Vector2.Zero, scale: 1.0f);
         _spawner.SpawnAsteroid(new Vector2(-2.5f, 0f), Vector2.Zero, scale: 0.75f);
         _spawner.SpawnAsteroid(new Vector2(+2.5f, 0f), Vector2.Zero, scale: 0.5f);
