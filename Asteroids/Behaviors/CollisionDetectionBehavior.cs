@@ -9,11 +9,19 @@ namespace Asteroids.Behaviors;
 
 public class CollisionDetectionBehavior : IBehavior
 {
+    private readonly EntityController _entityController;
+    private readonly EventQueue _eventQueue;
     private readonly List<Collision> _activeCollisions = new List<Collision>();
+
+    public CollisionDetectionBehavior(EntityController entityController, EventQueue eventQueue)
+    {
+        _entityController = entityController;
+        _eventQueue = eventQueue;
+    }
 
     public void Update(UpdateContext context)
     {
-        var checkList = context.Controllers.GetController<EntityController>().Entities
+        var checkList = _entityController.Entities
             .Select(entity => new
             {
                 Entity = entity,
@@ -39,7 +47,7 @@ public class CollisionDetectionBehavior : IBehavior
             {
                 if (collision != null)
                 {
-                    context.EventQueue.Push(new Event
+                    _eventQueue.Push(new Event
                     {
                         EventType = EventType.CollisionFinished,
                         Collision = collision
@@ -59,7 +67,7 @@ public class CollisionDetectionBehavior : IBehavior
             collision = new Collision(left.Entity, right.Entity);
             _activeCollisions.Add(collision);
 
-            context.EventQueue.Push(new Event
+            _eventQueue.Push(new Event
             {
                 EventType = EventType.CollisionStarted,
                 Collision = collision

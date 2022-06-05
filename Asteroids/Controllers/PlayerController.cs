@@ -6,13 +6,20 @@ namespace Asteroids.Controllers;
 public class PlayerController : IController
 {
     private readonly CommandQueue _commandQueue;
+    private readonly EventQueue _eventQueue;
     private readonly List<Player> _players = new List<Player>();
+    private long _entityDestroySubscription;
+    private long _sceneChangeSubscription;
 
     public PlayerController(CommandQueue commandQueue, EventQueue eventQueue)
     {
         _commandQueue = commandQueue;
+        _eventQueue = eventQueue;
+    }
 
-        eventQueue.OnEvent(EventType.EntityDestroy, @event =>
+    public void Initialize()
+    {
+        _entityDestroySubscription = _eventQueue.Subscribe(EventType.EntityDestroy, @event =>
         {
             if (@event.Entity is not Player player)
             {
@@ -21,6 +28,14 @@ public class PlayerController : IController
 
             RemovePlayer(player);
         });
+
+        _sceneChangeSubscription = _eventQueue.Subscribe(EventType.SceneChange, _ => Reset());
+    }
+
+    public void Terminate()
+    {
+        _eventQueue.Unsubscribe(EventType.EntityDestroy, _entityDestroySubscription);
+        _eventQueue.Unsubscribe(EventType.SceneChange, _sceneChangeSubscription);
     }
 
     public IReadOnlyCollection<Player> Players

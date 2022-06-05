@@ -1,10 +1,19 @@
 using Asteroids.Engine;
-using Asteroids.Entities;
 
 namespace Asteroids.Behaviors;
 
 public interface IBehavior
 {
+    void Initialize()
+    {
+        //
+    }
+
+    void Terminate()
+    {
+        //
+    }
+
     void Update(UpdateContext context);
 
     bool Persistent

@@ -2,10 +2,18 @@ namespace Asteroids.Engine;
 
 public class EventQueue
 {
-    public delegate void Handler(Event @event);
+    public delegate void HandlerDelegate(Event @event);
 
-    private readonly Dictionary<EventType, Handler> _handlers = new Dictionary<EventType, Handler>();
+    private struct Handler
+    {
+        public long Index { get; init; }
+
+        public HandlerDelegate Delegate { get; init; }
+    }
+
+    private readonly Dictionary<EventType, List<Handler>> _handlers = new Dictionary<EventType, List<Handler>>();
     private List<Event> _pendingEvents = new List<Event>();
+    private long _idx;
 
     public void Push(Event @event)
     {
@@ -25,7 +33,10 @@ public class EventQueue
                 continue;
             }
 
-            _handlers[@event.EventType](@event);
+            foreach (Handler handler in _handlers[@event.EventType])
+            {
+                handler.Delegate(@event);
+            }
         }
     }
 
@@ -35,10 +46,31 @@ public class EventQueue
         _handlers.Clear();
     }
 
-    public void OnEvent(EventType expectedType, Handler handler)
+    public long Subscribe(EventType expectedType, HandlerDelegate @delegate)
     {
-        _handlers[expectedType] = _handlers.ContainsKey(expectedType)
-            ? (Handler)Delegate.Combine(_handlers[expectedType], handler)
-            : handler;
+        Handler handler = new Handler
+        {
+            Index = ++_idx,
+            Delegate = @delegate
+        };
+
+        if (!_handlers.ContainsKey(expectedType))
+        {
+            _handlers[expectedType] = new List<Handler>();
+        }
+
+        _handlers[expectedType].Add(handler);
+
+        return handler.Index;
+    }
+
+    public void Unsubscribe(EventType type, long idx)
+    {
+        if (!_handlers.ContainsKey(type))
+        {
+            return;
+        }
+
+        _handlers[type].RemoveAll(handler => handler.Index == idx);
     }
 }

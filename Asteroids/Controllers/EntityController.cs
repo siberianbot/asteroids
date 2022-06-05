@@ -8,11 +8,22 @@ public class EntityController : IController
     private readonly CommandQueue _commandQueue;
     private readonly EventQueue _eventQueue;
     private readonly List<Entity> _entities = new List<Entity>();
+    private long _sceneChangeSubscription;
 
     public EntityController(CommandQueue commandQueue, EventQueue eventQueue)
     {
         _commandQueue = commandQueue;
         _eventQueue = eventQueue;
+    }
+
+    public void Initialize()
+    {
+        _sceneChangeSubscription = _eventQueue.Subscribe(EventType.SceneChange, _ => Reset());
+    }
+
+    public void Terminate()
+    {
+        _eventQueue.Unsubscribe(EventType.SceneChange, _sceneChangeSubscription);
     }
 
     public IReadOnlyCollection<Entity> Entities

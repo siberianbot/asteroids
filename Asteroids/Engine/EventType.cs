@@ -4,5 +4,8 @@ public enum EventType
 {
     CollisionStarted,
     CollisionFinished,
-    EntityDestroy
+    EntityDestroy,
+    KeyPress,
+    KeyRelease,
+    SceneChange
 }

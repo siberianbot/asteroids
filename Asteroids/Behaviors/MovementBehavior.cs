@@ -7,9 +7,16 @@ namespace Asteroids.Behaviors;
 
 public class MovementBehavior : IBehavior
 {
+    private readonly EntityController _entityController;
+
+    public MovementBehavior(EntityController entityController)
+    {
+        _entityController = entityController;
+    }
+
     public void Update(UpdateContext context)
     {
-        foreach (Entity entity in context.Controllers.GetController<EntityController>().Entities)
+        foreach (Entity entity in _entityController.Entities)
         {
             MovementComponent? movementComponent = entity.GetComponent<MovementComponent>();
             PositionComponent? positionComponent = entity.GetComponent<PositionComponent>();

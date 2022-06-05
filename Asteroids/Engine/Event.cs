@@ -1,5 +1,6 @@
 using Asteroids.Entities;
 using Asteroids.Physics;
+using Silk.NET.Input;
 
 namespace Asteroids.Engine;
 
@@ -10,4 +11,6 @@ public struct Event
     public Entity? Entity { get; init; }
 
     public Collision? Collision { get; init; }
+
+    public Key? Key { get; set; }
 }

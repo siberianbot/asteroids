@@ -1,9 +1,9 @@
 namespace Asteroids.Engine;
 
-public delegate void Command();
-
 public class CommandQueue
 {
+    public delegate void Command();
+
     private List<Command> _pendingCommands = new List<Command>();
 
     public void Push(Command command)

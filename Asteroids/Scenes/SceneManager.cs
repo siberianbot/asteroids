@@ -1,5 +1,5 @@
+using Asteroids.Behaviors;
 using Asteroids.Controllers;
-using Asteroids.Engine;
 using Asteroids.Entities;
 
 namespace Asteroids.Scenes;
@@ -8,15 +8,15 @@ public class SceneManager
 {
     private readonly List<Scene> _scenes;
 
-    public SceneManager(Spawner spawner, CameraController cameraController, BehaviorController behaviorController, Vars vars, EventQueue eventQueue)
+    public SceneManager(Spawner spawner, BehaviorFactory behaviorFactory, ControllersCollection controllersCollection)
     {
         _scenes = new List<Scene>
         {
-            new TestbedScene(spawner, cameraController, behaviorController, vars),
-            new AsteroidsDemoScene(spawner, vars),
-            new SpaceshipDemoScene(spawner, vars),
-            new AsteroidCollisionScene(spawner, behaviorController, vars, eventQueue),
-            new PlayableDemoScene(spawner, vars, cameraController, behaviorController, eventQueue)
+            new TestbedScene(spawner, behaviorFactory, controllersCollection),
+            new AsteroidsDemoScene(spawner),
+            new SpaceshipDemoScene(spawner),
+            new AsteroidCollisionScene(spawner, behaviorFactory, controllersCollection),
+            new PlayableDemoScene(spawner, behaviorFactory, controllersCollection)
         };
     }
 

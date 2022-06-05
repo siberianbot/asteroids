@@ -10,16 +10,22 @@ public class EntityCleanupBehavior : IBehavior
 {
     private const float MaxDistance = 100f;
 
+    private readonly EntityController _entityController;
+    private readonly PlayerController _playerController;
+
+    public EntityCleanupBehavior(EntityController entityController, PlayerController playerController)
+    {
+        _entityController = entityController;
+        _playerController = playerController;
+    }
+
     public void Update(UpdateContext context)
     {
-        EntityController entityController = context.Controllers.GetController<EntityController>();
-        PlayerController playerController = context.Controllers.GetController<PlayerController>();
-
-        Vector2[] knownPositions = playerController.Players
+        Vector2[] knownPositions = _playerController.Players
             .Where(player => player.Alive)
             .Select(player =>
             {
-                return entityController
+                return _entityController
                     .GetOwnedEntities<Spaceship>(player)
                     .Single()
                     .GetComponent<PositionComponent>()!
@@ -27,7 +33,7 @@ public class EntityCleanupBehavior : IBehavior
             })
             .ToArray();
 
-        foreach (Entity entity in entityController.Entities.Except(playerController.Players))
+        foreach (Entity entity in _entityController.Entities.Except(_playerController.Players))
         {
             PositionComponent? positionComponent = entity.GetComponent<PositionComponent>();
 
@@ -41,7 +47,7 @@ public class EntityCleanupBehavior : IBehavior
                 continue;
             }
 
-            entityController.DestroyEntity(entity);
+            _entityController.DestroyEntity(entity);
         }
     }
 }

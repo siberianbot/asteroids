@@ -8,15 +8,9 @@ public struct UpdateContext
 {
     public float Delta { get; init; }
 
-    public EngineVars EngineVars { get; init; }
-
+    [Obsolete]
     public CommandQueue CommandQueue { get; init; }
 
-    public EventQueue EventQueue { get; init; }
-
+    [Obsolete]
     public Spawner Spawner { get; init; }
-
-    public Vars GlobalVars { get; init; }
-
-    public ControllersCollection Controllers { get; init; }
 }

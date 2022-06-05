@@ -6,23 +6,56 @@ using Silk.NET.Input;
 
 namespace Asteroids.Behaviors;
 
-// TODO: rework
 public class PlayerControlBehavior : IBehavior
 {
+    [Flags]
+    private enum Action
+    {
+        None = 0,
+        Accelerate = 0b1,
+        Decelerate = 0b10,
+        Stop = 0b100,
+        TurnLeft = 0b1000,
+        TurnRight = 0b10000,
+        Fire = 0b100000
+    }
+
+    private readonly PlayerController _playerController;
+    private readonly EntityController _entityController;
+    private readonly EventQueue _eventQueue;
+    private long _keyPressSubscription;
+    private long _keyReleaseSubscription;
+    private Action _currentAction = Action.None;
+
+    public PlayerControlBehavior(PlayerController playerController, EntityController entityController, EventQueue eventQueue)
+    {
+        _playerController = playerController;
+        _entityController = entityController;
+        _eventQueue = eventQueue;
+    }
+
+    public void Initialize()
+    {
+        _keyPressSubscription = _eventQueue.Subscribe(EventType.KeyPress, @event => HandleKeyPress(@event.Key!.Value));
+        _keyReleaseSubscription = _eventQueue.Subscribe(EventType.KeyRelease, @event => HandleKeyRelease(@event.Key!.Value));
+    }
+
+    public void Terminate()
+    {
+        _eventQueue.Unsubscribe(EventType.KeyPress, _keyPressSubscription);
+        _eventQueue.Unsubscribe(EventType.KeyRelease, _keyReleaseSubscription);
+    }
+
     public void Update(UpdateContext context)
     {
-        InputController inputController = context.Controllers.GetController<InputController>();
-
-        foreach (Player player in context.Controllers.GetController<PlayerController>().Players)
+        foreach (Player player in _playerController.Players)
         {
             if (!player.Alive)
             {
                 continue;
             }
 
-            Spaceship? ownedSpaceship = context.Controllers.GetController<EntityController>()
-                .GetOwnedEntities<Spaceship>(player)
-                .SingleOrDefault();
+            Spaceship? ownedSpaceship = _entityController.GetOwnedEntities<Spaceship>(player).SingleOrDefault();
 
             if (ownedSpaceship == null)
             {
@@ -34,33 +67,59 @@ public class PlayerControlBehavior : IBehavior
             BulletSpawnerComponent bulletSpawnerComponent = ownedSpaceship.GetComponent<BulletSpawnerComponent>()
                                                             ?? throw new ArgumentException();
 
-            if (inputController.IsKeyPressed(Key.Left))
+            if (_currentAction.HasFlag(Action.TurnLeft))
             {
                 spaceshipControlComponent.TurnLeft();
             }
 
-            if (inputController.IsKeyPressed(Key.Right))
+            if (_currentAction.HasFlag(Action.TurnRight))
             {
                 spaceshipControlComponent.TurnRight();
             }
 
-            if (inputController.IsKeyPressed(Key.Z))
+            if (_currentAction.HasFlag(Action.Stop))
             {
                 spaceshipControlComponent.Stop();
             }
-            else if (inputController.IsKeyPressed(Key.Up))
+
+            if (_currentAction.HasFlag(Action.Accelerate))
             {
                 spaceshipControlComponent.Accelerate();
             }
-            else if (inputController.IsKeyPressed(Key.Down))
+
+            if (_currentAction.HasFlag(Action.Decelerate))
             {
                 spaceshipControlComponent.Decelerate();
             }
 
-            if (inputController.IsKeyPressed(Key.Space))
+            if (_currentAction.HasFlag(Action.Fire))
             {
                 bulletSpawnerComponent.Fire();
             }
         }
+    }
+
+    private void HandleKeyPress(Key key)
+    {
+        _currentAction |= KeyToAction(key);
+    }
+
+    private void HandleKeyRelease(Key key)
+    {
+        _currentAction &= ~KeyToAction(key);
+    }
+
+    private static Action KeyToAction(Key key)
+    {
+        return key switch
+        {
+            Key.Up => Action.Accelerate,
+            Key.Down => Action.Decelerate,
+            Key.Z => Action.Stop,
+            Key.Left => Action.TurnLeft,
+            Key.Right => Action.TurnRight,
+            Key.Space => Action.Fire,
+            _ => Action.None
+        };
     }
 }

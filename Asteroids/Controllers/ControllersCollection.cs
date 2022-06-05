@@ -34,4 +34,20 @@ public class ControllersCollection
 
         return (TController)_controllers[type];
     }
+
+    public void InitializeAll()
+    {
+        foreach ((_, IController controller) in _controllers)
+        {
+            controller.Initialize();
+        }
+    }
+
+    public void TerminateAll()
+    {
+        foreach ((_, IController controller) in _controllers)
+        {
+            controller.Terminate();
+        }
+    }
 }

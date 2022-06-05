@@ -28,6 +28,7 @@ public sealed class Engine : IDisposable
     private readonly Lazy<Spawner> _spawner;
     private readonly Lazy<ImGuiController> _imguiController; // <- NOT OUR CONTROLLER
     private readonly Lazy<IInputContext> _inputContext;
+    private readonly Lazy<BehaviorFactory> _behaviorFactory;
 
     private readonly ControllersCollection _controllers = new ControllersCollection();
 
@@ -45,14 +46,21 @@ public sealed class Engine : IDisposable
         _engineState = new Lazy<EngineVars>();
         _vars = new Lazy<Vars>(() => new Vars());
 
-        _spawner = new Lazy<Spawner>(() => new Spawner(_controllers.GetController<EntityController>(), _controllers.GetController<PlayerController>()));
+        _spawner = new Lazy<Spawner>(() => new Spawner(
+            _controllers.GetController<EntityController>(),
+            _controllers.GetController<PlayerController>()));
+
+        _behaviorFactory = new Lazy<BehaviorFactory>(() => new BehaviorFactory(
+            _controllers,
+            _engineState.Value,
+            _eventQueue.Value,
+            _spawner.Value,
+            _vars.Value));
 
         _sceneManager = new Lazy<SceneManager>(() => new SceneManager(
             _spawner.Value,
-            _controllers.GetController<CameraController>(),
-            _controllers.GetController<BehaviorController>(),
-            _vars.Value,
-            _eventQueue.Value));
+            _behaviorFactory.Value,
+            _controllers));
 
         _inputContext = new Lazy<IInputContext>(_window.CreateInput);
         Lazy<GL> gl = new Lazy<GL>(_window.CreateOpenGL);
@@ -67,21 +75,17 @@ public sealed class Engine : IDisposable
 
     private void InitWindow()
     {
-        _controllers.AddController(new CameraController());
-        _controllers.AddController(new BehaviorController(_commandQueue.Value));
+        _controllers.AddController(new CameraController(_eventQueue.Value));
+        _controllers.AddController(new BehaviorController(_commandQueue.Value, _eventQueue.Value));
         _controllers.AddController(new PlayerController(_commandQueue.Value, _eventQueue.Value));
         _controllers.AddController(new EntityController(_commandQueue.Value, _eventQueue.Value));
-        _controllers.AddController(new SceneController(
-            _sceneManager.Value,
-            _controllers.GetController<EntityController>(),
-            _controllers.GetController<CameraController>(),
-            _controllers.GetController<BehaviorController>(),
-            _controllers.GetController<PlayerController>(),
-            _commandQueue.Value));
-        _controllers.AddController(new InputController(_inputContext.Value, _commandQueue.Value));
+        _controllers.AddController(new SceneController(_sceneManager.Value, _commandQueue.Value, _eventQueue.Value, _vars.Value));
+        _controllers.AddController(new InputController(_inputContext.Value, _eventQueue.Value));
 
-        _controllers.GetController<BehaviorController>().AddBehavior(new DebugBehavior());
-        _controllers.GetController<BehaviorController>().AddBehavior(new UIBehavior());
+        _controllers.InitializeAll();
+
+        _controllers.GetController<BehaviorController>().AddBehavior(_behaviorFactory.Value.CreateDebugBehavior());
+        _controllers.GetController<BehaviorController>().AddBehavior(_behaviorFactory.Value.CreateUIBehavior());
         _controllers.GetController<SceneController>().ChangeScene(Constants.Scenes.PlayableDemo);
 
         OnResize(_window.Size);
@@ -89,6 +93,7 @@ public sealed class Engine : IDisposable
 
     private void CloseWindow()
     {
+        _controllers.TerminateAll();
         _renderer.Value.Dispose();
     }
 
@@ -181,20 +186,16 @@ public sealed class Engine : IDisposable
     {
         DateTime start = DateTime.UtcNow;
 
-        _commandQueue.Value.ExecutePending();
         _eventQueue.Value.ExecutePending();
+        _commandQueue.Value.ExecutePending();
 
         _imguiController.Value.Update((float)delta);
 
         UpdateContext context = new UpdateContext
         {
             Delta = (float)delta * _vars.Value.GetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f),
-            EngineVars = _engineState.Value,
             Spawner = _spawner.Value,
             CommandQueue = _commandQueue.Value,
-            GlobalVars = _vars.Value,
-            Controllers = _controllers,
-            EventQueue = _eventQueue.Value
         };
 
         foreach (Entity entity in _controllers.GetController<EntityController>().Entities)

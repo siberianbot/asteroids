@@ -7,14 +7,23 @@ using Asteroids.Physics;
 
 namespace Asteroids.Behaviors;
 
+// TODO:
+// 1. spawning of asteroids working incorrectly (incorrect angles, velocities, etc)
+// 2. looks bad, refactor
+
 public class CollisionHandlingBehavior : IBehavior
 {
+    private readonly EntityController _entityController;
+    private readonly Spawner _spawner;
     private readonly List<Entity> _excluded = new List<Entity>();
     private readonly List<Collision> _collisions = new List<Collision>();
 
-    public CollisionHandlingBehavior(EventQueue eventQueue)
+    public CollisionHandlingBehavior(EntityController entityController, EventQueue eventQueue, Spawner spawner)
     {
-        eventQueue.OnEvent(EventType.CollisionStarted, @event =>
+        _entityController = entityController;
+        _spawner = spawner;
+
+        eventQueue.Subscribe(EventType.CollisionStarted, @event =>
         {
             if (_excluded.Contains(@event.Collision!.Left) || _excluded.Contains(@event.Collision.Right))
             {
@@ -24,9 +33,9 @@ public class CollisionHandlingBehavior : IBehavior
             _collisions.Add(@event.Collision);
         });
 
-        eventQueue.OnEvent(EventType.EntityDestroy, @event => _excluded.Remove(@event.Entity!));
+        eventQueue.Subscribe(EventType.EntityDestroy, @event => _excluded.Remove(@event.Entity!));
 
-        eventQueue.OnEvent(EventType.CollisionFinished, @event =>
+        eventQueue.Subscribe(EventType.CollisionFinished, @event =>
         {
             if (_excluded.Contains(@event.Collision!.Left))
             {
@@ -44,13 +53,13 @@ public class CollisionHandlingBehavior : IBehavior
     {
         foreach (Collision collision in _collisions)
         {
-            HandleCollision(collision, context.Delta, context.Spawner, context.Controllers.GetController<EntityController>());
+            HandleCollision(collision, context.Delta);
         }
 
         _collisions.Clear();
     }
 
-    private void HandleCollision(Collision collision, float delta, Spawner spawner, EntityController entityController)
+    private void HandleCollision(Collision collision, float delta)
     {
         MovementComponent leftMovement = collision.Left.GetComponent<MovementComponent>() ?? throw new ArgumentException();
         PositionComponent leftPosition = collision.Left.GetComponent<PositionComponent>() ?? throw new ArgumentException();
@@ -66,8 +75,8 @@ public class CollisionHandlingBehavior : IBehavior
 
             deflected = Vector2.Normalize(deflected);
 
-            _excluded.Add(spawner.SpawnAsteroid(position, deflected, velocity, scale));
-            _excluded.Add(spawner.SpawnAsteroid(position,
+            _excluded.Add(_spawner.SpawnAsteroid(position, deflected, velocity, scale));
+            _excluded.Add(_spawner.SpawnAsteroid(position,
                 Vector2.Reflect(
                     deflected,
                     Vector2.Normalize(new Vector2(-leftMovement.Direction.Y, leftMovement.Direction.X))),
@@ -84,15 +93,15 @@ public class CollisionHandlingBehavior : IBehavior
 
             deflected = Vector2.Normalize(deflected);
 
-            _excluded.Add(spawner.SpawnAsteroid(position, Vector2.Normalize(deflected), velocity, scale));
-            _excluded.Add(spawner.SpawnAsteroid(position,
+            _excluded.Add(_spawner.SpawnAsteroid(position, Vector2.Normalize(deflected), velocity, scale));
+            _excluded.Add(_spawner.SpawnAsteroid(position,
                 Vector2.Reflect(
                     deflected,
                     Vector2.Normalize(new Vector2(-rightMovement.Direction.Y, rightMovement.Direction.X))),
                 velocity, scale));
         }
 
-        entityController.DestroyEntity(collision.Left);
-        entityController.DestroyEntity(collision.Right);
+        _entityController.DestroyEntity(collision.Left);
+        _entityController.DestroyEntity(collision.Right);
     }
 }

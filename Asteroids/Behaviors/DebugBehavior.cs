@@ -8,16 +8,43 @@ namespace Asteroids.Behaviors;
 
 public class DebugBehavior : IBehavior
 {
+    private readonly EventQueue _eventQueue;
+    private readonly EngineVars _engineVars;
+    private readonly Vars _vars;
+    private readonly SceneController _sceneController;
+    private long _subscriptionIdx;
+
+    public DebugBehavior(EventQueue eventQueue, EngineVars engineVars, Vars vars, SceneController sceneController)
+    {
+        _eventQueue = eventQueue;
+        _engineVars = engineVars;
+        _vars = vars;
+        _sceneController = sceneController;
+    }
+
+    public void Initialize()
+    {
+        _subscriptionIdx = _eventQueue.Subscribe(EventType.KeyPress, @event =>
+        {
+            if (@event.Key != Key.F12)
+            {
+                return;
+            }
+
+            bool value = _vars.GetVar(Constants.Vars.Debug_Enabled, false);
+
+            _vars.SetVar(Constants.Vars.Debug_Enabled, !value);
+        });
+    }
+
+    public void Terminate()
+    {
+        _eventQueue.Unsubscribe(EventType.KeyPress, _subscriptionIdx);
+    }
+
     public void Update(UpdateContext context)
     {
-        if (context.Controllers.GetController<InputController>().IsKeyPressed(Key.F12))
-        {
-            bool value = context.GlobalVars.GetVar(Constants.Vars.Debug_Enabled, false);
-
-            context.GlobalVars.SetVar(Constants.Vars.Debug_Enabled, !value);
-        }
-
-        if (!context.GlobalVars.GetVar(Constants.Vars.Debug_Enabled, false))
+        if (!_vars.GetVar(Constants.Vars.Debug_Enabled, false))
         {
             return;
         }
@@ -29,60 +56,60 @@ public class DebugBehavior : IBehavior
         {
             if (ImGui.CollapsingHeader("Frame Time"))
             {
-                ImGui.Text($"Update Time: {Math.Round(context.EngineVars.UpdateTimeMs, 2)} ms");
-                ImGui.Text($"Render Time: {Math.Round(context.EngineVars.RenderTimeMs, 2)} ms");
-                ImGui.Text($"FPS: {Math.Round(1000 / context.EngineVars.RenderTimeMs)}");
+                ImGui.Text($"Update Time: {Math.Round(_engineVars.UpdateTimeMs, 2)} ms");
+                ImGui.Text($"Render Time: {Math.Round(_engineVars.RenderTimeMs, 2)} ms");
+                ImGui.Text($"FPS: {Math.Round(1000 / _engineVars.RenderTimeMs)}");
             }
 
             if (ImGui.CollapsingHeader("Scenes"))
             {
                 if (ImGui.Button("Testbed"))
                 {
-                    context.Controllers.GetController<SceneController>().ChangeScene(Constants.Scenes.Testbed);
+                    _sceneController.ChangeScene(Constants.Scenes.Testbed);
                 }
 
                 if (ImGui.Button("Asteroids Demo"))
                 {
-                    context.Controllers.GetController<SceneController>().ChangeScene(Constants.Scenes.AsteroidsDemo);
+                    _sceneController.ChangeScene(Constants.Scenes.AsteroidsDemo);
                 }
 
                 if (ImGui.Button("Spaceship Demo"))
                 {
-                    context.Controllers.GetController<SceneController>().ChangeScene(Constants.Scenes.SpaceshipDemo);
+                    _sceneController.ChangeScene(Constants.Scenes.SpaceshipDemo);
                 }
 
                 if (ImGui.Button("Asteroid Collision"))
                 {
-                    context.Controllers.GetController<SceneController>().ChangeScene(Constants.Scenes.AsteroidCollision);
+                    _sceneController.ChangeScene(Constants.Scenes.AsteroidCollision);
                 }
 
                 if (ImGui.Button("Playable Demo"))
                 {
-                    context.Controllers.GetController<SceneController>().ChangeScene(Constants.Scenes.PlayableDemo);
+                    _sceneController.ChangeScene(Constants.Scenes.PlayableDemo);
                 }
             }
 
             if (ImGui.CollapsingHeader("Engine"))
             {
-                float timeMultiplier = context.GlobalVars.GetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f);
+                float timeMultiplier = _vars.GetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f);
                 if (ImGui.SliderFloat("Time multiplier", ref timeMultiplier, -5.0f, 5.0f))
                 {
-                    context.GlobalVars.SetVar(Constants.Vars.Engine_TimeMultiplier, timeMultiplier);
+                    _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, timeMultiplier);
                 }
 
                 if (ImGui.Button("Stop"))
                 {
-                    context.GlobalVars.SetVar(Constants.Vars.Engine_TimeMultiplier, 0.0f);
+                    _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 0.0f);
                 }
 
                 if (ImGui.Button("TOOO SLOW"))
                 {
-                    context.GlobalVars.SetVar(Constants.Vars.Engine_TimeMultiplier, 0.063f);
+                    _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 0.063f);
                 }
 
                 if (ImGui.Button("Reset time multiplier"))
                 {
-                    context.GlobalVars.SetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f);
+                    _vars.SetVar(Constants.Vars.Engine_TimeMultiplier, 1.0f);
                 }
             }
 
@@ -90,16 +117,16 @@ public class DebugBehavior : IBehavior
             {
                 if (ImGui.Button("Toggle bounding box rendering"))
                 {
-                    bool value = context.GlobalVars.GetVar(Constants.Vars.Physics_ShowBoundingBox, false);
+                    bool value = _vars.GetVar(Constants.Vars.Physics_ShowBoundingBox, false);
 
-                    context.GlobalVars.SetVar(Constants.Vars.Physics_ShowBoundingBox, !value);
+                    _vars.SetVar(Constants.Vars.Physics_ShowBoundingBox, !value);
                 }
 
                 if (ImGui.Button("Toggle collider rendering"))
                 {
-                    bool value = context.GlobalVars.GetVar(Constants.Vars.Physics_ShowCollider, false);
+                    bool value = _vars.GetVar(Constants.Vars.Physics_ShowCollider, false);
 
-                    context.GlobalVars.SetVar(Constants.Vars.Physics_ShowCollider, !value);
+                    _vars.SetVar(Constants.Vars.Physics_ShowCollider, !value);
                 }
             }
 

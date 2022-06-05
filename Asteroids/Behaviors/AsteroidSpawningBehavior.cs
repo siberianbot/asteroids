@@ -9,12 +9,16 @@ namespace Asteroids.Behaviors;
 
 public class AsteroidSpawningBehavior : IBehavior
 {
+    private readonly PlayerController _playerController;
+    private readonly EntityController _entityController;
     private readonly float _radius;
     private readonly float _maxCooldown;
     private float _cooldown;
 
-    public AsteroidSpawningBehavior(float radius, float maxCooldown)
+    public AsteroidSpawningBehavior(PlayerController playerController, EntityController entityController, float radius, float maxCooldown)
     {
+        _playerController = playerController;
+        _entityController = entityController;
         _radius = radius;
         _maxCooldown = maxCooldown;
         _cooldown = maxCooldown;
@@ -31,15 +35,14 @@ public class AsteroidSpawningBehavior : IBehavior
 
         _cooldown = 0;
 
-        foreach (Player player in context.Controllers.GetController<PlayerController>().Players)
+        foreach (Player player in _playerController.Players)
         {
             if (!player.Alive)
             {
                 continue;
             }
 
-            Vector2 position = context.Controllers.GetController<EntityController>()
-                .GetOwnedEntities<Spaceship>(player)
+            Vector2 position = _entityController.GetOwnedEntities<Spaceship>(player)
                 .Single()
                 .GetComponent<PositionComponent>()!
                 .Position;
