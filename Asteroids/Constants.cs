@@ -45,7 +45,7 @@ public static class Constants
     {
         public const string DebugEnabled = "Debug:Enabled";
         public const string EngineTimeMultiplier = "Engine:TimeMultiplier";
-        public const string PhysicsShowBoundingBox = "Physics:ShowBoundingBox";
+        public const string PhysicsShowActivationRadius = "Physics:ShowActivationRadius";
         public const string PhysicsShowCollider = "Physics:ShowCollider";
         public const string AsteroidsSpawningRadius = "AsteroidsSpawning:Radius";
         public const string AsteroidsSpawningCooldown = "AsteroidsSpawning:Cooldown";

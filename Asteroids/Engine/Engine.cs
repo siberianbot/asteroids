@@ -3,7 +3,6 @@ using Asteroids.Behaviors;
 using Asteroids.Components;
 using Asteroids.Controllers;
 using Asteroids.Entities;
-using Asteroids.Physics;
 using Asteroids.Rendering;
 using Asteroids.Scenes;
 using Asteroids.Utils;
@@ -23,6 +22,7 @@ public sealed class Engine : IDisposable
     private readonly Lazy<EventQueue> _eventQueue;
     private readonly Lazy<EngineVars> _engineState;
     private readonly Lazy<Vars> _vars;
+    private readonly Lazy<ModelDataFactory> _modelDataFactory;
     private readonly Lazy<Renderer> _renderer;
     private readonly Lazy<SceneManager> _sceneManager;
     private readonly Lazy<Spawner> _spawner;
@@ -64,6 +64,7 @@ public sealed class Engine : IDisposable
             _controllers));
 
         _inputContext = new Lazy<IInputContext>(_window.CreateInput);
+        _modelDataFactory = new Lazy<ModelDataFactory>(() => new ModelDataFactory(_vars.Value));
         Lazy<GL> gl = new Lazy<GL>(_window.CreateOpenGL);
         _renderer = new Lazy<Renderer>(() => new Renderer(gl.Value));
         _imguiController = new Lazy<ImGuiController>(() => new ImGuiController(gl.Value, _window, _inputContext.Value));
@@ -104,65 +105,22 @@ public sealed class Engine : IDisposable
 
         _renderer.Value.Clear();
 
-        List<ModelData> models = new List<ModelData>();
-
-        // TODO: deal with this mess
-        foreach (Entity entity in _controllers.GetController<EntityController>().Entities)
-        {
-            ModelComponent? modelComponent = entity.GetComponent<ModelComponent>();
-
-            if (modelComponent == null)
+        IEnumerable<ModelData> models = _controllers.GetController<EntityController>().Entities
+            .Select(entity => new
             {
-                continue;
-            }
-
-            PositionComponent positionComponent = entity.GetComponent<PositionComponent>() ?? throw new NullReferenceException();
-            ColliderComponent? colliderComponent = entity.GetComponent<ColliderComponent>();
-
-            if (_vars.Value.GetVar(Constants.Vars.PhysicsShowBoundingBox, false) &&
-                colliderComponent != null)
-            {
-                ModelData boundingBoxData = new ModelData(
-                    GenerationUtils.GenerateCircleVerticesData(colliderComponent.Radius, 48).ToArray(),
-                    GenerationUtils.GenerateIndicesData(48).ToArray(),
-                    48,
-                    Constants.Colors.DarkGray,
-                    positionComponent.TransformMatrix
-                );
-
-                models.Add(boundingBoxData);
-            }
-
-            if (_vars.Value.GetVar(Constants.Vars.PhysicsShowCollider, false) &&
-                colliderComponent != null)
-            {
-                foreach (Collider collider in colliderComponent.Colliders)
-                {
-                    ModelData colliderData = new ModelData(
-                        Collider.DataOf(collider).ToArray(),
-                        GenerationUtils.GenerateIndicesData(3).ToArray(),
-                        3,
-                        Constants.Colors.DarkGray,
-                        positionComponent.TransformMatrix
-                    );
-
-                    models.Add(colliderData);
-                }
-            }
-
-            ModelData data = new ModelData(
-                modelComponent.VerticesData,
-                modelComponent.IndicesData,
-                modelComponent.Count,
-                modelComponent.Color,
-                positionComponent.TransformMatrix
-            );
-
-            models.Add(data);
-        }
+                ModelComponent = entity.GetComponent<ModelComponent>(),
+                PositionComponent = entity.GetComponent<PositionComponent>(),
+                ColliderComponent = entity.GetComponent<ColliderComponent>()
+            })
+            .Where(x => x.ModelComponent != null)
+            .SelectMany(x => _modelDataFactory.Value.CreateFrom(
+                x.ModelComponent!,
+                x.PositionComponent ?? throw new NullReferenceException(),
+                x.ColliderComponent));
 
         Matrix4x4 viewMatrix = _controllers.GetController<CameraController>().CurrentCamera?.ViewMatrix ??
                                MatrixUtils.GetViewMatrix(new Vector2(0, 0));
+
         RenderData renderData = new RenderData(models, viewMatrix);
 
         _renderer.Value.Render(renderData);

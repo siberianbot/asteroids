@@ -64,7 +64,7 @@ public class Spawner
         }
 
         Asteroid asteroid = new Asteroid(rotationVelocity, scale.Value);
-        asteroid.AddComponent(new ModelComponent(points, Constants.Colors.Gray));
+        asteroid.AddComponent(new ModelComponent(points.SelectMany(v => new[] { v.X, v.Y }).ToArray(), Constants.Colors.Gray));
         asteroid.AddComponent(new ColliderComponent(colliders, scale.Value));
         asteroid.AddComponent(new PositionComponent(position, 0f));
         asteroid.AddComponent(new MovementComponent(velocity.Value, direction));
@@ -81,7 +81,7 @@ public class Spawner
         float rotation = Random.Shared.NextSingle() * MathF.Tau;
 
         Spaceship spaceship = new Spaceship(owner);
-        spaceship.AddComponent(new ModelComponent(Spaceship.Model, color.Value));
+        spaceship.AddComponent(new ModelComponent(Spaceship.Model.SelectMany(v => new[] { v.X, v.Y }).ToArray(), color.Value));
         spaceship.AddComponent(new ColliderComponent(Spaceship.CollisionModel, 0.25f));
         spaceship.AddComponent(new MovementComponent(0.0f, Vector2.Zero));
         spaceship.AddComponent(new PositionComponent(position, rotation));
@@ -95,7 +95,7 @@ public class Spawner
     public Bullet SpawnBullet(Entity owner, Vector2 position, Vector2 direction)
     {
         Bullet bullet = new Bullet(owner);
-        bullet.AddComponent(new ModelComponent(Bullet.Model, Constants.Colors.White));
+        bullet.AddComponent(new ModelComponent(Bullet.Model.SelectMany(v => new[] { v.X, v.Y }).ToArray(), Constants.Colors.White));
         bullet.AddComponent(new ColliderComponent(Bullet.CollisionModel, 0.05f));
         bullet.AddComponent(new MovementComponent(15.0f, direction));
         bullet.AddComponent(new PositionComponent(position, 0.0f));

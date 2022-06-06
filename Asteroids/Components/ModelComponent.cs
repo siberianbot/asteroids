@@ -5,11 +5,13 @@ namespace Asteroids.Components;
 
 public class ModelComponent : Component
 {
-    public ModelComponent(IReadOnlyCollection<Vector2> points, Vector3 color)
+    public ModelComponent(float[] verticesData, Vector3 color)
     {
-        VerticesData = points.SelectMany(point => new[] { point.X, point.Y }).ToArray();
-        IndicesData = GenerationUtils.GenerateIndicesData(points.Count).ToArray();
-        Count = (uint)points.Count;
+        int count = verticesData.Length / 2;
+
+        VerticesData = verticesData;
+        IndicesData = GenerationUtils.GenerateIndicesData(count).ToArray();
+        Count = (uint)count;
         Color = color;
     }
 

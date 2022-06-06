@@ -114,12 +114,11 @@ public class DebugBehavior : IBehavior
             }
 
             if (ImGui.CollapsingHeader("Physics"))
-            {
-                if (ImGui.Button("Toggle bounding box rendering"))
+            { if (ImGui.Button("Toggle activation radius rendering"))
                 {
-                    bool value = _vars.GetVar(Constants.Vars.PhysicsShowBoundingBox, false);
+                    bool value = _vars.GetVar(Constants.Vars.PhysicsShowActivationRadius, false);
 
-                    _vars.SetVar(Constants.Vars.PhysicsShowBoundingBox, !value);
+                    _vars.SetVar(Constants.Vars.PhysicsShowActivationRadius, !value);
                 }
 
                 if (ImGui.Button("Toggle collider rendering"))
