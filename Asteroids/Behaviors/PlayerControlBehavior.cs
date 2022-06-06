@@ -48,7 +48,7 @@ public class PlayerControlBehavior : IBehavior
 
     public void Update(float delta)
     {
-        // TODO: it gonna make 
+        // TODO: it gonna make all players controllable (I gonna fix that later)
         foreach (Player player in _playerController.Players)
         {
             if (!player.Alive)

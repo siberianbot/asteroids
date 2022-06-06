@@ -122,21 +122,12 @@ public sealed class Engine : IDisposable
             if (_vars.Value.GetVar(Constants.Vars.PhysicsShowBoundingBox, false) &&
                 colliderComponent != null)
             {
-                Box2D<float> boundingBox = colliderComponent.BoundingBox;
-
                 ModelData boundingBoxData = new ModelData(
-                    new[]
-                    {
-                        boundingBox.Min.X, boundingBox.Min.Y,
-                        boundingBox.Min.X, boundingBox.Max.Y,
-                        boundingBox.Max.X, boundingBox.Max.Y,
-                        boundingBox.Max.X, boundingBox.Min.Y,
-                    },
-                    GenerationUtils.GenerateIndicesData(4).ToArray(),
-                    4,
+                    GenerationUtils.GenerateCircleVerticesData(colliderComponent.Radius, 48).ToArray(),
+                    GenerationUtils.GenerateIndicesData(48).ToArray(),
+                    48,
                     Constants.Colors.DarkGray,
-                    Matrix4x4.CreateTranslation(new Vector3(0.0f, 0.0f, -1.0f)) *
-                    Matrix4x4.Identity
+                    positionComponent.TransformMatrix
                 );
 
                 models.Add(boundingBoxData);
@@ -148,14 +139,11 @@ public sealed class Engine : IDisposable
                 foreach (Collider collider in colliderComponent.Colliders)
                 {
                     ModelData colliderData = new ModelData(
-                        Collider.VerticesOf(collider)
-                            .SelectMany(vertices => new[] { vertices.X, vertices.Y })
-                            .ToArray(),
+                        Collider.DataOf(collider).ToArray(),
                         GenerationUtils.GenerateIndicesData(3).ToArray(),
                         3,
                         Constants.Colors.DarkGray,
-                        Matrix4x4.CreateTranslation(0, 0, -1) *
-                        Matrix4x4.Identity
+                        positionComponent.TransformMatrix
                     );
 
                     models.Add(colliderData);

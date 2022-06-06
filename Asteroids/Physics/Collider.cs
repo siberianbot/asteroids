@@ -21,21 +21,14 @@ public readonly struct Collider
         return $"({A}, {B}, {C})";
     }
 
-    public static Collider Translate(Collider collider, Vector2 position)
+    public static Collider Translate(Collider collider, Vector2 position, float angle)
     {
-        return new Collider(
-            collider.A + position,
-            collider.B + position,
-            collider.C + position
-        );
-    }
+        Vector2 origin = Vector2.Zero;
 
-    public static Collider Rotate(Collider collider, Vector2 origin, float angle)
-    {
         return new Collider(
-            MathUtils.Rotate(collider.A, angle, origin),
-            MathUtils.Rotate(collider.B, angle, origin),
-            MathUtils.Rotate(collider.C, angle, origin)
+            MathUtils.Rotate(collider.A, angle, origin) + position,
+            MathUtils.Rotate(collider.B, angle, origin) + position,
+            MathUtils.Rotate(collider.C, angle, origin) + position
         );
     }
 
@@ -51,5 +44,15 @@ public readonly struct Collider
         yield return (collider.A, collider.B);
         yield return (collider.B, collider.C);
         yield return (collider.C, collider.A);
+    }
+
+    public static IEnumerable<float> DataOf(Collider collider)
+    {
+        yield return collider.A.X;
+        yield return collider.A.Y;
+        yield return collider.B.X;
+        yield return collider.B.Y;
+        yield return collider.C.X;
+        yield return collider.C.Y;
     }
 }

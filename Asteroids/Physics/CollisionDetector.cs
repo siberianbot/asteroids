@@ -6,6 +6,11 @@ namespace Asteroids.Physics;
 
 public static class CollisionDetector
 {
+    public static bool CirclesCollisionTest(Vector2 leftPos, float leftRadius, Vector2 rightPos, float rightRadius)
+    {
+        return MathF.Pow(rightPos.X - leftPos.X, 2) + MathF.Pow(rightPos.Y - leftPos.Y, 2) <= MathF.Pow(leftRadius + rightRadius, 2);
+    }
+
     public static bool BoundingBoxCollisionTest(Box2D<float> left, Box2D<float> right)
     {
         Vector2D<float> maxDistance = left.Size / 2 + right.Size / 2;
