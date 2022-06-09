@@ -8,7 +8,6 @@ public class BehaviorFactory
 {
     private readonly ControllersCollection _controllersCollection;
     private readonly CommandQueue _commandQueue;
-    private readonly EngineVars _engineVars;
     private readonly EventQueue _eventQueue;
     private readonly Spawner _spawner;
     private readonly Vars _vars;
@@ -16,14 +15,12 @@ public class BehaviorFactory
     public BehaviorFactory(
         ControllersCollection controllersCollection,
         CommandQueue commandQueue,
-        EngineVars engineVars,
         EventQueue eventQueue,
         Spawner spawner,
         Vars vars)
     {
         _controllersCollection = controllersCollection;
         _commandQueue = commandQueue;
-        _engineVars = engineVars;
         _eventQueue = eventQueue;
         _spawner = spawner;
         _vars = vars;
@@ -61,15 +58,6 @@ public class BehaviorFactory
             _spawner);
     }
 
-    public DebugBehavior CreateDebugBehavior()
-    {
-        return new DebugBehavior(
-            _eventQueue,
-            _engineVars,
-            _vars,
-            _controllersCollection.GetController<SceneController>());
-    }
-
     public EntityCleanupBehavior CreateEntityCleanupBehavior()
     {
         return new EntityCleanupBehavior(
@@ -94,7 +82,6 @@ public class BehaviorFactory
     public PlayerSpawningBehavior CreatePlayerSpawningBehavior()
     {
         return new PlayerSpawningBehavior(
-            _controllersCollection.GetController<CameraController>(),
             _controllersCollection.GetController<PlayerController>(),
             _spawner);
     }
@@ -103,12 +90,5 @@ public class BehaviorFactory
     {
         return new ScoringBehavior(
             _eventQueue);
-    }
-
-    public UIBehavior CreateUIBehavior()
-    {
-        return new UIBehavior(
-            _engineVars,
-            _controllersCollection.GetController<PlayerController>());
     }
 }

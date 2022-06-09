@@ -1,25 +1,36 @@
 using System.Numerics;
-using Asteroids.Controllers;
+using Asteroids.Client.Controllers;
 using Asteroids.Engine;
 using ImGuiNET;
 using Silk.NET.Input;
 
-namespace Asteroids.Behaviors;
+namespace Asteroids.Client.UI;
 
-public class DebugBehavior : IBehavior
+public interface IClientUI
+{
+    void Initialize()
+    {
+        //
+    }
+
+    void Terminate()
+    {
+        //
+    }
+
+    void Update();
+}
+
+public class DebugUI : IClientUI
 {
     private readonly EventQueue _eventQueue;
-    private readonly EngineVars _engineVars;
     private readonly Vars _vars;
-    private readonly SceneController _sceneController;
     private long _subscriptionIdx;
 
-    public DebugBehavior(EventQueue eventQueue, EngineVars engineVars, Vars vars, SceneController sceneController)
+    public DebugUI(EventQueue eventQueue, Vars vars)
     {
         _eventQueue = eventQueue;
-        _engineVars = engineVars;
         _vars = vars;
-        _sceneController = sceneController;
     }
 
     public void Initialize()
@@ -42,7 +53,7 @@ public class DebugBehavior : IBehavior
         _eventQueue.Unsubscribe(EventType.KeyPress, _subscriptionIdx);
     }
 
-    public void Update(float delta)
+    public void Update()
     {
         if (!_vars.GetVar(Constants.Vars.DebugEnabled, false))
         {
@@ -56,37 +67,40 @@ public class DebugBehavior : IBehavior
         {
             if (ImGui.CollapsingHeader("Frame Time"))
             {
-                ImGui.Text($"Update Time: {Math.Round(_engineVars.UpdateTimeMs, 2)} ms");
-                ImGui.Text($"Render Time: {Math.Round(_engineVars.RenderTimeMs, 2)} ms");
-                ImGui.Text($"FPS: {Math.Round(1000 / _engineVars.RenderTimeMs)}");
+                // ImGui.Text($"Update Time: {Math.Round(_engineVars.UpdateTimeMs, 2)} ms");
+                // ImGui.Text($"Render Time: {Math.Round(_engineVars.RenderTimeMs, 2)} ms");
+                // ImGui.Text($"FPS: {Math.Round(1000 / _engineVars.RenderTimeMs)}");
             }
 
             if (ImGui.CollapsingHeader("Scenes"))
             {
-                if (ImGui.Button("Testbed"))
-                {
-                    _sceneController.ChangeScene(Constants.Scenes.Testbed);
-                }
-
-                if (ImGui.Button("Asteroids Demo"))
-                {
-                    _sceneController.ChangeScene(Constants.Scenes.AsteroidsDemo);
-                }
-
-                if (ImGui.Button("Spaceship Demo"))
-                {
-                    _sceneController.ChangeScene(Constants.Scenes.SpaceshipDemo);
-                }
-
-                if (ImGui.Button("Asteroid Collision"))
-                {
-                    _sceneController.ChangeScene(Constants.Scenes.AsteroidCollision);
-                }
-
-                if (ImGui.Button("Playable Demo"))
-                {
-                    _sceneController.ChangeScene(Constants.Scenes.PlayableDemo);
-                }
+                // TODO:
+                ImGui.Text("Scenes are not available yet");
+                
+                // if (ImGui.Button("Testbed"))
+                // {
+                //     _sceneController.ChangeScene(Constants.Scenes.Testbed);
+                // }
+                //
+                // if (ImGui.Button("Asteroids Demo"))
+                // {
+                //     _sceneController.ChangeScene(Constants.Scenes.AsteroidsDemo);
+                // }
+                //
+                // if (ImGui.Button("Spaceship Demo"))
+                // {
+                //     _sceneController.ChangeScene(Constants.Scenes.SpaceshipDemo);
+                // }
+                //
+                // if (ImGui.Button("Asteroid Collision"))
+                // {
+                //     _sceneController.ChangeScene(Constants.Scenes.AsteroidCollision);
+                // }
+                //
+                // if (ImGui.Button("Playable Demo"))
+                // {
+                //     _sceneController.ChangeScene(Constants.Scenes.PlayableDemo);
+                // }
             }
 
             if (ImGui.CollapsingHeader("Engine"))
@@ -131,10 +145,5 @@ public class DebugBehavior : IBehavior
 
             ImGui.End();
         }
-    }
-
-    public bool Persistent
-    {
-        get => true;
     }
 }

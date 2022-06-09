@@ -22,4 +22,9 @@ public class CommandQueue
             command();
         }
     }
+
+    public void Reset()
+    {
+        _pendingCommands.Clear();
+    }
 }

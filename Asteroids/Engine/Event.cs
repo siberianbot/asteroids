@@ -12,5 +12,5 @@ public struct Event
 
     public Collision? Collision { get; init; }
 
-    public Key? Key { get; set; }
+    public Key? Key { get; init; }
 }

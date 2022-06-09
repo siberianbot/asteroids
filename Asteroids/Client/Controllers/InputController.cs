@@ -1,9 +1,9 @@
 using Asteroids.Engine;
 using Silk.NET.Input;
 
-namespace Asteroids.Controllers;
+namespace Asteroids.Client.Controllers;
 
-public class InputController : IController
+public class InputController : IClientController
 {
     private readonly EventQueue _eventQueue;
     private readonly Dictionary<Key, bool> _keyStates = new Dictionary<Key, bool>();

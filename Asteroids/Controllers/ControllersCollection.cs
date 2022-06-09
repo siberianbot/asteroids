@@ -50,4 +50,9 @@ public class ControllersCollection
             controller.Terminate();
         }
     }
+
+    public void Clear()
+    {
+        _controllers.Clear();
+    }
 }

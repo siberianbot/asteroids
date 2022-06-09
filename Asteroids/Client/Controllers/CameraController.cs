@@ -1,9 +1,10 @@
 using Asteroids.Engine;
 using Asteroids.Entities;
 
-namespace Asteroids.Controllers;
+namespace Asteroids.Client.Controllers;
 
-public class CameraController : IController
+// TODO: NOT REQUIRED?
+public class CameraController
 {
     private readonly EventQueue _eventQueue;
     private long _sceneChangeSubscription;

@@ -1,6 +1,5 @@
 using System.Numerics;
 using Asteroids.Behaviors;
-using Asteroids.Components;
 using Asteroids.Controllers;
 using Asteroids.Entities;
 
@@ -10,14 +9,12 @@ public class TestbedScene : Scene
 {
     private readonly Spawner _spawner;
     private readonly BehaviorFactory _behaviorFactory;
-    private readonly CameraController _cameraController;
     private readonly BehaviorController _behaviorController;
 
     public TestbedScene(Spawner spawner, BehaviorFactory behaviorFactory, ControllersCollection controllersCollection)
     {
         _spawner = spawner;
         _behaviorFactory = behaviorFactory;
-        _cameraController = controllersCollection.GetController<CameraController>();
         _behaviorController = controllersCollection.GetController<BehaviorController>();
     }
 
@@ -31,7 +28,6 @@ public class TestbedScene : Scene
         Player player = _spawner.SpawnPlayer("test player", Constants.Colors.Green);
         Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f), player);
 
-        _cameraController.CurrentCamera = _spawner.SpawnCamera(spaceship);
         _behaviorController.AddBehavior(_behaviorFactory.CreatePlayerControlBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreateMovementBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreateEntityCleanupBehavior());
