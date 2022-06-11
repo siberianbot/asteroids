@@ -7,17 +7,18 @@ using Asteroids.Scenes;
 
 namespace Asteroids.Server;
 
-public class Server
+public class LocalServer : IServer
 {
     private readonly CommandQueue _commandQueue = new CommandQueue();
-    private readonly EventQueue _eventQueue = new EventQueue();
-    private readonly ControllersCollection _controllers = new ControllersCollection();
     private readonly Vars _vars = new Vars();
+    private readonly ControllersCollection _controllers = new ControllersCollection();
+    private readonly EventQueue _eventQueue;
     private readonly Thread _serverThread;
     private bool _alive;
 
-    public Server()
+    public LocalServer(EventQueue eventQueue)
     {
+        _eventQueue = eventQueue;
         _serverThread = new Thread(ServerFunc);
     }
 
@@ -41,13 +42,12 @@ public class Server
         }
     }
 
-    public ControllersCollection Controllers
-    {
-        get => _controllers;
-    }
+    public ServerState State { get; private set; } = ServerState.Stopped;
 
     private void ServerFunc()
     {
+        State = ServerState.Initializing;
+
         _commandQueue.Reset();
         _eventQueue.Reset();
         _controllers.Clear();
@@ -85,7 +85,9 @@ public class Server
         Stopwatch stopwatch = new Stopwatch();
 
         stopwatch.Start();
-        
+
+        State = ServerState.Alive;
+
         while (_alive)
         {
             float delta = (float)stopwatch.Elapsed.TotalSeconds;
@@ -105,6 +107,10 @@ public class Server
             }
         }
 
+        State = ServerState.Stopping;
+
         _controllers.TerminateAll();
+
+        State = ServerState.Stopped;
     }
 }
