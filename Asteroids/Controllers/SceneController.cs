@@ -9,6 +9,7 @@ public class SceneController : IController
     private readonly CommandQueue _commandQueue;
     private readonly EventQueue _eventQueue;
     private readonly Vars _vars;
+    private long _sceneChangeSubscriptionIdx;
 
     public SceneController(
         SceneManager sceneManager,
@@ -22,19 +23,22 @@ public class SceneController : IController
         _vars = vars;
     }
 
-    public void ChangeScene(string sceneName)
+    public void Initialize()
     {
-        Scene scene = _sceneManager.GetScene(sceneName);
-
-        _eventQueue.Push(new Event
+        _sceneChangeSubscriptionIdx = _eventQueue.Subscribe(EventType.SceneChange, @event =>
         {
-            EventType = EventType.SceneChange
-        });
+            Scene scene = _sceneManager.GetScene(@event.SceneName!);
 
-        _commandQueue.Push(() =>
-        {
-            scene.Load();
-            _vars.SetVar(Constants.Vars.EngineTimeMultiplier, 1.0f);
+            _commandQueue.Push(() =>
+            {
+                scene.Load();
+                _vars.SetVar(Constants.Vars.EngineTimeMultiplier, 1.0f); // TODO: remove
+            });
         });
+    }
+
+    public void Terminate()
+    {
+        _eventQueue.Unsubscribe(EventType.SceneChange, _sceneChangeSubscriptionIdx);
     }
 }

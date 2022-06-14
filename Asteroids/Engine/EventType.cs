@@ -11,6 +11,8 @@ public enum EventType
     ClientDisconnected,
     KeyPress,
     KeyRelease,
+    ShowMenu,
+    HideMenu,
 
     CollisionStarted,
     CollisionFinished,

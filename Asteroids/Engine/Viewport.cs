@@ -1,5 +1,8 @@
 using System.Numerics;
+using Asteroids.Components;
+using Asteroids.Entities;
 using Asteroids.Rendering;
+using Asteroids.Server;
 using Asteroids.Utils;
 using Silk.NET.Input;
 using Silk.NET.Maths;
@@ -16,6 +19,7 @@ public class Viewport : IDisposable
     private readonly Lazy<IInputContext> _inputContext;
     private readonly Lazy<Renderer> _renderer;
     private readonly Lazy<ImGuiController> _imguiController;
+    private readonly ModelDataFactory _modelDataFactory;
     private bool _disposed;
 
     public Viewport(Engine engine)
@@ -33,6 +37,7 @@ public class Viewport : IDisposable
         Lazy<GL> gl = new Lazy<GL>(_window.CreateOpenGL);
         _renderer = new Lazy<Renderer>(() => new Renderer(gl.Value));
         _imguiController = new Lazy<ImGuiController>(() => new ImGuiController(gl.Value, _window, _inputContext.Value));
+        _modelDataFactory = new ModelDataFactory(engine.Vars);
     }
 
     public void Run()
@@ -72,31 +77,41 @@ public class Viewport : IDisposable
         _imguiController.Value.Update((float)delta);
 
         _engine.EventQueue.ExecutePending();
-        _engine.Client.ClientUIContainer.Update();
+        _engine.UIContainer.Update();
     }
 
     private void OnRender(double delta)
     {
         _renderer.Value.Clear();
 
-        // IEnumerable<ModelData> models = _server.Controllers.GetController<EntityController>().Entities
-        //     .Select(entity => new
-        //     {
-        //         ModelComponent = entity.GetComponent<ModelComponent>(),
-        //         PositionComponent = entity.GetComponent<PositionComponent>(),
-        //         ColliderComponent = entity.GetComponent<ColliderComponent>()
-        //     })
-        //     .Where(x => x.ModelComponent != null)
-        //     .SelectMany(x => _modelDataFactory.Value.CreateFrom(
-        //         x.ModelComponent!,
-        //         x.PositionComponent ?? throw new NullReferenceException(),
-        //         x.ColliderComponent));
+        if (_engine.Server != null && _engine.Server.State == ServerState.Alive)
+        {
+            IEnumerable<ModelData> models = _engine.Server!.EntityCollection!.Entities
+                .Select(entity => new
+                {
+                    ModelComponent = entity.GetComponent<ModelComponent>(),
+                    PositionComponent = entity.GetComponent<PositionComponent>(),
+                    ColliderComponent = entity.GetComponent<ColliderComponent>()
+                })
+                .Where(x => x.ModelComponent != null)
+                .SelectMany(x => _modelDataFactory.CreateFrom(
+                    x.ModelComponent!,
+                    x.PositionComponent ?? throw new NullReferenceException(),
+                    x.ColliderComponent))
+                .ToArray();
 
-        Matrix4x4 viewMatrix = MatrixUtils.GetViewMatrix(new Vector2(0, 0));
+            Vector2 position = _engine.Client?.Player != null
+                ? _engine.Server!.EntityCollection!.GetOwnedEntities<Spaceship>(_engine.Client.Player)
+                    .SingleOrDefault()?.GetComponent<PositionComponent>()?.Position ?? new Vector2(0, 0)
+                : new Vector2(0, 0);
 
-        // RenderData renderData = new RenderData(models, viewMatrix);
+            Matrix4x4 viewMatrix = MatrixUtils.GetViewMatrix(position);
 
-        // _renderer.Value.Render(renderData);
+            RenderData renderData = new RenderData(models, viewMatrix);
+
+            _renderer.Value.Render(renderData);
+        }
+
         _imguiController.Value.Render();
     }
 

@@ -13,18 +13,27 @@ public class EventQueue
 
     private readonly Dictionary<EventType, List<Handler>> _handlers = new Dictionary<EventType, List<Handler>>();
     private List<Event> _pendingEvents = new List<Event>();
+    private readonly object _pendingEventsLock = new object();
     private long _idx;
 
     public void Push(Event @event)
     {
-        _pendingEvents.Add(@event);
+        lock (_pendingEventsLock)
+        {
+            _pendingEvents.Add(@event);
+        }
     }
 
     public void ExecutePending()
     {
-        List<Event> events = _pendingEvents;
+        List<Event> events;
 
-        _pendingEvents = new List<Event>();
+        lock (_pendingEventsLock)
+        {
+            events = _pendingEvents;
+
+            _pendingEvents = new List<Event>();
+        }
 
         foreach (Event @event in events)
         {
@@ -42,7 +51,11 @@ public class EventQueue
 
     public void Reset()
     {
-        _pendingEvents.Clear();
+        lock (_pendingEventsLock)
+        {
+            _pendingEvents.Clear();
+        }
+
         _handlers.Clear();
     }
 

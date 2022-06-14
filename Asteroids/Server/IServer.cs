@@ -1,3 +1,5 @@
+using Asteroids.Entities;
+
 namespace Asteroids.Server;
 
 public interface IServer
@@ -6,5 +8,11 @@ public interface IServer
 
     void Stop();
 
+    IClient Join(string name);
+
+    void Leave(IClient client);
+
     ServerState State { get; }
+
+    IEntityCollection? EntityCollection { get; }
 }

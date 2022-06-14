@@ -1,13 +1,10 @@
-using Asteroids.UI;
+using Asteroids.Entities;
 
 namespace Asteroids.Server;
 
 public class LocalClient : IClient
 {
-    public LocalClient(Engine.Engine engine)
-    {
-        
-    }
-    
-    public UIContainer ClientUIContainer { get; } = new UIContainer();
+    public Player? Player { get; set; }
+
+    public string Name { get; init; }
 }

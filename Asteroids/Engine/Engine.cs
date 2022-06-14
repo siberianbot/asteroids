@@ -8,52 +8,37 @@ public sealed class Engine : IDisposable
     private bool _disposed;
 
     private readonly EventQueue _eventQueue = new EventQueue();
-    private readonly LocalClient _client;
     private readonly Viewport _viewport;
-    private IServer? _server;
 
     public Engine()
     {
-        _client = new LocalClient(this);
         _viewport = new Viewport(this);
     }
 
     public void Run()
     {
-        _client.ClientUIContainer.Set(3, new DebugUI(this));
-        _client.ClientUIContainer.Set(2, new MenuUI(this));
+        Server = new LocalServer(_eventQueue);
+        Server.Start();
+
+        UIContainer.Set(3, new DebugUI(this));
+        UIContainer.Set(2, new MenuUI(this));
 
         _eventQueue.Push(new Event { EventType = EventType.EngineReady });
 
         _viewport.Run();
 
-        _client.ClientUIContainer.Clear();
+        UIContainer.Clear();
 
-        StopServer();
+        Server.Stop();
     }
 
-    public void StartServer()
-    {
-        StopServer();
+    public IClient? Client { get; set; }
 
-        _server = new LocalServer(_eventQueue);
-        _server.Start();
-    }
+    public IServer Server { get; private set; }
 
-    public void StopServer()
-    {
-        _server?.Stop();
-    }
+    public Vars Vars { get; } = new Vars();
 
-    public IClient Client
-    {
-        get => _client;
-    }
-
-    public IServer? Server
-    {
-        get => _server;
-    }
+    public UIContainer UIContainer { get; } = new UIContainer();
 
     public EventQueue EventQueue
     {

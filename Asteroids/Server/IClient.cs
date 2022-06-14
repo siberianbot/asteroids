@@ -1,8 +1,10 @@
-using Asteroids.UI;
+using Asteroids.Entities;
 
 namespace Asteroids.Server;
 
 public interface IClient
 {
-    UIContainer ClientUIContainer { get; }
+    Player? Player { get; set; }
+
+    string Name { get; }
 }

@@ -43,6 +43,7 @@ public class DebugUI : IClientUI
 
         ImGui.SetNextWindowPos(Vector2.Zero);
         ImGui.SetNextWindowSize(new Vector2(400, _engine.Viewport.Size.Y));
+        ImGui.SetNextWindowBgAlpha(0.5f);
 
         if (ImGui.Begin("Debug Menu", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize))
         {

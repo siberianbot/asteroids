@@ -3,7 +3,7 @@ using Asteroids.Entities;
 
 namespace Asteroids.Controllers;
 
-public class EntityController : IController
+public class EntityController : IController, IEntityCollection
 {
     private readonly CommandQueue _commandQueue;
     private readonly EventQueue _eventQueue;

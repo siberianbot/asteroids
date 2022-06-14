@@ -1,19 +1,16 @@
 using Asteroids.Behaviors;
 using Asteroids.Controllers;
-using Asteroids.Entities;
 
 namespace Asteroids.Scenes;
 
 public class PlayableDemoScene : Scene
 {
-    private readonly Spawner _spawner;
     private readonly BehaviorFactory _behaviorFactory;
     private readonly BehaviorController _behaviorController;
 
 
-    public PlayableDemoScene(Spawner spawner, BehaviorFactory behaviorFactory, ControllersCollection controllersCollection)
+    public PlayableDemoScene(BehaviorFactory behaviorFactory, ControllersCollection controllersCollection)
     {
-        _spawner = spawner;
         _behaviorFactory = behaviorFactory;
         _behaviorController = controllersCollection.GetController<BehaviorController>();
     }
@@ -34,7 +31,5 @@ public class PlayableDemoScene : Scene
         _behaviorController.AddBehavior(_behaviorFactory.CreatePlayerControlBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreatePlayerSpawningBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreateEntityCleanupBehavior());
-
-        _spawner.SpawnPlayer("Asteroids Player", Constants.Colors.Green);
     }
 }

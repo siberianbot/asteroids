@@ -42,7 +42,35 @@ public class LocalServer : IServer
         }
     }
 
+    public IClient Join(string name)
+    {
+        LocalClient client = new LocalClient
+        {
+            Name = name,
+            Player = null
+        };
+
+        _eventQueue.Push(new Event
+        {
+            EventType = EventType.ClientConnected,
+            Client = client
+        });
+
+        return client;
+    }
+
+    public void Leave(IClient client)
+    {
+        _eventQueue.Push(new Event
+        {
+            EventType = EventType.ClientDisconnected,
+            Client = client
+        });
+    }
+
     public ServerState State { get; private set; } = ServerState.Stopped;
+
+    public IEntityCollection? EntityCollection { get; private set; }
 
     private void ServerFunc()
     {
@@ -54,13 +82,15 @@ public class LocalServer : IServer
 
         BehaviorController behaviorController = new BehaviorController(_commandQueue, _eventQueue);
         _controllers.AddController(behaviorController);
+
         EntityController entityController = new EntityController(_commandQueue, _eventQueue);
         _controllers.AddController(entityController);
-        _controllers.AddController(new PlayerController(_commandQueue, _eventQueue));
+        EntityCollection = entityController;
 
-        Spawner spawner = new Spawner(
-            _controllers.GetController<EntityController>(),
-            _controllers.GetController<PlayerController>());
+        PlayerController playerController = new PlayerController(_commandQueue, _eventQueue);
+        _controllers.AddController(playerController);
+
+        Spawner spawner = new Spawner(entityController, playerController);
 
         BehaviorFactory behaviorFactory = new BehaviorFactory(
             _controllers,
@@ -74,12 +104,23 @@ public class LocalServer : IServer
             behaviorFactory,
             _controllers);
 
-        SceneController sceneController = new SceneController(sceneManager, _commandQueue, _eventQueue, _vars);
-        _controllers.AddController(sceneController);
+        _controllers.AddController(new SceneController(sceneManager, _commandQueue, _eventQueue, _vars));
 
         _controllers.InitializeAll();
 
-        sceneController.ChangeScene(Constants.Scenes.AsteroidCollision);
+        long clientConnectedSubscriptionIdx = _eventQueue.Subscribe(EventType.ClientConnected, @event =>
+        {
+            @event.Client!.Player = spawner.SpawnPlayer(@event.Client!.Name, Constants.Colors.Green);
+
+            playerController.AddPlayer(@event.Client!.Player);
+        });
+
+        long clientDisconnectedSubscriptionIdx = _eventQueue.Subscribe(EventType.ClientDisconnected, @event =>
+        {
+            @event.Client!.Player = null;
+
+            playerController.RemovePlayer(@event.Client!.Player!);
+        });
 
         _alive = true;
         Stopwatch stopwatch = new Stopwatch();
@@ -109,6 +150,8 @@ public class LocalServer : IServer
 
         State = ServerState.Stopping;
 
+        _eventQueue.Unsubscribe(EventType.ClientConnected, clientConnectedSubscriptionIdx);
+        _eventQueue.Unsubscribe(EventType.ClientDisconnected, clientDisconnectedSubscriptionIdx);
         _controllers.TerminateAll();
 
         State = ServerState.Stopped;

@@ -16,7 +16,7 @@ public class SceneManager
             new AsteroidsDemoScene(spawner),
             new SpaceshipDemoScene(spawner),
             new AsteroidCollisionScene(spawner, behaviorFactory, controllersCollection),
-            new PlayableDemoScene(spawner, behaviorFactory, controllersCollection)
+            new PlayableDemoScene(behaviorFactory, controllersCollection)
         };
     }
 
