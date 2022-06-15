@@ -5,14 +5,12 @@ namespace Asteroids.Controllers;
 
 public class BehaviorController : IController
 {
-    private readonly CommandQueue _commandQueue;
     private readonly EventQueue _eventQueue;
     private readonly List<IBehavior> _behaviors = new List<IBehavior>();
     private long _sceneChangeSubscription;
 
-    public BehaviorController(CommandQueue commandQueue, EventQueue eventQueue)
+    public BehaviorController(EventQueue eventQueue)
     {
-        _commandQueue = commandQueue;
         _eventQueue = eventQueue;
     }
 
@@ -39,11 +37,8 @@ public class BehaviorController : IController
             throw new Exception($"behavior {typeof(TBehavior).Name} already presented");
         }
 
-        _commandQueue.Push(() =>
-        {
-            _behaviors.Add(behavior);
-            behavior.Initialize();
-        });
+        _behaviors.Add(behavior);
+        behavior.Initialize();
     }
 
     public void RemoveBehavior<TBehavior>()
@@ -56,11 +51,8 @@ public class BehaviorController : IController
             return;
         }
 
-        _commandQueue.Push(() =>
-        {
-            behavior.Terminate();
-            _behaviors.Remove(behavior);
-        });
+        behavior.Terminate();
+        _behaviors.Remove(behavior);
     }
 
     public void Reset()

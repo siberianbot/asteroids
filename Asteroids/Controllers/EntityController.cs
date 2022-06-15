@@ -5,25 +5,41 @@ namespace Asteroids.Controllers;
 
 public class EntityController : IController, IEntityCollection
 {
-    private readonly CommandQueue _commandQueue;
     private readonly EventQueue _eventQueue;
     private readonly List<Entity> _entities = new List<Entity>();
     private long _sceneChangeSubscription;
+    private long _entitySpawnSubscription;
+    private long _entityDestroySubscription;
 
-    public EntityController(CommandQueue commandQueue, EventQueue eventQueue)
+    public EntityController(EventQueue eventQueue)
     {
-        _commandQueue = commandQueue;
         _eventQueue = eventQueue;
     }
 
     public void Initialize()
     {
         _sceneChangeSubscription = _eventQueue.Subscribe(EventType.SceneChange, _ => Reset());
+
+        _entitySpawnSubscription = _eventQueue.Subscribe(EventType.EntitySpawn, @event =>
+        {
+            _entities.Add(@event.Entity!);
+
+            @event.Entity!.Create();
+        });
+
+        _entityDestroySubscription = _eventQueue.Subscribe(EventType.EntityDestroy, @event =>
+        {
+            @event.Entity!.Destroy();
+
+            _entities.Remove(@event.Entity!);
+        });
     }
 
     public void Terminate()
     {
         _eventQueue.Unsubscribe(EventType.SceneChange, _sceneChangeSubscription);
+        _eventQueue.Unsubscribe(EventType.EntitySpawn, _entitySpawnSubscription);
+        _eventQueue.Unsubscribe(EventType.EntityDestroy, _entityDestroySubscription);
     }
 
     public IReadOnlyCollection<Entity> Entities
@@ -33,23 +49,15 @@ public class EntityController : IController, IEntityCollection
 
     public void AddEntity(Entity entity)
     {
-        _commandQueue.Push(() =>
+        _eventQueue.Push(new Event
         {
-            _entities.Add(entity);
-
-            entity.Create();
+            EventType = EventType.EntitySpawn,
+            Entity = entity
         });
     }
 
     public void DestroyEntity(Entity entity)
     {
-        _commandQueue.Push(() =>
-        {
-            entity.Destroy();
-
-            _entities.Remove(entity);
-        });
-
         _eventQueue.Push(new Event
         {
             EventType = EventType.EntityDestroy,

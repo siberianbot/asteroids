@@ -16,6 +16,8 @@ public enum EventType
 
     CollisionStarted,
     CollisionFinished,
-    EntityDestroy,
     SceneChange,
+    
+    EntitySpawn,
+    EntityDestroy,
 }

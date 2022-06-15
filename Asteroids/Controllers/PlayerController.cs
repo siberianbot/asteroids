@@ -5,20 +5,29 @@ namespace Asteroids.Controllers;
 
 public class PlayerController : IController
 {
-    private readonly CommandQueue _commandQueue;
     private readonly EventQueue _eventQueue;
     private readonly List<Player> _players = new List<Player>();
+    private long _entitySpawnSubscription;
     private long _entityDestroySubscription;
     private long _sceneChangeSubscription;
 
-    public PlayerController(CommandQueue commandQueue, EventQueue eventQueue)
+    public PlayerController(EventQueue eventQueue)
     {
-        _commandQueue = commandQueue;
         _eventQueue = eventQueue;
     }
 
     public void Initialize()
     {
+        _entitySpawnSubscription = _eventQueue.Subscribe(EventType.EntitySpawn, @event =>
+        {
+            if (@event.Entity is not Player player)
+            {
+                return;
+            }
+
+            _players.Add(player);
+        });
+
         _entityDestroySubscription = _eventQueue.Subscribe(EventType.EntityDestroy, @event =>
         {
             if (@event.Entity is not Player player)
@@ -26,7 +35,7 @@ public class PlayerController : IController
                 return;
             }
 
-            RemovePlayer(player);
+            _players.Remove(player);
         });
 
         _sceneChangeSubscription = _eventQueue.Subscribe(EventType.SceneChange, _ => Reset());
@@ -34,6 +43,7 @@ public class PlayerController : IController
 
     public void Terminate()
     {
+        _eventQueue.Unsubscribe(EventType.EntitySpawn, _entitySpawnSubscription);
         _eventQueue.Unsubscribe(EventType.EntityDestroy, _entityDestroySubscription);
         _eventQueue.Unsubscribe(EventType.SceneChange, _sceneChangeSubscription);
     }
@@ -41,16 +51,6 @@ public class PlayerController : IController
     public IReadOnlyCollection<Player> Players
     {
         get => _players;
-    }
-
-    public void AddPlayer(Player player)
-    {
-        _commandQueue.Push(() => _players.Add(player));
-    }
-
-    public void RemovePlayer(Player player)
-    {
-        _commandQueue.Push(() => _players.Remove(player));
     }
 
     public void Reset()

@@ -1,7 +1,6 @@
 using System.Numerics;
 using Asteroids.Components;
 using Asteroids.Controllers;
-using Asteroids.Engine;
 using Asteroids.Physics;
 using Asteroids.Utils;
 
@@ -11,12 +10,10 @@ namespace Asteroids.Entities;
 public class Spawner
 {
     private readonly EntityController _entityController;
-    private readonly PlayerController _playerController;
 
-    public Spawner(EntityController entityController, PlayerController playerController)
+    public Spawner(EntityController entityController)
     {
         _entityController = entityController;
-        _playerController = playerController;
     }
 
     public Asteroid SpawnAsteroid(Vector2 position, Vector2 direction, float? velocity = null, float? scale = null)
@@ -110,7 +107,6 @@ public class Spawner
         Player player = new Player(name, color);
 
         _entityController.AddEntity(player);
-        _playerController.AddPlayer(player);
 
         return player;
     }

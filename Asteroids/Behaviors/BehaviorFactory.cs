@@ -7,20 +7,17 @@ namespace Asteroids.Behaviors;
 public class BehaviorFactory
 {
     private readonly ControllersCollection _controllersCollection;
-    private readonly CommandQueue _commandQueue;
     private readonly EventQueue _eventQueue;
     private readonly Spawner _spawner;
     private readonly Vars _vars;
 
     public BehaviorFactory(
         ControllersCollection controllersCollection,
-        CommandQueue commandQueue,
         EventQueue eventQueue,
         Spawner spawner,
         Vars vars)
     {
         _controllersCollection = controllersCollection;
-        _commandQueue = commandQueue;
         _eventQueue = eventQueue;
         _spawner = spawner;
         _vars = vars;
@@ -38,7 +35,6 @@ public class BehaviorFactory
     public BulletSpawningBehavior CreateBulletSpawningBehavior()
     {
         return new BulletSpawningBehavior(
-            _commandQueue,
             _controllersCollection.GetController<EntityController>(),
             _spawner);
     }

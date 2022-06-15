@@ -9,7 +9,6 @@ namespace Asteroids.Server;
 
 public class LocalServer : IServer
 {
-    private readonly CommandQueue _commandQueue = new CommandQueue();
     private readonly Vars _vars = new Vars();
     private readonly ControllersCollection _controllers = new ControllersCollection();
     private readonly EventQueue _eventQueue;
@@ -76,25 +75,22 @@ public class LocalServer : IServer
     {
         State = ServerState.Initializing;
 
-        _commandQueue.Reset();
         _eventQueue.Reset();
         _controllers.Clear();
 
-        BehaviorController behaviorController = new BehaviorController(_commandQueue, _eventQueue);
+        BehaviorController behaviorController = new BehaviorController(_eventQueue);
         _controllers.AddController(behaviorController);
 
-        EntityController entityController = new EntityController(_commandQueue, _eventQueue);
+        EntityController entityController = new EntityController(_eventQueue);
         _controllers.AddController(entityController);
         EntityCollection = entityController;
 
-        PlayerController playerController = new PlayerController(_commandQueue, _eventQueue);
-        _controllers.AddController(playerController);
+        _controllers.AddController(new PlayerController(_eventQueue));
 
-        Spawner spawner = new Spawner(entityController, playerController);
+        Spawner spawner = new Spawner(entityController);
 
         BehaviorFactory behaviorFactory = new BehaviorFactory(
             _controllers,
-            _commandQueue,
             _eventQueue,
             spawner,
             _vars);
@@ -104,22 +100,18 @@ public class LocalServer : IServer
             behaviorFactory,
             _controllers);
 
-        _controllers.AddController(new SceneController(sceneManager, _commandQueue, _eventQueue, _vars));
+        _controllers.AddController(new SceneController(sceneManager, _eventQueue, _vars));
 
         _controllers.InitializeAll();
 
-        long clientConnectedSubscriptionIdx = _eventQueue.Subscribe(EventType.ClientConnected, @event =>
-        {
-            @event.Client!.Player = spawner.SpawnPlayer(@event.Client!.Name, Constants.Colors.Green);
-
-            playerController.AddPlayer(@event.Client!.Player);
-        });
+        long clientConnectedSubscriptionIdx = _eventQueue.Subscribe(EventType.ClientConnected,
+            @event => @event.Client!.Player = spawner.SpawnPlayer(@event.Client!.Name, Constants.Colors.Green));
 
         long clientDisconnectedSubscriptionIdx = _eventQueue.Subscribe(EventType.ClientDisconnected, @event =>
         {
-            @event.Client!.Player = null;
+            entityController.DestroyEntity(@event.Client!.Player!);
 
-            playerController.RemovePlayer(@event.Client!.Player!);
+            @event.Client!.Player = null;
         });
 
         _alive = true;
@@ -135,7 +127,6 @@ public class LocalServer : IServer
             stopwatch.Restart();
 
             _eventQueue.ExecutePending();
-            _commandQueue.ExecutePending();
 
             foreach (Entity entity in entityController.Entities)
             {
