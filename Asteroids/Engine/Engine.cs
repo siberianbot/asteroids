@@ -7,7 +7,6 @@ public sealed class Engine : IDisposable
 {
     private bool _disposed;
 
-    private readonly EventQueue _eventQueue = new EventQueue();
     private readonly Viewport _viewport;
 
     public Engine()
@@ -17,13 +16,13 @@ public sealed class Engine : IDisposable
 
     public void Run()
     {
-        Server = new LocalServer(_eventQueue, Vars);
+        Server = new LocalServer(EventQueue, Vars);
         Server.Start();
 
         UIContainer.Set(3, new DebugUI(this));
         UIContainer.Set(2, new MenuUI(this));
 
-        _eventQueue.Push(new Event { EventType = EventType.EngineReady });
+        EventQueue.Push(new Event { EventType = EventType.EngineReady });
 
         _viewport.Run();
 
@@ -32,15 +31,15 @@ public sealed class Engine : IDisposable
         Server.Stop();
     }
 
-    public IClient? Client { get; set; }
-
-    public IServer? Server { get; private set; }
-
     public Vars Vars { get; } = new Vars();
 
     public UIContainer UIContainer { get; } = new UIContainer();
 
     public EventQueue EventQueue { get; } = new EventQueue();
+
+    public IClient? Client { get; set; }
+
+    public IServer? Server { get; private set; }
 
     public Viewport Viewport
     {
