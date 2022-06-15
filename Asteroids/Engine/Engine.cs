@@ -17,7 +17,7 @@ public sealed class Engine : IDisposable
 
     public void Run()
     {
-        Server = new LocalServer(_eventQueue);
+        Server = new LocalServer(_eventQueue, Vars);
         Server.Start();
 
         UIContainer.Set(3, new DebugUI(this));
@@ -34,16 +34,13 @@ public sealed class Engine : IDisposable
 
     public IClient? Client { get; set; }
 
-    public IServer Server { get; private set; }
+    public IServer? Server { get; private set; }
 
     public Vars Vars { get; } = new Vars();
 
     public UIContainer UIContainer { get; } = new UIContainer();
 
-    public EventQueue EventQueue
-    {
-        get => _eventQueue;
-    }
+    public EventQueue EventQueue { get; } = new EventQueue();
 
     public Viewport Viewport
     {
