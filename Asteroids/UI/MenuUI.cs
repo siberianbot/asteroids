@@ -11,10 +11,7 @@ public class MenuUI : ClientUI
     public MenuUI(Engine.Engine engine) : base(engine.Vars, Constants.Vars.ClientUIShowMenu)
     {
         _engine = engine;
-    }
 
-    public override void Initialize()
-    {
         SetVisibility(true);
     }
 
@@ -35,7 +32,8 @@ public class MenuUI : ClientUI
                 });
 
                 _engine.Client = _engine.Server!.Join("Asteroids Player");
-                _engine.InputProcessor.Enabled = true;
+
+                _engine.Vars.SetVar(Constants.Vars.ClientUIShowPlayerStats, true);
 
                 SetVisibility(false);
             }

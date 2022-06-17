@@ -8,7 +8,6 @@ public class UIContainer
     public void Set(int idx, IClientUI clientUI)
     {
         _uis[idx] = clientUI ?? throw new ArgumentNullException(nameof(clientUI));
-        _uis[idx]!.Initialize();
     }
 
     public void Unset(int idx)

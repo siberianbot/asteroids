@@ -50,8 +50,10 @@ public static class Constants
         public const string AsteroidsSpawningRadius = "AsteroidsSpawning:Radius";
         public const string AsteroidsSpawningCooldown = "AsteroidsSpawning:Cooldown";
 
-        public const string ClientUIShowMenu = "ClientUI:ShowMenu";
         public const string ClientUIShowDebug = "ClientUI:ShowDebug";
+        public const string ClientUIShowMenu = "ClientUI:ShowMenu";
+        public const string ClientUIShowPlayerStats = "ClientUI:ShowPlayerStats";
+        public const string ClientUIShowScoreboard = "ClientUI:ShowScoreboard";
     }
 
     public static class Asteroids

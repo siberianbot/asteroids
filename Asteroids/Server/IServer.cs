@@ -15,4 +15,6 @@ public interface IServer
     ServerState State { get; }
 
     IEntityCollection? EntityCollection { get; }
+
+    IPlayerCollection? PlayerCollection { get; }
 }

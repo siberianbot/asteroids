@@ -72,6 +72,8 @@ public class LocalServer : IServer
 
     public IEntityCollection? EntityCollection { get; private set; }
 
+    public IPlayerCollection? PlayerCollection { get; private set; }
+
     private void ServerFunc()
     {
         State = ServerState.Initializing;
@@ -86,7 +88,9 @@ public class LocalServer : IServer
         _controllers.AddController(entityController);
         EntityCollection = entityController;
 
-        _controllers.AddController(new PlayerController(_eventQueue));
+        PlayerController playerController = new PlayerController(_eventQueue);
+        _controllers.AddController(playerController);
+        PlayerCollection = playerController;
 
         Spawner spawner = new Spawner(entityController);
 

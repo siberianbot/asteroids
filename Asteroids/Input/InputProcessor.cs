@@ -27,8 +27,6 @@ public class InputProcessor
     private readonly Dictionary<Key, Action> _keyPress = new Dictionary<Key, Action>();
     private readonly Dictionary<Key, Action> _keyRelease = new Dictionary<Key, Action>();
 
-    public bool Enabled { get; set; }
-
     public void PushKeyPress(Key key)
     {
         _pending.Enqueue(new KeyEvent(key, KeyState.Press));
@@ -51,20 +49,17 @@ public class InputProcessor
 
     public void ExecutePending()
     {
-        if (Enabled)
+        foreach (KeyEvent @event in _pending)
         {
-            foreach (KeyEvent @event in _pending)
+            switch (@event.State)
             {
-                switch (@event.State)
-                {
-                    case KeyState.Press when _keyPress.TryGetValue(@event.Key, out Action? keyPressAction):
-                        keyPressAction.Invoke();
-                        break;
+                case KeyState.Press when _keyPress.TryGetValue(@event.Key, out Action? keyPressAction):
+                    keyPressAction.Invoke();
+                    break;
 
-                    case KeyState.Release when _keyRelease.TryGetValue(@event.Key, out Action? keyReleaseAction):
-                        keyReleaseAction.Invoke();
-                        break;
-                }
+                case KeyState.Release when _keyRelease.TryGetValue(@event.Key, out Action? keyReleaseAction):
+                    keyReleaseAction.Invoke();
+                    break;
             }
         }
 

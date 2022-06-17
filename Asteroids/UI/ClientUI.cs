@@ -13,11 +13,6 @@ public abstract class ClientUI : IClientUI
         _uiVarName = uiVarName;
     }
 
-    public virtual void Initialize()
-    {
-        //
-    }
-
     public void Update()
     {
         if (!_vars.GetVar(_uiVarName, false))

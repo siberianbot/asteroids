@@ -9,11 +9,9 @@ public sealed class Engine : IDisposable
 {
     private bool _disposed;
 
-    private readonly Viewport _viewport;
-
     public Engine()
     {
-        _viewport = new Viewport(this);
+        Viewport = new Viewport(this);
     }
 
     public void Run()
@@ -23,11 +21,16 @@ public sealed class Engine : IDisposable
 
         UIContainer.Set(3, new DebugUI(this));
         UIContainer.Set(2, new MenuUI(this));
+        UIContainer.Set(1, new ScoreboardUI(this));
+        UIContainer.Set(0, new PlayerStatsUI(this));
 
         InputProcessor.OnKeyPress(Key.Escape,
             () => Vars.SetVar(Constants.Vars.ClientUIShowMenu, !Vars.GetVar(Constants.Vars.ClientUIShowMenu, false)));
         InputProcessor.OnKeyPress(Key.F12,
             () => Vars.SetVar(Constants.Vars.ClientUIShowDebug, !Vars.GetVar(Constants.Vars.ClientUIShowDebug, false)));
+        InputProcessor.OnKeyPress(Key.Tab, () => Vars.SetVar(Constants.Vars.ClientUIShowScoreboard, true));
+        InputProcessor.OnKeyRelease(Key.Tab, () => Vars.SetVar(Constants.Vars.ClientUIShowScoreboard, false));
+
         InputProcessor.OnKeyPress(Key.Up, () => EventQueue.Push(new Event
         {
             EventType = EventType.ClientAction,
@@ -106,11 +109,9 @@ public sealed class Engine : IDisposable
             ClientActionState = ClientActionState.Enable
         }));
 
-        InputProcessor.Enabled = false;
-
         EventQueue.Push(new Event { EventType = EventType.EngineReady });
 
-        _viewport.Run();
+        Viewport.Run();
 
         UIContainer.Clear();
 
@@ -129,10 +130,7 @@ public sealed class Engine : IDisposable
 
     public IServer? Server { get; private set; }
 
-    public Viewport Viewport
-    {
-        get => _viewport;
-    }
+    public Viewport Viewport { get; }
 
     #region IDisposable
 
@@ -154,7 +152,7 @@ public sealed class Engine : IDisposable
             return;
         }
 
-        _viewport.Dispose();
+        Viewport.Dispose();
 
         _disposed = true;
     }
