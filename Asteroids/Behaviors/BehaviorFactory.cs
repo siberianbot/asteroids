@@ -39,6 +39,11 @@ public class BehaviorFactory
             _spawner);
     }
 
+    public CameraFollowBehavior CreateCameraFollowBehavior()
+    {
+        return new CameraFollowBehavior(_controllersCollection.GetController<EntityController>());
+    }
+
     public CollisionDetectionBehavior CreateCollisionDetectionBehavior()
     {
         return new CollisionDetectionBehavior(

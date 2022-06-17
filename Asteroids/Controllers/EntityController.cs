@@ -78,6 +78,7 @@ public class EntityController : IController, IEntityCollection
         });
     }
 
+    // TODO: this method is used only for retrieving single entity, is it really required to retrieve all entities?
     public IEnumerable<TOwnedEntity> GetOwnedEntities<TOwnedEntity>(Entity owner)
         where TOwnedEntity : Entity, IOwnedEntity
     {

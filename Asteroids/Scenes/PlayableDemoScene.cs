@@ -31,5 +31,6 @@ public class PlayableDemoScene : Scene
         _behaviorController.AddBehavior(_behaviorFactory.CreatePlayerControlBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreatePlayerSpawningBehavior());
         _behaviorController.AddBehavior(_behaviorFactory.CreateEntityCleanupBehavior());
+        _behaviorController.AddBehavior(_behaviorFactory.CreateCameraFollowBehavior());
     }
 }

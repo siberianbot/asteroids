@@ -114,6 +114,7 @@ public class LocalServer : IServer
         long clientConnectedSubscriptionIdx = _eventQueue.Subscribe(EventType.ClientConnected, @event =>
         {
             @event.Client!.Player = spawner.SpawnPlayer(Constants.Colors.Green);
+            @event.Client!.Camera = spawner.SpawnCamera(@event.Client!.Player);
 
             _clients.Add(@event.Client);
         });
@@ -121,8 +122,10 @@ public class LocalServer : IServer
         long clientDisconnectedSubscriptionIdx = _eventQueue.Subscribe(EventType.ClientDisconnected, @event =>
         {
             entityController.DestroyEntity(@event.Client!.Player!);
+            entityController.DestroyEntity(@event.Client!.Camera!);
 
             @event.Client!.Player = null;
+            @event.Client!.Camera = null;
 
             _clients.Remove(@event.Client);
         });

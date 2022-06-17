@@ -111,21 +111,13 @@ public class Spawner
         return player;
     }
 
-    // public Camera SpawnCamera(Entity target)
-    // {
-    //     Camera camera = new Camera(target);
-    //
-    //     _entityController.AddEntity(camera);
-    //
-    //     return camera;
-    // }
-    //
-    // public Camera SpawnCamera(Vector2 position)
-    // {
-    //     Camera camera = new Camera(position);
-    //
-    //     _entityController.AddEntity(camera);
-    //
-    //     return camera;
-    // }
+    public Camera SpawnCamera(Entity? owner)
+    {
+        Camera camera = new Camera(owner);
+        camera.AddComponent(new PositionComponent(Vector2.Zero, 0));
+
+        _entityController.AddEntity(camera);
+
+        return camera;
+    }
 }

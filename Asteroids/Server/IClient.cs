@@ -6,5 +6,7 @@ public interface IClient
 {
     Player? Player { get; set; }
 
+    Camera? Camera { get; set; }
+
     string Name { get; }
 }

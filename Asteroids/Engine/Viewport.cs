@@ -1,6 +1,5 @@
 using System.Numerics;
 using Asteroids.Components;
-using Asteroids.Entities;
 using Asteroids.Rendering;
 using Asteroids.Server;
 using Asteroids.Utils;
@@ -101,10 +100,9 @@ public class Viewport : IDisposable
                     x.ColliderComponent))
                 .ToArray();
 
-            Vector2 position = _engine.Client?.Player != null
-                ? _engine.Server!.EntityCollection!.GetOwnedEntities<Spaceship>(_engine.Client.Player)
-                    .SingleOrDefault()?.GetComponent<PositionComponent>()?.Position ?? new Vector2(0, 0)
-                : new Vector2(0, 0);
+            Vector2 position = _engine.Client?.Camera != null
+                ? _engine.Client.Camera.GetComponent<PositionComponent>()!.Position
+                : Vector2.Zero;
 
             Matrix4x4 viewMatrix = MatrixUtils.GetViewMatrix(position);
 
