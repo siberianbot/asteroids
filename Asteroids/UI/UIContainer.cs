@@ -13,7 +13,6 @@ public class UIContainer
 
     public void Unset(int idx)
     {
-        _uis[idx]?.Terminate();
         _uis[idx] = null;
     }
 

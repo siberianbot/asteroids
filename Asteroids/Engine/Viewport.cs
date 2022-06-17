@@ -77,6 +77,7 @@ public class Viewport : IDisposable
         _imguiController.Value.Update((float)delta);
 
         _engine.EventQueue.ExecutePending();
+        _engine.InputProcessor.ExecutePending();
         _engine.UIContainer.Update();
     }
 
@@ -122,12 +123,12 @@ public class Viewport : IDisposable
 
     private void OnKeyPress(IKeyboard keyboard, Key key, int _)
     {
-        _engine.EventQueue.Push(new Event { EventType = EventType.KeyPress, Key = key });
+        _engine.InputProcessor.PushKeyPress(key);
     }
 
     private void OnKeyRelease(IKeyboard keyboard, Key key, int _)
     {
-        _engine.EventQueue.Push(new Event { EventType = EventType.KeyRelease, Key = key });
+        _engine.InputProcessor.PushKeyRelease(key);
     }
 
     #region IDisposable

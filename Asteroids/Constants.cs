@@ -49,6 +49,9 @@ public static class Constants
         public const string PhysicsShowCollider = "Physics:ShowCollider";
         public const string AsteroidsSpawningRadius = "AsteroidsSpawning:Radius";
         public const string AsteroidsSpawningCooldown = "AsteroidsSpawning:Cooldown";
+
+        public const string ClientUIShowMenu = "ClientUI:ShowMenu";
+        public const string ClientUIShowDebug = "ClientUI:ShowDebug";
     }
 
     public static class Asteroids

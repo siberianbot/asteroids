@@ -9,10 +9,7 @@ public enum EventType
 
     ClientConnected,
     ClientDisconnected,
-    KeyPress,
-    KeyRelease,
-    ShowMenu,
-    HideMenu,
+    ClientAction,
 
     CollisionStarted,
     CollisionFinished,
