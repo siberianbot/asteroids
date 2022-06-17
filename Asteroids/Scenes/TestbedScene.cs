@@ -25,7 +25,7 @@ public class TestbedScene : Scene
 
     public override void Load()
     {
-        Player player = _spawner.SpawnPlayer("test player", Constants.Colors.Green);
+        Player player = _spawner.SpawnPlayer(Constants.Colors.Green);
         Spaceship spaceship = _spawner.SpawnSpaceship(new Vector2(+2.5f, -2.0f), player);
 
         _behaviorController.AddBehavior(_behaviorFactory.CreatePlayerControlBehavior());

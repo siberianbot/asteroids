@@ -29,7 +29,7 @@ public class PlayerStatsUI : ClientUI
                                              ImGuiWindowFlags.NoTitleBar))
         {
             ImGui.Text($"Score: {_engine.Client.Player.Score}");
-            ImGui.Text($"{_engine.Client.Player.Name}");
+            ImGui.Text($"{_engine.Client.Name}");
 
             ImGui.End();
         }

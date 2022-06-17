@@ -3,7 +3,7 @@ using Asteroids.Entities;
 
 namespace Asteroids.Controllers;
 
-public class PlayerController : IController, IPlayerCollection
+public class PlayerController : IController
 {
     private readonly EventQueue _eventQueue;
     private readonly List<Player> _players = new List<Player>();

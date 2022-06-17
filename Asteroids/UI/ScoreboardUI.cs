@@ -1,5 +1,5 @@
 using System.Numerics;
-using Asteroids.Entities;
+using Asteroids.Server;
 using ImGuiNET;
 
 namespace Asteroids.UI;
@@ -15,7 +15,7 @@ public class ScoreboardUI : ClientUI
 
     protected override void OnUpdate()
     {
-        if (_engine.Server?.PlayerCollection == null)
+        if (_engine.Server == null)
         {
             return;
         }
@@ -35,16 +35,21 @@ public class ScoreboardUI : ClientUI
                 ImGui.TableSetupColumn("status", ImGuiTableColumnFlags.None, 0.10f);
                 ImGui.TableSetupColumn("score", ImGuiTableColumnFlags.None, 0.15f);
 
-                foreach (Player player in _engine.Server.PlayerCollection.Players)
+                foreach (IClient client in _engine.Server.Clients)
                 {
+                    if (client.Player == null)
+                    {
+                        continue;
+                    }
+
                     ImGui.TableNextRow();
 
                     ImGui.TableNextColumn();
-                    ImGui.Text(player.Name);
+                    ImGui.Text(client.Name);
                     ImGui.TableNextColumn();
-                    ImGui.Text(player.Alive ? "Alive" : "Dead");
+                    ImGui.Text(client.Player.Alive ? "Alive" : "Dead");
                     ImGui.TableNextColumn();
-                    ImGui.Text($"{player.Score}");
+                    ImGui.Text($"{client.Player.Score}");
                 }
 
                 ImGui.EndTable();

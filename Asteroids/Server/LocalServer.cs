@@ -13,6 +13,7 @@ public class LocalServer : IServer
     private readonly Vars _vars;
     private readonly EventQueue _eventQueue;
     private readonly Thread _serverThread;
+    private readonly List<IClient> _clients = new List<IClient>();
     private bool _alive;
 
     public LocalServer(EventQueue eventQueue, Vars vars)
@@ -72,7 +73,10 @@ public class LocalServer : IServer
 
     public IEntityCollection? EntityCollection { get; private set; }
 
-    public IPlayerCollection? PlayerCollection { get; private set; }
+    public IEnumerable<IClient> Clients
+    {
+        get => _clients;
+    }
 
     private void ServerFunc()
     {
@@ -88,9 +92,7 @@ public class LocalServer : IServer
         _controllers.AddController(entityController);
         EntityCollection = entityController;
 
-        PlayerController playerController = new PlayerController(_eventQueue);
-        _controllers.AddController(playerController);
-        PlayerCollection = playerController;
+        _controllers.AddController(new PlayerController(_eventQueue));
 
         Spawner spawner = new Spawner(entityController);
 
@@ -109,14 +111,20 @@ public class LocalServer : IServer
 
         _controllers.InitializeAll();
 
-        long clientConnectedSubscriptionIdx = _eventQueue.Subscribe(EventType.ClientConnected,
-            @event => @event.Client!.Player = spawner.SpawnPlayer(@event.Client!.Name, Constants.Colors.Green));
+        long clientConnectedSubscriptionIdx = _eventQueue.Subscribe(EventType.ClientConnected, @event =>
+        {
+            @event.Client!.Player = spawner.SpawnPlayer(Constants.Colors.Green);
+
+            _clients.Add(@event.Client);
+        });
 
         long clientDisconnectedSubscriptionIdx = _eventQueue.Subscribe(EventType.ClientDisconnected, @event =>
         {
             entityController.DestroyEntity(@event.Client!.Player!);
 
             @event.Client!.Player = null;
+
+            _clients.Remove(@event.Client);
         });
 
         _alive = true;
@@ -145,6 +153,9 @@ public class LocalServer : IServer
         }
 
         State = ServerState.Stopping;
+
+        // TODO: handle client disconnection
+        _clients.Clear();
 
         _eventQueue.Unsubscribe(EventType.ClientConnected, clientConnectedSubscriptionIdx);
         _eventQueue.Unsubscribe(EventType.ClientDisconnected, clientDisconnectedSubscriptionIdx);

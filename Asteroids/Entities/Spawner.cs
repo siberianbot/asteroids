@@ -102,9 +102,9 @@ public class Spawner
         return bullet;
     }
 
-    public Player SpawnPlayer(string name, Vector3 color)
+    public Player SpawnPlayer(Vector3 color)
     {
-        Player player = new Player(name, color);
+        Player player = new Player(color);
 
         _entityController.AddEntity(player);
 

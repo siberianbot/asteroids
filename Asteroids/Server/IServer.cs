@@ -16,5 +16,5 @@ public interface IServer
 
     IEntityCollection? EntityCollection { get; }
 
-    IPlayerCollection? PlayerCollection { get; }
+    IEnumerable<IClient> Clients { get; }
 }
