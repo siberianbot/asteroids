@@ -7,6 +7,7 @@ public class EntityController : IController, IEntityCollection
 {
     private readonly EventQueue _eventQueue;
     private readonly List<Entity> _entities = new List<Entity>();
+    private readonly object _entitiesLock = new object();
     private long _sceneChangeSubscription;
     private long _entitySpawnSubscription;
     private long _entityDestroySubscription;
@@ -22,7 +23,10 @@ public class EntityController : IController, IEntityCollection
 
         _entitySpawnSubscription = _eventQueue.Subscribe(EventType.EntitySpawn, @event =>
         {
-            _entities.Add(@event.Entity!);
+            lock (_entitiesLock)
+            {
+                _entities.Add(@event.Entity!);
+            }
 
             @event.Entity!.Create();
         });
@@ -31,7 +35,10 @@ public class EntityController : IController, IEntityCollection
         {
             @event.Entity!.Destroy();
 
-            _entities.Remove(@event.Entity!);
+            lock (_entitiesLock)
+            {
+                _entities.Remove(@event.Entity!);
+            }
         });
     }
 
@@ -44,7 +51,13 @@ public class EntityController : IController, IEntityCollection
 
     public IReadOnlyCollection<Entity> Entities
     {
-        get => _entities;
+        get
+        {
+            lock (_entitiesLock)
+            {
+                return _entities.ToArray();
+            }
+        }
     }
 
     public void AddEntity(Entity entity)
@@ -68,13 +81,20 @@ public class EntityController : IController, IEntityCollection
     public IEnumerable<TOwnedEntity> GetOwnedEntities<TOwnedEntity>(Entity owner)
         where TOwnedEntity : Entity, IOwnedEntity
     {
-        return _entities
-            .OfType<TOwnedEntity>()
-            .Where(entity => entity.Owner == owner);
+        lock (_entitiesLock)
+        {
+            return _entities
+                .OfType<TOwnedEntity>()
+                .Where(entity => entity.Owner == owner)
+                .ToArray();
+        }
     }
 
     public void Reset()
     {
-        _entities.Clear();
+        lock (_entitiesLock)
+        {
+            _entities.Clear();
+        }
     }
 }
