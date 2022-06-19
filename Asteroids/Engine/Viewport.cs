@@ -83,9 +83,9 @@ public class Viewport : IDisposable
     {
         _renderer.Value.Clear();
 
-        if (_engine.Server != null && _engine.Server.State == ServerState.Alive)
+        if (_engine.ClientServerHost.Server != null && _engine.ClientServerHost.Server.State == ServerState.Alive)
         {
-            IEnumerable<ModelData> models = _engine.Server!.EntityCollection!.Entities
+            IEnumerable<ModelData> models = _engine.ClientServerHost.Server!.EntityCollection!.Entities
                 .Select(entity => new
                 {
                     ModelComponent = entity.GetComponent<ModelComponent>(),
@@ -99,8 +99,8 @@ public class Viewport : IDisposable
                     x.ColliderComponent))
                 .ToArray();
 
-            Vector2 position = _engine.Client?.Camera != null
-                ? _engine.Client.Camera.GetComponent<PositionComponent>()!.Position
+            Vector2 position = _engine.ClientServerHost.Client?.Camera != null
+                ? _engine.ClientServerHost.Client.Camera.GetComponent<PositionComponent>()!.Position
                 : Vector2.Zero;
 
             Matrix4x4 viewMatrix = MatrixUtils.GetViewMatrix(position);

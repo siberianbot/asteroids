@@ -22,13 +22,13 @@ public class DebugUI : ClientUI
         {
             if (ImGui.CollapsingHeader("Server Info"))
             {
-                if (_engine.Server == null)
+                if (_engine.ClientServerHost.Server == null)
                 {
                     ImGui.Text("Not connected");
                 }
                 else
                 {
-                    ImGui.Text($"State: {_engine.Server.State}");
+                    ImGui.Text($"State: {_engine.ClientServerHost.Server.State}");
                 }
             }
 

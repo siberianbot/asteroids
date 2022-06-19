@@ -15,7 +15,7 @@ public class ScoreboardUI : ClientUI
 
     protected override void OnUpdate()
     {
-        if (_engine.Server == null)
+        if (_engine.ClientServerHost.Server == null)
         {
             return;
         }
@@ -35,7 +35,7 @@ public class ScoreboardUI : ClientUI
                 ImGui.TableSetupColumn("status", ImGuiTableColumnFlags.None, 0.10f);
                 ImGui.TableSetupColumn("score", ImGuiTableColumnFlags.None, 0.15f);
 
-                foreach (IClient client in _engine.Server.Clients)
+                foreach (IClient client in _engine.ClientServerHost.Server.Clients)
                 {
                     if (client.Player == null)
                     {

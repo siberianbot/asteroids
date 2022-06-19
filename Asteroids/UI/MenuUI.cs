@@ -1,5 +1,6 @@
 using System.Numerics;
 using Asteroids.Engine;
+using Asteroids.Server;
 using ImGuiNET;
 
 namespace Asteroids.UI;
@@ -25,9 +26,9 @@ public class MenuUI : ClientUI
         {
             if (ImGui.Button("New Game", new Vector2(-1f, 40f)))
             {
-                _engine.Client.JoinServer(_engine.Server);
+                _engine.ClientServerHost.CreateLocalServer();
 
-                _engine.Client.PushEvent(new Event
+                _engine.ClientServerHost.PushEvent(new Event
                 {
                     EventType = EventType.SceneChange,
                     SceneName = Constants.Scenes.PlayableDemo

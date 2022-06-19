@@ -14,7 +14,7 @@ public class PlayerStatsUI : ClientUI
 
     protected override void OnUpdate()
     {
-        if (_engine.Client?.Player == null)
+        if (_engine.ClientServerHost.Client.Player == null)
         {
             return;
         }
@@ -28,8 +28,8 @@ public class PlayerStatsUI : ClientUI
                                              ImGuiWindowFlags.NoInputs |
                                              ImGuiWindowFlags.NoTitleBar))
         {
-            ImGui.Text($"Score: {_engine.Client.Player.Score}");
-            ImGui.Text($"{_engine.Client.Name}");
+            ImGui.Text($"Score: {_engine.ClientServerHost.Client.Player.Score}");
+            ImGui.Text($"{_engine.ClientServerHost.Client.Name}");
 
             ImGui.End();
         }
