@@ -17,6 +17,8 @@ public struct Event
 
     public IClient? Client { get; init; }
 
+    public string? ClientName { get; init; }
+
     public ClientAction? ClientAction { get; init; }
 
     public ClientActionState? ClientActionState { get; init; }

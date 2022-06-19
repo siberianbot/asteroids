@@ -12,11 +12,12 @@ public sealed class Engine : IDisposable
     public Engine()
     {
         Viewport = new Viewport(this);
+        Client = new LocalClient(Vars);
+        Server = new LocalServer(EventQueue, Vars);
     }
 
     public void Run()
     {
-        Server = new LocalServer(EventQueue, Vars);
         Server.Start();
 
         UIContainer.Set(3, new DebugUI(this));
@@ -126,9 +127,9 @@ public sealed class Engine : IDisposable
 
     public InputProcessor InputProcessor { get; } = new InputProcessor();
 
-    public IClient? Client { get; set; }
+    public IClient Client { get; }
 
-    public IServer? Server { get; private set; }
+    public IServer Server { get; }
 
     public Viewport Viewport { get; }
 

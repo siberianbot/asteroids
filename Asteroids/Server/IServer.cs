@@ -1,3 +1,4 @@
+using Asteroids.Engine;
 using Asteroids.Entities;
 
 namespace Asteroids.Server;
@@ -8,9 +9,7 @@ public interface IServer
 
     void Stop();
 
-    IClient Join(string name);
-
-    void Leave(IClient client);
+    void Push(Event @event);
 
     ServerState State { get; }
 

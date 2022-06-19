@@ -43,30 +43,9 @@ public class LocalServer : IServer
         }
     }
 
-    public IClient Join(string name)
+    public void Push(Event @event)
     {
-        LocalClient client = new LocalClient
-        {
-            Name = name,
-            Player = null
-        };
-
-        _eventQueue.Push(new Event
-        {
-            EventType = EventType.ClientConnected,
-            Client = client
-        });
-
-        return client;
-    }
-
-    public void Leave(IClient client)
-    {
-        _eventQueue.Push(new Event
-        {
-            EventType = EventType.ClientDisconnected,
-            Client = client
-        });
+        _eventQueue.Push(@event);
     }
 
     public ServerState State { get; private set; } = ServerState.Stopped;

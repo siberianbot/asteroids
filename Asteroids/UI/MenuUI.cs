@@ -31,7 +31,7 @@ public class MenuUI : ClientUI
                     SceneName = Constants.Scenes.PlayableDemo
                 });
 
-                _engine.Client = _engine.Server!.Join("Asteroids Player");
+                _engine.Client.Join(_engine.Server);
 
                 _engine.Vars.SetVar(Constants.Vars.ClientUIShowPlayerStats, true);
 
