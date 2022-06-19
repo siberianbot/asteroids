@@ -9,16 +9,15 @@ namespace Asteroids.Server;
 
 public class LocalServer : IServer
 {
+    private readonly EventQueue _eventQueue = new EventQueue();
     private readonly ControllersCollection _controllers = new ControllersCollection();
     private readonly Vars _vars;
-    private readonly EventQueue _eventQueue;
     private readonly Thread _serverThread;
     private readonly List<IClient> _clients = new List<IClient>();
     private bool _alive;
 
-    public LocalServer(EventQueue eventQueue, Vars vars)
+    public LocalServer(Vars vars)
     {
-        _eventQueue = eventQueue;
         _vars = vars;
         _serverThread = new Thread(ServerFunc);
     }

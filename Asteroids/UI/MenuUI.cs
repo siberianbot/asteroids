@@ -25,13 +25,13 @@ public class MenuUI : ClientUI
         {
             if (ImGui.Button("New Game", new Vector2(-1f, 40f)))
             {
-                _engine.EventQueue.Push(new Event
+                _engine.Client.JoinServer(_engine.Server);
+
+                _engine.Client.PushEvent(new Event
                 {
                     EventType = EventType.SceneChange,
                     SceneName = Constants.Scenes.PlayableDemo
                 });
-
-                _engine.Client.Join(_engine.Server);
 
                 _engine.Vars.SetVar(Constants.Vars.ClientUIShowPlayerStats, true);
 

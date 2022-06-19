@@ -27,11 +27,16 @@ public class LocalClient : IClient
         get => _server != null;
     }
 
-    public void Join(IServer server)
+    public void JoinServer(IServer server)
     {
+        if (_server != null)
+        {
+            LeaveServer();
+        }
+
         _server = server;
 
-        _server.Push(new Event
+        PushEvent(new Event
         {
             EventType = EventType.ClientConnected,
             Client = this,
@@ -39,19 +44,30 @@ public class LocalClient : IClient
         });
     }
 
-    public void Leave()
+    public void LeaveServer()
     {
         if (_server == null)
         {
             return;
         }
 
-        _server.Push(new Event
+        PushEvent(new Event
         {
             EventType = EventType.ClientDisconnected,
             Client = this
         });
 
         _server = null;
+    }
+
+    public void PushEvent(Event @event)
+    {
+        if (_server == null)
+        {
+            // TODO: I don't know what to do there
+            throw new NotImplementedException();
+        }
+
+        _server.Push(@event);
     }
 }

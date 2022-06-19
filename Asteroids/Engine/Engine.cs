@@ -13,7 +13,7 @@ public sealed class Engine : IDisposable
     {
         Viewport = new Viewport(this);
         Client = new LocalClient(Vars);
-        Server = new LocalServer(EventQueue, Vars);
+        Server = new LocalServer(Vars);
     }
 
     public void Run()
@@ -32,85 +32,83 @@ public sealed class Engine : IDisposable
         InputProcessor.OnKeyPress(Key.Tab, () => Vars.SetVar(Constants.Vars.ClientUIShowScoreboard, true));
         InputProcessor.OnKeyRelease(Key.Tab, () => Vars.SetVar(Constants.Vars.ClientUIShowScoreboard, false));
 
-        InputProcessor.OnKeyPress(Key.Up, () => EventQueue.Push(new Event
+        InputProcessor.OnKeyPress(Key.Up, () => Client.PushEvent(new Event
         {
             EventType = EventType.ClientAction,
             Client = Client,
             ClientAction = ClientAction.Accelerate,
             ClientActionState = ClientActionState.Enable
         }));
-        InputProcessor.OnKeyRelease(Key.Up, () => EventQueue.Push(new Event
+        InputProcessor.OnKeyRelease(Key.Up, () => Client.PushEvent(new Event
         {
             EventType = EventType.ClientAction,
             Client = Client,
             ClientAction = ClientAction.Accelerate,
             ClientActionState = ClientActionState.Disable
         }));
-        InputProcessor.OnKeyPress(Key.Down, () => EventQueue.Push(new Event
+        InputProcessor.OnKeyPress(Key.Down, () => Client.PushEvent(new Event
         {
             EventType = EventType.ClientAction,
             Client = Client,
             ClientAction = ClientAction.Decelerate,
             ClientActionState = ClientActionState.Enable
         }));
-        InputProcessor.OnKeyRelease(Key.Down, () => EventQueue.Push(new Event
+        InputProcessor.OnKeyRelease(Key.Down, () => Client.PushEvent(new Event
         {
             EventType = EventType.ClientAction,
             Client = Client,
             ClientAction = ClientAction.Decelerate,
             ClientActionState = ClientActionState.Disable
         }));
-        InputProcessor.OnKeyPress(Key.Left, () => EventQueue.Push(new Event
+        InputProcessor.OnKeyPress(Key.Left, () => Client.PushEvent(new Event
         {
             EventType = EventType.ClientAction,
             Client = Client,
             ClientAction = ClientAction.TurnLeft,
             ClientActionState = ClientActionState.Enable
         }));
-        InputProcessor.OnKeyRelease(Key.Left, () => EventQueue.Push(new Event
+        InputProcessor.OnKeyRelease(Key.Left, () => Client.PushEvent(new Event
         {
             EventType = EventType.ClientAction,
             Client = Client,
             ClientAction = ClientAction.TurnLeft,
             ClientActionState = ClientActionState.Disable
         }));
-        InputProcessor.OnKeyPress(Key.Right, () => EventQueue.Push(new Event
+        InputProcessor.OnKeyPress(Key.Right, () => Client.PushEvent(new Event
         {
             EventType = EventType.ClientAction,
             Client = Client,
             ClientAction = ClientAction.TurnRight,
             ClientActionState = ClientActionState.Enable
         }));
-        InputProcessor.OnKeyRelease(Key.Right, () => EventQueue.Push(new Event
+        InputProcessor.OnKeyRelease(Key.Right, () => Client.PushEvent(new Event
         {
             EventType = EventType.ClientAction,
             Client = Client,
             ClientAction = ClientAction.TurnRight,
             ClientActionState = ClientActionState.Disable
         }));
-        InputProcessor.OnKeyPress(Key.Z, () => EventQueue.Push(new Event
+        InputProcessor.OnKeyPress(Key.Z, () => Client.PushEvent(new Event
         {
             EventType = EventType.ClientAction,
             Client = Client,
             ClientAction = ClientAction.Stop,
             ClientActionState = ClientActionState.Enable
         }));
-        InputProcessor.OnKeyRelease(Key.Z, () => EventQueue.Push(new Event
+        InputProcessor.OnKeyRelease(Key.Z, () => Client.PushEvent(new Event
         {
             EventType = EventType.ClientAction,
             Client = Client,
             ClientAction = ClientAction.Stop,
             ClientActionState = ClientActionState.Disable
         }));
-        InputProcessor.OnKeyPress(Key.Space, () => EventQueue.Push(new Event
+        InputProcessor.OnKeyPress(Key.Space, () => Client.PushEvent(new Event
         {
             EventType = EventType.ClientAction,
             Client = Client,
             ClientAction = ClientAction.Fire,
             ClientActionState = ClientActionState.Enable
         }));
-
-        EventQueue.Push(new Event { EventType = EventType.EngineReady });
 
         Viewport.Run();
 
@@ -122,8 +120,6 @@ public sealed class Engine : IDisposable
     public Vars Vars { get; } = new Vars();
 
     public UIContainer UIContainer { get; } = new UIContainer();
-
-    public EventQueue EventQueue { get; } = new EventQueue();
 
     public InputProcessor InputProcessor { get; } = new InputProcessor();
 

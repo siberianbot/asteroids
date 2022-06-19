@@ -1,3 +1,4 @@
+using Asteroids.Engine;
 using Asteroids.Entities;
 
 namespace Asteroids.Server;
@@ -12,7 +13,9 @@ public interface IClient
 
     bool IsJoined { get; }
 
-    void Join(IServer server);
+    void JoinServer(IServer server);
 
-    void Leave();
+    void LeaveServer();
+
+    void PushEvent(Event @event);
 }

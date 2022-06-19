@@ -75,7 +75,6 @@ public class Viewport : IDisposable
     {
         _imguiController.Value.Update((float)delta);
 
-        _engine.EventQueue.ExecutePending();
         _engine.InputProcessor.ExecutePending();
         _engine.UIContainer.Update();
     }
